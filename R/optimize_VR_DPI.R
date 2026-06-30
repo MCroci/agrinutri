@@ -177,29 +177,53 @@ optimize_VR_DPI <- function(field_inputs,
   eonr <- matrix(NA_real_, nrow = n_cells, ncol = 3L,
                  dimnames = list(NULL, c("N", "P", "K")))
 
+  # The QUEFTS economic optimisation (Rquefts::optApp, an LP solved via limSolve)
+  # can fail for an individual cell when the NNI-scaled attainable biomass drives
+  # the solver into a degenerate or infeasible state. A single bad cell must not
+  # abort the whole field prescription, so each cell is evaluated defensively and
+  # left as NA on failure (mirroring the tryCatch already used for fertApp()).
   for (i in seq_len(n_cells)) {
-    biom_i <- nfert_to_quefts_biom(
-      field_inputs$expected_yield_tons_ha,
-      nni_v[i],
-      crop_pars
-    )
-    qm <- Rquefts::quefts(
-      soil_pars,
-      crop_pars,
-      list(N = 0, P = 0, K = 0),
-      biom_i
-    )
-    res <- Rquefts::optApp(
-      qm,
-      fertilizers = fert_opt,
-      dm_crop_value = dm_crop_value
-    )
-    eonr[i, "N"] <- as.numeric(res$N) * 100
-    eonr[i, "P"] <- as.numeric(res$P) * 100
-    eonr[i, "K"] <- as.numeric(res$K) * 100
+    cell <- tryCatch({
+      biom_i <- nfert_to_quefts_biom(
+        field_inputs$expected_yield_tons_ha,
+        nni_v[i],
+        crop_pars
+      )
+      qm <- Rquefts::quefts(
+        soil_pars,
+        crop_pars,
+        list(N = 0, P = 0, K = 0),
+        biom_i
+      )
+      res <- Rquefts::optApp(
+        qm,
+        fertilizers = fert_opt,
+        dm_crop_value = dm_crop_value
+      )
+      c(
+        N = as.numeric(res$N)[1L] * 100,
+        P = as.numeric(res$P)[1L] * 100,
+        K = as.numeric(res$K)[1L] * 100
+      )
+    }, error = function(e) c(N = NA_real_, P = NA_real_, K = NA_real_))
+    eonr[i, ] <- cell
   }
 
   N_cap_cell <- pmin(N_tot_field * w_norm, N_MAS)
+
+  # Cells whose economic optimum could not be computed fall back to the
+  # regulatory balance cap, so the prescription stays complete and mass-balanced
+  # even when the optional QUEFTS optimiser misbehaves on some cells/platforms.
+  failed <- !is.finite(eonr[, "N"])
+  if (any(failed)) {
+    warning(sprintf(
+      paste0("optimize_VR_DPI(): QUEFTS economic optimisation failed for %d of ",
+             "%d cell(s); using the DPI balance cap for those cell(s)."),
+      sum(failed), n_cells
+    ), call. = FALSE)
+    eonr[failed, "N"] <- N_cap_cell[failed]
+  }
+
   N_cell <- pmin(eonr[, "N"], N_cap_cell)
 
   # --- Mass-balance projection on field mean ------------------------------

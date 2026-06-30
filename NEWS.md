@@ -1,5 +1,27 @@
 # NFert News
 
+## Version 0.14.1 (2026-06-30) — Robust QUEFTS optimisation + cleaner build
+
+### Fixes
+
+* `optimize_VR_DPI()` no longer aborts the whole field prescription when the
+  optional QUEFTS economic optimiser (`Rquefts::optApp()`, solved via
+  **limSolve**) fails on an individual cell. Each cell's optimisation is now
+  evaluated defensively; cells that cannot be solved fall back to the DPI
+  regulatory balance cap (with a single summarising warning) so the returned
+  rasters stay complete and mass-balanced. This also fixes the CI test
+  `test-optimize_VR_DPI.R`, which runs the optimiser only on macOS/Linux
+  (it is skipped on Windows because some `Rquefts::optApp` builds segfault
+  there), where a per-cell solver failure was failing `R-CMD-check` and
+  `test-coverage` on the Unix runners while Windows stayed green.
+
+### Build
+
+* `.Rbuildignore` now excludes stray top-level `*.pdf` files (e.g. the bundled
+  reprint `1-s2.0-S2772375526002674-main.pdf`) from the package tarball,
+  removing the "non-standard files at top level" `R CMD check` NOTE and trimming
+  the build size.
+
 ## Version 0.13.3 (2026-05-09) — Forg aligned with DPI when texture omitted
 
 ### Fixes
