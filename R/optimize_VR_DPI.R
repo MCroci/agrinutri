@@ -212,30 +212,48 @@ optimize_VR_DPI <- function(field_inputs,
     eonr[i, ] <- cell
   }
 
-  N_cap_cell <- pmin(N_tot_field * w_norm, N_MAS)
+  # --- Field target and NNI redistribution (mass-balance constraint) -------
+  # Semantics: the economic optimum sets the applied field level, the regulatory
+  # budget (DPI dose, MAS, ZVN) is a CEILING and not a target, and the NNI weights
+  # redistribute that level in space. The applied field mean is therefore the
+  # economic optimum, capped by the regulatory budget only where the latter binds.
 
   # Cells whose economic optimum could not be computed fall back to the
-  # regulatory balance cap, so the prescription stays complete and mass-balanced
-  # even when the optional QUEFTS optimiser misbehaves on some cells/platforms.
+  # regulatory field budget, so the field mean stays defined even when the
+  # optional QUEFTS optimiser fails on some cells/platforms.
   failed <- !is.finite(eonr[, "N"])
   if (any(failed)) {
     warning(sprintf(
       paste0("optimize_VR_DPI(): QUEFTS economic optimisation failed for %d of ",
-             "%d cell(s); using the DPI balance cap for those cell(s)."),
+             "%d cell(s); using the DPI budget for those cell(s)."),
       sum(failed), n_cells
     ), call. = FALSE)
-    eonr[failed, "N"] <- N_cap_cell[failed]
+    eonr[failed, "N"] <- N_tot_field
   }
 
-  N_cell <- pmin(eonr[, "N"], N_cap_cell)
+  eonr_mean_N     <- mean(eonr[, "N"])
+  regulatory_bind <- eonr_mean_N > N_tot_field
+  # The regulatory budget can be zero or negative when organic inputs already
+  # meet (or exceed) crop demand: in that case no mineral N is applied.
+  N_field_target  <- max(0, min(eonr_mean_N, N_tot_field))
 
-  # --- Mass-balance projection on field mean ------------------------------
+  # Redistribute the field target by the NNI weights (mean(w_norm) == 1, so the
+  # field mean is preserved), then water-fill to respect the per-cell MAS ceiling
+  # and non-negativity while holding the target field sum.
+  target_sum <- N_field_target * n_cells
+  N_cell <- N_field_target * w_norm
   for (.iter in seq_len(max_iter)) {
-    delta <- N_tot_field - mean(N_cell)
-    if (abs(delta) < tol) break
-    step <- delta * w_norm * min(1, 0.8 / max(w_norm))
-    N_cell <- pmax(0, pmin(N_cell + step, pmin(N_MAS, N_cap_cell)))
+    over  <- N_cell > N_MAS
+    under <- N_cell < 0
+    N_cell[over]  <- N_MAS
+    N_cell[under] <- 0
+    free    <- !(over | under)
+    sw      <- sum(w_norm[free])
+    deficit <- target_sum - sum(N_cell)
+    if (!any(free) || sw <= 0 || abs(deficit) < tol * n_cells) break
+    N_cell[free] <- N_cell[free] + deficit * w_norm[free] / sw
   }
+  N_cell <- pmax(0, pmin(N_cell, N_MAS))
 
   # --- fertApp (optional) --------------------------------------------------
   nutrients <- data.frame(
@@ -284,19 +302,22 @@ optimize_VR_DPI <- function(field_inputs,
     K_prescription = K_rast,
     fertilizer_mix = mix,
     economics = list(
-      mean_dose    = mean(N_cell),
-      p_y          = p_y,
+      mean_dose     = mean(N_cell),
+      eonr_mean_N   = eonr_mean_N,
+      p_y           = p_y,
       dm_eur_per_kg = dm_crop_value
     ),
     compliance = list(
-      DPI_cap_kg_ha   = N_tot_DPI,
-      MAS_kg_ha       = if (is.finite(N_MAS)) N_MAS else NA_real_,
-      ZVN_active      = isTRUE(zvn),
-      ZVN_cap_kg_ha   = if (isTRUE(zvn)) 170 else NA_real_,
-      applied_cap_kg_ha = N_tot_field,
-      mass_balance_ok = abs(mean(N_cell) - N_tot_field) < max(tol, 0.05),
-      max_cell_N      = max(N_cell),
-      mean_field_N    = mean(N_cell)
+      DPI_cap_kg_ha      = N_tot_DPI,
+      MAS_kg_ha          = if (is.finite(N_MAS)) N_MAS else NA_real_,
+      ZVN_active         = isTRUE(zvn),
+      ZVN_cap_kg_ha      = if (isTRUE(zvn)) 170 else NA_real_,
+      applied_cap_kg_ha  = N_tot_field,
+      field_target_kg_ha = N_field_target,
+      regulatory_binding = regulatory_bind,
+      mass_balance_ok    = abs(mean(N_cell) - N_field_target) < max(tol, 0.05),
+      max_cell_N         = max(N_cell),
+      mean_field_N       = mean(N_cell)
     )
   )
 }

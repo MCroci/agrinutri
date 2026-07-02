@@ -19,6 +19,16 @@
   so a single failed cell falls back to the DPI balance cap (with one summarising
   warning) instead of aborting the whole prescription.
 
+* `optimize_VR_DPI()` redistribution now preserves the field mean. The economic
+  optimum sets the applied field level, the regulatory budget (DPI dose, MAS, ZVN)
+  acts as a ceiling rather than a forced target, and the NNI weights redistribute
+  that level in space with a water-filling clip to the per-cell MAS limit, so
+  `compliance$mass_balance_ok` holds. New reporting fields: `economics$eonr_mean_N`
+  (unconstrained economic optimum), `compliance$field_target_kg_ha` (applied field
+  mean) and `compliance$regulatory_binding` (whether the ceiling bound). A zero or
+  negative regulatory budget (organic inputs already meeting crop demand) now
+  yields a zero mineral-N prescription.
+
 ### Build
 
 * `.Rbuildignore` now excludes stray top-level `*.pdf` files (e.g. the bundled
