@@ -157,7 +157,9 @@ optimize_VR_DPI <- function(field_inputs,
     stop("fertilizers must contain price_kg (EUR/kg) for fertApp().", call. = FALSE)
   }
 
-  fert_opt <- fertilizers[, c("name", "N", "P", "K"), drop = FALSE]
+  # optApp() validates and optimises fertilizer cost, so it requires the
+  # price_kg column in addition to name, N, P, K (percentage nutrient contents).
+  fert_opt <- fertilizers[, c("name", "N", "P", "K", "price_kg"), drop = FALSE]
 
   # --- QUEFTS crop & soil --------------------------------------------------
   if (is.null(crop_params)) {
@@ -177,11 +179,12 @@ optimize_VR_DPI <- function(field_inputs,
   eonr <- matrix(NA_real_, nrow = n_cells, ncol = 3L,
                  dimnames = list(NULL, c("N", "P", "K")))
 
-  # The QUEFTS economic optimisation (Rquefts::optApp, an LP solved via limSolve)
-  # can fail for an individual cell when the NNI-scaled attainable biomass drives
-  # the solver into a degenerate or infeasible state. A single bad cell must not
-  # abort the whole field prescription, so each cell is evaluated defensively and
-  # left as NA on failure (mirroring the tryCatch already used for fertApp()).
+  # The QUEFTS economic optimisation (Rquefts::optApp, a cost optimisation over
+  # the fertilizer set) can still fail for an individual cell when the NNI-scaled
+  # attainable biomass drives the optimiser into a degenerate state. A single bad
+  # cell must not abort the whole field prescription, so each cell is evaluated
+  # defensively and left as NA on failure (mirroring the tryCatch used for
+  # fertApp()). optApp() returns the applied N, P and K already in kg/ha.
   for (i in seq_len(n_cells)) {
     cell <- tryCatch({
       biom_i <- nfert_to_quefts_biom(
@@ -201,9 +204,9 @@ optimize_VR_DPI <- function(field_inputs,
         dm_crop_value = dm_crop_value
       )
       c(
-        N = as.numeric(res$N)[1L] * 100,
-        P = as.numeric(res$P)[1L] * 100,
-        K = as.numeric(res$K)[1L] * 100
+        N = as.numeric(res$N)[1L],
+        P = as.numeric(res$P)[1L],
+        K = as.numeric(res$K)[1L]
       )
     }, error = function(e) c(N = NA_real_, P = NA_real_, K = NA_real_))
     eonr[i, ] <- cell

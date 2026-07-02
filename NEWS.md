@@ -1,19 +1,23 @@
 # NFert News
 
-## Version 0.14.1 (2026-06-30) — Robust QUEFTS optimisation + cleaner build
+## Version 0.14.1 (2026-06-30) — QUEFTS coupling fixed + cleaner build
 
 ### Fixes
 
-* `optimize_VR_DPI()` no longer aborts the whole field prescription when the
-  optional QUEFTS economic optimiser (`Rquefts::optApp()`, solved via
-  **limSolve**) fails on an individual cell. Each cell's optimisation is now
-  evaluated defensively; cells that cannot be solved fall back to the DPI
-  regulatory balance cap (with a single summarising warning) so the returned
-  rasters stay complete and mass-balanced. This also fixes the CI test
-  `test-optimize_VR_DPI.R`, which runs the optimiser only on macOS/Linux
-  (it is skipped on Windows because some `Rquefts::optApp` builds segfault
-  there), where a per-cell solver failure was failing `R-CMD-check` and
-  `test-coverage` on the Unix runners while Windows stayed green.
+* `optimize_VR_DPI()`: fixed two bugs that stopped the optional QUEFTS
+  economic-optimum coupling from running at all. (1) The fertilizer table passed
+  to `Rquefts::optApp()` dropped the `price_kg` column that `optApp()` requires,
+  so the call errored on every cell. This was the root cause of the `R-CMD-check`
+  and `test-coverage` failures on the Unix runners: the integration test in
+  `test-optimize_VR_DPI.R` runs the optimiser only on macOS and Linux (it is
+  skipped on Windows because some `Rquefts::optApp` builds segfault there), so the
+  deterministic error failed the Unix jobs while Windows stayed green. The table
+  now carries `price_kg`. (2) `optApp()` returns the applied N, P and K already in
+  kg per ha, but the per-cell rates were multiplied by 100, inflating the economic
+  optimum and the P2O5 and K2O prescription rasters by two orders of magnitude;
+  the factor is removed. As added robustness, each cell's optimisation is wrapped
+  so a single failed cell falls back to the DPI balance cap (with one summarising
+  warning) instead of aborting the whole prescription.
 
 ### Build
 
