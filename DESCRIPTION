@@ -1,12 +1,11 @@
 Package: NFert
 Title: N, P and K Fertilization Following Emilia-Romagna DPI 2026
-Version: 0.14.1
+Version: 0.14.2
 URL: https://github.com/mcroci/NFert, https://mcroci.github.io/NFert/
 BugReports: https://github.com/mcroci/NFert/issues
 Authors@R:
     c(
         person("Michele", "Croci", email = "michele.croci@unicatt.it", role = c("aut", "cre")),
-        person("Giorgio", "Impollonia", role = "aut"),
         person("Andrea", "Ferrarini", role = "aut"),
         person("Andrea", "Fiorini", role = "aut"),
         person("Manuele", "Ragazzi", role = "aut"),

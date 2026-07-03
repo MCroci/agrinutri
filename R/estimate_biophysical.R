@@ -15,10 +15,21 @@
 #' simulations and are distributed as \code{*.json} files.
 #'
 #' @section Inputs and outputs:
-#' The S2 raster is expected to store DN values with the ESA L2A convention
-#' (offset \code{-1000}, scale \code{10000}). By default the function applies
-#' this rescaling; pass \code{apply_offset = FALSE} if the raster is already
-#' in surface-reflectance units (0-1.5).
+#' The S2 raster is expected to store surface reflectance scaled by
+#' \code{scale} (default \code{10000}), i.e. reflectance = DN / scale in the
+#' 0-1.5 range. This "harmonized" / offset-applied convention is shared with
+#' \code{\link{compute_vi}}, matches the bundled example scenes and most
+#' analysis-ready L2A products (Copernicus harmonized, Google Earth Engine
+#' \code{HARMONIZED}, sen2r), and is the reflectance range the bundled GPR
+#' models were trained on (per-band training means 0.04-0.41). Accordingly
+#' \strong{no additive offset is applied by default} (\code{apply_offset =
+#' FALSE}). Only for \emph{raw} Processing Baseline 04.00+ L2A DN, where the
+#' \code{BOA_ADD_OFFSET} of -1000 has not yet been applied, set
+#' \code{apply_offset = TRUE} (with \code{offset = -1000}) so the function
+#' computes reflectance = (DN + offset) / scale. Getting this wrong shifts
+#' every band by ~0.1 reflectance and can drive all pixels out of the valid
+#' range, in which case the GPR returns empty (all-\code{NA}) maps; the
+#' function warns when most valid pixels fall outside 0-1.5.
 #'
 #' One GeoTIFF is written per requested variable (plus an \code{_unc.tif}
 #' file with prediction standard deviation for variables whose model exposes
@@ -47,10 +58,17 @@
 #' @param variables Character vector. Any subset of \code{c("LAI", "Cm",
 #'   "Cw", "FVC", "Cab", "laiCab", "CNC_Cab", "CNC_Cprot")}.
 #' @param model_dir Directory containing the \code{*.json} GPR model files.
-#' @param apply_offset Logical. If \code{TRUE} (default) the raster is
-#'   shifted by \code{offset} and divided by \code{scale} before inference.
-#' @param offset,scale Radiometric conversion from DN to surface reflectance.
-#'   Defaults match ESA S2 L2A processor baseline 04.00 onwards.
+#' @param apply_offset Logical. If \code{TRUE} the raster is shifted by
+#'   \code{offset} before being divided by \code{scale}. Default \code{FALSE}:
+#'   the input is treated as offset-applied reflectance (reflectance = DN /
+#'   scale), matching \code{\link{compute_vi}} and the bundled scenes. Set
+#'   \code{TRUE} only for raw baseline-04.00 L2A DN (see the Inputs and
+#'   outputs section).
+#' @param offset,scale Radiometric conversion from DN to surface reflectance:
+#'   reflectance = (DN + offset) / scale when \code{apply_offset = TRUE}, else
+#'   DN / scale. \code{offset = -1000} matches the ESA S2 L2A processor
+#'   baseline 04.00 \code{BOA_ADD_OFFSET} and is only used when
+#'   \code{apply_offset = TRUE}.
 #' @param nodata_in Integer. Pixel value treated as nodata in the input.
 #' @param block_rows Integer. Number of rows processed per chunk; tune to
 #'   available RAM (512 is safe on 8 GB machines).
@@ -90,7 +108,7 @@ estimate_biophysical <- function(
   variables    = c("LAI", "Cm", "Cw", "FVC", "Cab", "laiCab",
                    "CNC_Cab", "CNC_Cprot"),
   model_dir    = NULL,
-  apply_offset = TRUE,
+  apply_offset = FALSE,
   offset       = -1000,
   scale        = 10000,
   nodata_in    = 0,
@@ -161,6 +179,12 @@ estimate_biophysical <- function(
     for (w_ in writers) try(terra::writeStop(w_), silent = TRUE)
   }, add = TRUE)
 
+  # Track how many genuine (non-nodata) data pixels get dropped by the
+  # reflectance range guard, to warn about scale/offset mismatches that would
+  # otherwise silently return empty maps.
+  n_data_px  <- 0L
+  n_range_px <- 0L
+
   row_starts <- seq(1, H, by = block_rows)
   for (rs in row_starts) {
     nr <- min(block_rows, H - rs + 1)
@@ -176,6 +200,10 @@ estimate_biophysical <- function(
     cube <- cube / scale
 
     bad <- apply(cube < 0 | cube > 1.5, 1, any, na.rm = TRUE)
+    # Count range failures only among genuine data pixels (nodata pixels are
+    # legitimately masked and must not inflate the mismatch diagnostic).
+    n_data_px  <- n_data_px  + sum(!nodata_mask)
+    n_range_px <- n_range_px + sum(bad & !nodata_mask)
     nodata_mask <- nodata_mask | bad
     cube[nodata_mask, ] <- 0
 
@@ -197,6 +225,20 @@ estimate_biophysical <- function(
   # flushed and closed).
   for (w_ in writers) terra::writeStop(w_)
   writers <- list()
+
+  # If most valid pixels fell outside 0-1.5 reflectance, the DN scaling is
+  # almost certainly wrong (e.g. apply_offset set the wrong way for the
+  # product's baseline). Surface this instead of silently returning empty maps.
+  if (n_data_px > 0L && n_range_px > 0.5 * n_data_px)
+    warning(sprintf(
+      paste0("%.0f%% of valid pixels fell outside the 0-1.5 reflectance ",
+             "range and were masked; the output maps may be largely empty. ",
+             "This usually means a DN scaling mismatch: check `scale` (=%g) ",
+             "and `apply_offset` (=%s, offset=%g). The bundled and most ",
+             "analysis-ready L2A scenes are offset-applied reflectance and ",
+             "need apply_offset = FALSE."),
+      100 * n_range_px / n_data_px, scale, apply_offset, offset),
+      call. = FALSE)
 
   # Return loaded SpatRasters keyed exactly like `out_paths`, keeping the
   # on-disk file paths on the `paths` attribute.

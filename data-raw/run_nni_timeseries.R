@@ -60,7 +60,7 @@ nni_timeseries <- function(field_dir,
                            fvc_mask     = TRUE,
                            fvc_min      = NULL,    # NULL = use crop default
                            w_min        = NULL,    # NULL = use crop default
-                           apply_offset = TRUE,    # L2A baseline 04+ default
+                           apply_offset = FALSE,   # offset-applied reflectance
                            scale        = 10000,   # change to 1 for float
                            nodata_in    = 0,
                            pattern      = "^S2_.*\\.tif$",

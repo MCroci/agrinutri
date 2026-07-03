@@ -153,7 +153,6 @@ vignette("NFert")
 
 - Michele Croci (maintainer)
 - Manuele Ragazzi
-- Giorgio Impollonia
 - Stefano Amaducci
 
 ## Citation

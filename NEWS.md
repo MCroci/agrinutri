@@ -1,5 +1,31 @@
 # NFert News
 
+## Version 0.14.2 (2026-07-03) — Sentinel-2 biophysical scaling fixed
+
+### Fixes
+
+* `estimate_biophysical()`: the default reflectance scaling no longer applies
+  the Baseline-04.00 `BOA_ADD_OFFSET` (`apply_offset` now defaults to `FALSE`).
+  The bundled scenes — and most analysis-ready L2A products (Copernicus
+  harmonized, Google Earth Engine `HARMONIZED`, sen2r) — already store
+  offset-applied surface reflectance × 10000, which is the 0–1 range the bundled
+  GPR models were trained on (per-band training means 0.04–0.41) and the same
+  convention `compute_vi()` uses. The old `apply_offset = TRUE` default
+  subtracted an extra 1000 DN (~0.1 reflectance): on the CERZOO silage-maize
+  scene it drove every visible-band pixel negative, so the `[0, 1.5]` range
+  guard masked the whole field and `estimate_biophysical()` returned an all-`NA`
+  LAI, which made `compute_NNI_from_S2()` produce an empty NNI map. With the
+  corrected default the CERZOO scene now retrieves a plausible LAI (median
+  ~3.5), FVC (~0.73) and a fully populated NNI map (median ~1.1). Users feeding
+  *raw* Baseline-04.00 L2A DN must now pass `apply_offset = TRUE` explicitly.
+
+* `estimate_biophysical()` now warns when more than half of the valid (non-
+  nodata) pixels fall outside the 0–1.5 reflectance range, which points to a
+  `scale`/`apply_offset` mismatch, instead of silently writing near-empty maps.
+
+* `data-raw/run_nni_timeseries.R`: its `apply_offset` default is aligned to
+  `FALSE` to match the corrected pipeline.
+
 ## Version 0.14.1 (2026-06-30) — QUEFTS coupling fixed + cleaner build
 
 ### Fixes

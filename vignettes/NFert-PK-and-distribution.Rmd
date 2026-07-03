@@ -1,6 +1,6 @@
 ---
 title: "N, P and K fertilization with NFert — DPI Emilia-Romagna 2026"
-author: "Michele Croci, Manuele Ragazzi, Giorgio Impollonia, Stefano Amaducci"
+author: "Michele Croci, Manuele Ragazzi, Stefano Amaducci"
 date: "`r format(Sys.Date(), '%B %Y')`"
 output:
   rmarkdown::html_vignette:
