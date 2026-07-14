@@ -24,17 +24,25 @@ order = [("Uniform", "Uniform"),
          ("NNI zones",             "NNI zones")]
 
 pubfig.set_style("elsevier", color=True)
-fig, axes = pubfig.new_figure(width="double", nrows=1, ncols=5, height_mm=78,
+fig, axes = pubfig.new_figure(width=118, nrows=2, ncols=3, height_mm=130,
                               journal="elsevier")
+try:
+    fig.get_layout_engine().set(wspace=0.0, hspace=0.04, w_pad=0.01, h_pad=0.02)
+except Exception:
+    pass
 norm = Normalize(vmin=165, vmax=235)
 cmap = "viridis"
-for ax, (name, title) in zip(axes.ravel(), order):
+flat = axes.ravel()
+for ax, (name, title) in zip(flat, order):
     sub = gdf[gdf["strategy"] == name]
     sub.plot(column="dose", ax=ax, cmap=cmap, norm=norm,
              edgecolor="0.55", linewidth=0.08)
     ax.set_title(title, pad=3)
     ax.set_aspect("equal")
     ax.set_axis_off()
+# hide any unused cells (5 panels in a 2x3 grid leaves one empty)
+for ax in flat[len(order):]:
+    ax.set_visible(False)
 
 sm = ScalarMappable(norm=norm, cmap=cmap); sm.set_array([])
 cbar = fig.colorbar(sm, ax=axes.ravel().tolist(), orientation="horizontal",

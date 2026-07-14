@@ -59,5 +59,6 @@ Suggests:
     xml2,
     spelling,
     Rquefts,
-    limSolve
+    limSolve,
+    geodata
 VignetteBuilder: knitr

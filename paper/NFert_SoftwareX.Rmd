@@ -5,8 +5,6 @@ author:
     affiliation: a
     email: michele.croci@unicatt.it
     corresponding: true
-  - name: Giorgio Impollonia
-    affiliation: a
   - name: Andrea Ferrarini
     affiliation: a
   - name: Andrea Fiorini
@@ -58,7 +56,7 @@ linestretch: 1.5
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, warning = FALSE, message = FALSE)
 ```
 
-**Michele Croci**^a,\*^, **Giorgio Impollonia**^a^, **Andrea Ferrarini**^a^, **Andrea Fiorini**^a^, **Manuele Ragazzi**^a^, **Nicolaj Franceschi**^a^, **Vincenzo Tabaglio**^a^, **Stefano Amaducci**^a^
+**Michele Croci**^a,\*^, **Andrea Ferrarini**^a^, **Andrea Fiorini**^a^, **Manuele Ragazzi**^a^, **Nicolaj Franceschi**^a^, **Vincenzo Tabaglio**^a^, **Stefano Amaducci**^a^
 
 ^a^ Department of Sustainable Crop Production (DI.PRO.VE.S.), Universita Cattolica del Sacro Cuore, via Emilia Parmense 84, 29122 Piacenza, Italy
 
