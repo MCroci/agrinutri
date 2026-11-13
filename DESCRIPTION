@@ -1,5 +1,5 @@
 Package: agrinutri
-Title: N, P and K Fertilization Following Emilia-Romagna DPI 2026
+Title: Nutrient Balances and Variable-Rate Fertilisation Planning
 Version: 1.0.1
 URL: https://github.com/mcroci/agrinutri, https://mcroci.github.io/agrinutri/
 BugReports: https://github.com/mcroci/agrinutri/issues
@@ -14,11 +14,13 @@ Authors@R:
         person("Vincenzo", "Tabaglio", role = "aut"),
         person("Stefano", "Amaducci", role = "aut")
     )
-Description: Calculates nitrogen, phosphorus (P2O5) and potassium (K2O) fertilization
-    requirements with the crop nutrient balance and the simplified
-    standard-dose methods of the Emilia-Romagna Integrated Production
-    Guidelines (Disciplinari di Produzione Integrata, DPI 2026), reproducing
-    the regional reference tool Fert_Office (v1.26). The nitrogen balance
+Description: Calculates nitrogen, phosphorus (P2O5) and potassium (K2O) fertilisation
+    requirements with crop nutrient balance and standard-dose methods, from
+    the field to the farm and to each pixel of soil maps. All coefficients are
+    editable data tables, so the balance can be re-parameterised for other
+    regional guidelines; the default parameterisation is that of the
+    Emilia-Romagna Integrated Production Guidelines (Disciplinari di
+    Produzione Integrata, DPI 2026) and its reference tool Fert_Office (v1.26). The nitrogen balance
     accounts for crop demand, soil supply, leaching, immobilization, previous
     crop residues, current and previous organic fertilization and natural
     deposition. The package also provides soil texture and chemistry

@@ -1,0 +1,6 @@
+{
+  "title": "agrinutri: Nutrient Balances and Variable-Rate Fertilisation Planning",
+  "upload_type": "software",
+  "license": "MIT",
+  "keywords": ["R package", "nutrient balance", "fertilisation planning", "variable-rate nitrogen", "precision agriculture", "Sentinel-2"]
+}
