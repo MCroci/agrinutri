@@ -12,11 +12,15 @@ link-citations: true
 
 # Abstract
 
-Regional nitrogen balances set legal fertiliser doses but are distributed as closed spreadsheets that compute one field at a time. agrinutri is an open-source R package that implements the nitrogen, phosphorus and potassium balance of the Emilia-Romagna Integrated Production Guidelines (DPI 2026), returns every balance term so that a dose can be audited, and keeps all coefficients as editable data. The balance runs per plot or per soil-map pixel, and a Sentinel-2 module turns the Nitrogen Nutrition Index into variable-rate prescriptions whose field mean equals the balance dose. In a Monte Carlo analysis on a real farm, soil-map error made the farm nitrogen total uncertain by less than 1 percent.
+Regional nitrogen balances set legal fertiliser doses but are distributed as closed spreadsheets that compute one field at a time. agrinutri is an open-source R package that implements the nitrogen, phosphorus and potassium balance of the Emilia-Romagna Integrated Production Guidelines (DPI 2026), returns every balance term for auditing and keeps all coefficients as editable data. The balance runs per plot or per soil-map pixel, and a Sentinel-2 module turns the Nitrogen Nutrition Index into variable-rate prescriptions that keep the balance dose. Examples cover a 10 ha maize field, a five-field farm and, as a scaling example, 17,332 fields of the Piacenza plain over 2019–2026.
 
 # Keywords
 
 R package; Nutrient balance; Fertilisation planning; Regulatory compliance; Precision agriculture; Sentinel-2
+
+```{=openxml}
+<w:p><w:r><w:br w:type="page"/></w:r></w:p>
+```
 
 # Code metadata
 
@@ -56,7 +60,7 @@ The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop d
 
 The main functionalities are grouped in Table 1.
 
-Table: Table 1. Main functionalities of agrinutri 1.0.0.
+Table: Table 1. Main functionalities of agrinutri 1.0.1.
 
 | Area | Functions |
 |------------|------------------------------------|
@@ -78,7 +82,7 @@ The variable-rate functions turn a vegetation index or NNI map into rates with a
 
 ## 2.3. Quality assurance
 
-Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edition) and Fert_Office differ, for example in the mineralisation rates of sandy soils and the immobilisation factors of poorly drained soils, agrinutri follows Fert_Office, the tool that inspections use, and its documentation lists the differences. The test suite (169 tests, 773 expectations, about 87 percent line coverage) covers every balance term, the regulatory checks, the exact mass balance of the prescriptions and the export formats, and runs on Windows, macOS and Linux through continuous integration.
+Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edition) and Fert_Office differ, for example in the mineralisation rates of sandy soils and the immobilisation factors of poorly drained soils, agrinutri follows Fert_Office, the tool that inspections use, and its documentation lists the differences. The test suite (169 tests, 776 expectations, about 87 percent line coverage) covers every balance term, the regulatory checks, the exact mass balance of the prescriptions and the export formats, and runs on Windows, macOS and Linux through continuous integration.
 
 # 3. Illustrative examples
 
@@ -125,7 +129,7 @@ export_prescription(rx, "TASKDATA", format = "isoxml")
 
 The median leaf area index is 3.7 and the median NNI 1.09. Of 977 pixels, 368 are in luxury consumption, 565 optimal and 44 deficient (Fig. 3). The NNI zones first set the cells to the upper bound (deficient), the target (optimal) or the lower bound (excessive). The mass-balance step then shifts the free cells so that the field mean is preserved: 8 deficient cells receive 226.8, 98 optimal cells (and 18 cells without a valid NNI) 201.3 and 50 excessive cells 161.0 kg N ha^−1^. The area-weighted mean of the 174 cells of 24 m × 30 m is 189.0 kg ha^−1^ (doses are rounded to 0.1 kg), so the redistribution follows the diagnosis while the field total stays at the balance dose.
 
-![Fig. 3. From a Sentinel-2 scene to a prescription for plot P01 of Fig. 2, a 10.2 ha maize field (13 August 2024): (a) leaf area index retrieved by Gaussian-process regression, (b) Nitrogen Nutrition Index (dashed lines on the colour bar: optimal band 0.9–1.1), (c) prescription on 24 m × 30 m cells driven by the NNI zones, with area-weighted mean equal to the balance dose of the plot (189 kg N ha^−1^).](figures/fig3_rs_prescription.pdf){width=100%}
+![Fig. 3. From a Sentinel-2 scene to a prescription for plot P01 of Fig. 2, a 10.2 ha maize field (13 August 2024): (a) leaf area index retrieved by Gaussian-process regression, (b) Nitrogen Nutrition Index (red: deficient, below 0.9; white: optimal, 0.9–1.1; blue: luxury consumption, above 1.1), (c) prescription on 24 m × 30 m cells driven by the NNI zones, with area-weighted mean equal to the balance dose of the plot (189 kg N ha^−1^).](figures/fig3_rs_prescription.pdf){width=100%}
 
 ## 3.4. Every method on the same farm
 

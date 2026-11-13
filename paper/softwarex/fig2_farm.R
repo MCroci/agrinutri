@@ -86,4 +86,4 @@ after ", tolower(lab$c2023)), lab$plot)) +
   labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand and losses (+)"), y = NULL) +
   theme_sat() + theme(legend.position = "top", legend.key.size = unit(2.5, "mm")) +
   guides(fill = guide_legend(nrow = 1))
-save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.15))), "fig2_farm", "double", 85)
+save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.15))), "fig2_farm", "double", 72)
