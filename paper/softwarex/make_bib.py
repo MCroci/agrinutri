@@ -18,7 +18,7 @@ EU2115 = r"""@misc{eu2021_2115,
 
 NFERT = r"""@misc{agrinutri2026,
   author = {Croci, Michele and Impollonia, Giorgio and Ferrarini, Andrea and Fiorini, Andrea and Ragazzi, Manuele and Franceschi, Nicolaj and Tabaglio, Vincenzo and Amaducci, Stefano},
-  title = {{agrinutri}: {N}, {P} and {K} Fertilization Following {Emilia-Romagna} {DPI} 2026. {R} package version 1.0.0},
+  title = {{agrinutri}: {N}, {P} and {K} Fertilization Following {Emilia-Romagna} {DPI} 2026. {R} package version 1.0.1},
   year = {2026},
   howpublished = {\url{https://github.com/mcroci/agrinutri}},
   note = {[Zenodo DOI to be added at release]}

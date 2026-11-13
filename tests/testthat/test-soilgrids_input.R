@@ -20,6 +20,7 @@ test_that("soilgrids_input returns a balance-ready stack (online)", {
   skip_on_cran()
   skip_if_not_installed("geodata")
   skip_if_not_installed("sf")
+  skip_if_not_installed("curl")   # skip_if_offline() needs curl
   skip_if_offline()
 
   aoi <- sf::st_as_sf(sf::st_sfc(

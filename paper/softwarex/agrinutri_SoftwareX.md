@@ -22,9 +22,9 @@ R package; Nutrient balance; Fertilisation planning; Regulatory compliance; Prec
 
 | Nr | Code metadata description | Metadata |
 |----|-----------------------|--------------------------------------|
-| C1 | Current code version | v1.0.0 |
+| C1 | Current code version | v1.0.1 |
 | C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/agrinutri |
-| C3 | Permanent link to reproducible capsule | [Zenodo DOI of the v1.0.0 release, to be added] |
+| C3 | Permanent link to reproducible capsule | [Zenodo DOI of the v1.0.1 release, to be added] |
 | C4 | Legal code license | MIT License |
 | C5 | Code versioning system used | git |
 | C6 | Software code languages, tools and services used | R |

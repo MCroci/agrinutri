@@ -1,5 +1,10 @@
 # agrinutri News
 
+## Version 1.0.1 (2026-11-13)
+
+* Test suite: the online SoilGrids test is skipped when the curl package is
+  not installed (it made R CMD check fail on CI). No change to the package code.
+
 ## Version 1.0.0: package renamed
 
 * The package formerly called NFert is now **agrinutri** (repository
