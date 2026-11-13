@@ -379,7 +379,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] terra_1.9-50    agrinutri_1.0.0
+#> [1] terra_1.9-50    agrinutri_1.0.1
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] cli_3.6.6         knitr_1.52        rlang_1.3.0       xfun_0.62        
