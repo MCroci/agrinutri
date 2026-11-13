@@ -4,7 +4,7 @@ bibliography: references.bib
 link-citations: true
 ---
 
-**Michele Croci**^a,\*^, **Giorgio Impollonia**^a^ [confirm affiliation], **Andrea Ferrarini**^a^, **Andrea Fiorini**^a^, **Manuele Ragazzi**^a^, **Nicolaj Franceschi**^a^, **Vincenzo Tabaglio**^a^, **Stefano Amaducci**^a^
+**Michele Croci**^a,\*^, **Giorgio Impollonia**^a^, **Andrea Ferrarini**^a^, **Andrea Fiorini**^a^, **Manuele Ragazzi**^a^, **Nicolaj Franceschi**^a^, **Vincenzo Tabaglio**^a^, **Stefano Amaducci**^a^
 
 ^a^ Department of Sustainable Crop Production (DI.PRO.VE.S.), Università Cattolica del Sacro Cuore, via Emilia Parmense 84, 29122 Piacenza, Italy
 
@@ -109,25 +109,23 @@ The returned object lists A = 186.6, B = 73.8, C = 0, D = 39.5 (including the �
 
 ## 3.3. From a satellite image to a machine file
 
-The package also ships a Sentinel-2 Level-2A scene of a 3.2 ha silage maize field at the CERZOO experimental farm near Piacenza (13 August 2024). A few calls go from the image to an ISOXML task file; here the target dose is set to 200 kg N ha^−1^, whereas in practice it is the balance dose of the field (`calculate_N_fertilization()`):
+A maize field of 10.2 ha in the Po plain near Piacenza, delineated from Sentinel-2 with Fields of The World [@kerner2024ftw], illustrates the remote-sensing chain on the Level-2A scene of 13 August 2024. A few calls go from the image to an ISOXML task file; here the target dose is set to 200 kg N ha^−1^, whereas in practice it is the balance dose of the field (`calculate_N_fertilization()`):
 
 ```r
-s2   <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "agrinutri")
-bio  <- estimate_biophysical(s2, output_dir = tempdir(),
-                             variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
-nni  <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
-                            crop = "maize", fvc = bio$FVC)
-farm <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"))
-rx   <- build_strip_prescription(farm[farm$id == 3, ], machine_width = 24,
-                                 cell_length = 30, variability = "nni",
-                                 nni_raster = nni$NNI, n_target = 200,
-                                 min_dose = 160, max_dose = 240)
+bio   <- estimate_biophysical("s2_20240813.tif", output_dir = tempdir(),
+                              variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
+nni   <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
+                             crop = "maize", fvc = bio$FVC)
+field <- sf::st_read("field.geojson")
+rx    <- build_strip_prescription(field, machine_width = 24, cell_length = 30,
+                                  variability = "nni", nni_raster = nni$NNI,
+                                  n_target = 200, min_dose = 160, max_dose = 240)
 export_prescription(rx, "TASKDATA", format = "isoxml")
 ```
 
-The median leaf area index is 3.6 and the median NNI 1.12. Of 329 pixels, 236 are in luxury consumption, 84 optimal and 9 deficient (Fig. 3). The NNI zones first set the cells to the upper bound (deficient), the target (optimal) or the lower bound (excessive). Because most of the field is in the excessive zone, the mass-balance step then raises the free cells: 5 deficient cells receive 240, 21 optimal cells (and 2 cells without a valid NNI) 230.4 and 36 excessive cells 184.3 kg N ha^−1^. The area-weighted mean of the 64 cells of 24 m × 30 m is 200.0 kg ha^−1^ (doses are rounded to 0.1 kg), so the redistribution follows the diagnosis while the field total stays at the target dose.
+The median leaf area index is 3.7 and the median NNI 1.09. Of 977 pixels, 368 are in luxury consumption, 565 optimal and 44 deficient (Fig. 3). The NNI zones first set the cells to the upper bound (deficient), the target (optimal) or the lower bound (excessive). The mass-balance step then shifts the free cells so that the field mean is preserved: 8 deficient cells receive 240, 98 optimal cells (and 18 cells without a valid NNI) 213.0 and 50 excessive cells 170.4 kg N ha^−1^. The area-weighted mean of the 174 cells of 24 m × 30 m is 200.0 kg ha^−1^ (doses are rounded to 0.1 kg), so the redistribution follows the diagnosis while the field total stays at the target dose.
 
-![Fig. 3. From a Sentinel-2 scene to a prescription for a 3.2 ha silage maize field (13 August 2024): (a) leaf area index retrieved by Gaussian-process regression, (b) Nitrogen Nutrition Index (dashed lines on the colour bar: optimal band 0.9–1.1), (c) prescription on 24 m × 30 m cells driven by the NNI zones, with area-weighted mean equal to the 200 kg N ha^−1^ target.](figures/fig3_rs_prescription.pdf){width=100%}
+![Fig. 3. From a Sentinel-2 scene to a prescription for a 10.2 ha maize field of the Piacenza plain (13 August 2024): (a) leaf area index retrieved by Gaussian-process regression, (b) Nitrogen Nutrition Index (dashed lines on the colour bar: optimal band 0.9–1.1), (c) prescription on 24 m × 30 m cells driven by the NNI zones, with area-weighted mean equal to the 200 kg N ha^−1^ target.](figures/fig3_rs_prescription.pdf){width=100%}
 
 ## 3.4. A province, year by year
 
@@ -141,13 +139,13 @@ The nitrogen requirement of the mapped fields, before any credit for current-yea
 
 agrinutri makes the Emilia-Romagna balance a reusable component instead of an end product.
 
-**New research questions.** Because the balance is a function rather than a set of spreadsheet cells, it can be called hundreds of thousands of times inside other analyses, which opens questions that cannot be asked of Fert_Office. One is how reliable a regulatory dose is when its soil inputs come from digital soil maps. On the CERZOO experimental farm, a different farm (eight maize and wheat fields, 32 ha), we propagated the errors of the clay, sand, organic carbon and total nitrogen maps through `N_balance()` by correlated Monte Carlo (100 draws on 866 pixels of 20 m). The per-pixel dose uncertainty was 3.3 percent, 95 percent (maize) and 96 percent (wheat) of it from soil texture. Because the map residuals showed no detectable spatial structure, the standard deviation of the farm nitrogen total was at most about 0.6 percent. Under the rainfall measured in 2024 to 2025, instead, the farm dose rose by 26 percent. The scripts of this analysis are in the repository (`paper/sat/`). Other questions of the same kind are how prescription methods compare when the field total is held constant, or how much variable-rate application can redistribute nitrogen without exceeding the plan.
+**New research questions.** Because the balance is a function rather than a set of spreadsheet cells, it can be called hundreds of thousands of times inside other analyses, which opens questions that cannot be asked of Fert_Office. Section 3.4 is one example: how the regulatory nitrogen requirement of a whole plain changes from year to year with the rainfall of the leaching terms, and how often the balance exceeds the crop maximum. Others are how much of the dose uncertainty comes from the soil maps that feed the balance, which can be propagated by drawing the soil inputs and re-running the balance; how prescription methods compare when the field total is held constant; or how much variable-rate application can redistribute nitrogen without exceeding the plan.
 
 **Existing questions, pursued better.** The balance can be computed for every plot of a farm, for several years or per pixel of soil maps, including the open SoilGrids layers [@poggio2021], in one script that can be re-run and shared. The regulatory dose is linked to in-season Sentinel-2 diagnosis and to variable-rate equipment under an explicit mass-balance constraint, so a sensor-driven map never changes the nitrogen total that the plan justifies. Since the coefficient tables are data, the machinery can be re-parameterised for other regional guidelines that use balance methods.
 
 **Daily practice.** For advisors, a plan becomes a script: a file of soil analyses and a field layer give the N, P and K balances, the MAS checks and the distribution plan for every plot in one run, and the version history records how each recommendation was obtained. For teaching, the package and its Shiny interface support the exercises of a precision-agriculture course [author to confirm course name, year and number of students], which go from the field balance to the export of a prescription map; students can see and change every term, which Fert_Office does not allow.
 
-**Quality of the reference itself.** Writing the balance as code brought to light differences between the printed tables of the guidelines and Fert_Office (Section 2.3), now documented, and the Monte Carlo stress test above found a cell of the texture triangle coded with a non-existent class, which is fixed in version 1.0.0 and covered by a test. An open, tested implementation thus also serves as a check on the regulatory scheme.
+**Quality of the reference itself.** Writing the balance as code brought to light differences between the printed tables of the guidelines and Fert_Office (Section 2.3), now documented, and a stress test that perturbed the soil inputs found a cell of the texture triangle coded with a non-existent class, which is fixed in version 1.0.0 and covered by a test. An open, tested implementation thus also serves as a check on the regulatory scheme.
 
 **Use.** agrinutri is public on GitHub with a documentation website and continuous integration on three operating systems, and passes the CRAN checks [author to add download or user figures, other publications or projects that use the package, and any commercial use, if available].
 
@@ -159,7 +157,7 @@ agrinutri is an open R implementation of the Emilia-Romagna DPI 2026 nutrient ba
 
 # Declaration of competing interest
 
-[Author to complete. Declare any relationship with providers of the soil or remote-sensing data used with the package.]
+[Author to complete.]
 
 # CRediT authorship contribution statement
 
@@ -171,14 +169,10 @@ agrinutri is an open R implementation of the Emilia-Romagna DPI 2026 nutrient ba
 
 # Data availability
 
-The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`) and the uncertainty analysis of Section 4 (`paper/sat/`) and the provincial application of Section 3.4 (`paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The CERZOO soil maps used in Section 4 come from a separate, proprietary mapping pipeline [author to state access conditions and credit]. The field boundaries and crop classes of Section 3.4 are distributed as aggregated results only; the regional soil maps, ERA5 and ISTAT data are public.
+The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 3.4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The field boundaries and crop classes of Sections 3.3 and 3.4 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and ISTAT data are public.
 
 # Acknowledgements
 
 The authors thank the Servizio Agricoltura Sostenibile of Regione Emilia-Romagna for publishing the DPI 2026 guidelines and the Fert_Office tool.
-
-# Funding
-
-This work was supported by the EOAGRITWIN project [grant number to be added].
 
 # References
