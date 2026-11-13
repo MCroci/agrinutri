@@ -1,9 +1,9 @@
 # Fig. 4 of the SoftwareX article: regulatory N requirement of the Piacenza plain, 2019-2026.
 # (a) N requirement of the mapped fields by crop and year, with the October-January rainfall;
-# (b) field dose in 2025. Run from the package root after a02:
+# (b) field dose in 2024, with the farm of Fig. 2 boxed. Run from the package root after a02:
 #   Rscript paper/softwarex/piacenza/a03_figure.R
 suppressMessages({ library(ggplot2); library(patchwork); library(sf) })
-source("paper/sat/theme_sat.R")
+source("paper/softwarex/theme_swx.R")
 HERE <- "paper/softwarex/piacenza"
 KW <- Sys.getenv("KWASI_DATA", "C:/Users/michele.croci/Desktop/kwasi-data")
 
@@ -29,13 +29,14 @@ pa <- ggplot(st, aes(factor(year), N_t / 1000, fill = crop)) + geom_col(width = 
   guides(fill = guide_legend(nrow = 2))
 
 tk <- readRDS(file.path(HERE, "data/tasks.rds"))
-d25 <- tk[tk$year == 2025 & is.finite(tk$dose), ]
+d25 <- tk[tk$year == 2024 & is.finite(tk$dose), ]
 d25 <- aggregate(cbind(Nw = dose * weight, weight) ~ i, d25, sum); d25$dose <- d25$Nw / d25$weight
 f <- st_read(file.path(KW, "uscita/consegna/crop_maps_shapefiles/crops_15classes.shp"), quiet = TRUE)
 f$dose <- NA_real_; f$dose[d25$i] <- d25$dose
 pb <- ggplot(f) + geom_sf(aes(fill = dose), colour = NA) +
   scale_fill_viridis_c(option = "mako", direction = -1, na.value = "grey85", limits = c(0, 300), oob = scales::squish,
-                       name = expression("N dose 2025 (kg N ha"^-1*")")) +
+                       name = expression("N dose 2024 (kg N ha"^-1*")")) +
+  geom_sf(data = st_as_sfc(st_bbox(st_buffer(f[f$id %in% read.csv("paper/softwarex/data/farm_2024_ids.csv")$id, ], 400))),
+          fill = NA, colour = OKABE[[6]], linewidth = 0.6) +
   map_furniture(st_bbox(f), len = 10000) + coord_sf(datum = NA, expand = FALSE) + theme_map() + cbar()
-save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.25))), "fig4_piacenza", "double", 95,
-         dir = "paper/softwarex/figures")
+save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.25))), "fig4_piacenza", "double", 95)

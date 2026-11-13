@@ -103,13 +103,13 @@ The returned object lists A = 186.6, B = 73.8, C = 0, D = 39.5 (including the �
 
 ## 3.2. A farm
 
-`farm_balance()` applies the balance to every plot of a vector layer whose columns carry the inputs, and appends the dose, the MAS check and the total nitrogen per plot. For the demonstration farm shipped with the package (eight plots, 35.5 ha), the farm needs 2156 kg of mineral N (Fig. 2). The per-plot terms show where the dose comes from: legumes need no mineral N because fixation covers their demand, and slurry on the maize plots replaces most of it. The soft wheat plot reaches 190.2 kg N ha^−1^, just above its 190 kg ha^−1^ maximum, and is flagged.
+`farm_balance()` applies the balance to every plot of a vector layer whose columns carry the inputs, and appends the dose, the MAS check and the total nitrogen per plot. The example farm is made of eight neighbouring fields of the Piacenza plain delineated from Sentinel-2 (57.5 ha), with the crop of 2024 and of 2023 (the previous crop) estimated from satellite data, soil inputs from the regional soil maps, the October–January rainfall from ERA5 and the provincial yields of 2024, as in Section 3.4. The farm needs 9.7 t of nitrogen before any organic fertiliser (Fig. 2). The per-plot terms show where the dose comes from: the soybean plot needs no mineral N because fixation covers its demand; the durum wheat after processing tomato gets a residue credit of 30 kg N ha^−1^ and needs 110 kg N ha^−1^ against 179 after maize; and the autumn–winter leaching adds about 60 kg N ha^−1^ to every plot. The soft wheat plot reaches 213 kg N ha^−1^, above its 180 kg ha^−1^ maximum, and is flagged.
 
-![Fig. 2. Balance of the demonstration farm. (a) Mineral N dose per plot; the hatched plot exceeds its maximum allowed dose. (b) Balance terms per plot: demand and losses (A, C, D) to the right, supplies (B, E, F, G) and current-year organic N (F~org~) to the left; diamonds mark the mineral N dose.](figures/fig2_farm.pdf){width=100%}
+![Fig. 2. Balance of a farm of eight satellite-delineated fields of the Piacenza plain, crop year 2024. (a) Mineral N dose per plot; the outlined plot exceeds its maximum allowed dose; grey: neighbouring fields. (b) Balance terms per plot: demand and losses (A, C, D) to the right, supplies (B, E, F, G) to the left; diamonds mark the dose. Plot P01 is the field of Fig. 3.](figures/fig2_farm.pdf){width=100%}
 
 ## 3.3. From a satellite image to a machine file
 
-A maize field of 10.2 ha in the Po plain near Piacenza, delineated from Sentinel-2 with Fields of The World [@kerner2024ftw], illustrates the remote-sensing chain on the Level-2A scene of 13 August 2024. A few calls go from the image to an ISOXML task file; here the target dose is set to 200 kg N ha^−1^, whereas in practice it is the balance dose of the field (`calculate_N_fertilization()`):
+Plot P01 of the farm in Fig. 2, a maize field of 10.2 ha delineated from Sentinel-2 with Fields of The World [@kerner2024ftw], illustrates the remote-sensing chain on the Level-2A scene of 13 August 2024. A few calls go from the image to an ISOXML task file; here the target dose is set to 200 kg N ha^−1^, whereas in practice it is the balance dose of the field (`calculate_N_fertilization()`):
 
 ```r
 bio   <- estimate_biophysical("s2_20240813.tif", output_dir = tempdir(),
@@ -125,7 +125,7 @@ export_prescription(rx, "TASKDATA", format = "isoxml")
 
 The median leaf area index is 3.7 and the median NNI 1.09. Of 977 pixels, 368 are in luxury consumption, 565 optimal and 44 deficient (Fig. 3). The NNI zones first set the cells to the upper bound (deficient), the target (optimal) or the lower bound (excessive). The mass-balance step then shifts the free cells so that the field mean is preserved: 8 deficient cells receive 240, 98 optimal cells (and 18 cells without a valid NNI) 213.0 and 50 excessive cells 170.4 kg N ha^−1^. The area-weighted mean of the 174 cells of 24 m × 30 m is 200.0 kg ha^−1^ (doses are rounded to 0.1 kg), so the redistribution follows the diagnosis while the field total stays at the target dose.
 
-![Fig. 3. From a Sentinel-2 scene to a prescription for a 10.2 ha maize field of the Piacenza plain (13 August 2024): (a) leaf area index retrieved by Gaussian-process regression, (b) Nitrogen Nutrition Index (dashed lines on the colour bar: optimal band 0.9–1.1), (c) prescription on 24 m × 30 m cells driven by the NNI zones, with area-weighted mean equal to the 200 kg N ha^−1^ target.](figures/fig3_rs_prescription.pdf){width=100%}
+![Fig. 3. From a Sentinel-2 scene to a prescription for plot P01 of Fig. 2, a 10.2 ha maize field (13 August 2024): (a) leaf area index retrieved by Gaussian-process regression, (b) Nitrogen Nutrition Index (dashed lines on the colour bar: optimal band 0.9–1.1), (c) prescription on 24 m × 30 m cells driven by the NNI zones, with area-weighted mean equal to the 200 kg N ha^−1^ target.](figures/fig3_rs_prescription.pdf){width=100%}
 
 ## 3.4. A province, year by year
 
@@ -133,7 +133,7 @@ Because every input is a column, the same balance scales from one field to a pro
 
 The nitrogen requirement of the mapped fields, before any credit for current-year organic fertilisers, ranged from 8.2 to 11.4 kt N per year over 56,000 to 72,000 ha with a known crop (Fig. 4). It followed the autumn–winter rainfall of the leaching terms (correlation 0.93 between the mean dose and the October–January rainfall): in the wet winters of 2020 and 2021 the mean dose rose to 164 and 183 kg N ha^−1^, against 137 in the dry winter of 2019, and in 2021 the balance exceeded the crop MAS on 44 percent of the area. Multiplying the mean dose of each crop by its provincial area gives 9.1 to 12.8 kt N per year for the province. ERA5 overestimates local rainfall (463 mm from October 2024 to January 2025 against 301 mm measured at a station of the plain), so these totals are an upper bound of the leaching effect.
 
-![Fig. 4. Regulatory nitrogen requirement of the Piacenza plain, 2019–2026. (a) Requirement of the mapped fields by crop group (bars) and October–January ERA5 rainfall (line, right axis); 2026 is provisional. (b) Field dose in 2025; grey: no crop estimate or crop outside the balance (vineyards, vegetables, fallow).](figures/fig4_piacenza.pdf){width=100%}
+![Fig. 4. Regulatory nitrogen requirement of the Piacenza plain, 2019–2026. (a) Requirement of the mapped fields by crop group (bars) and October–January ERA5 rainfall (line, right axis); 2026 is provisional. (b) Field dose in 2024; grey: no crop estimate or crop outside the balance (vineyards, vegetables, fallow); box: the farm of Fig. 2.](figures/fig4_piacenza.pdf){width=100%}
 
 # 4. Impact
 

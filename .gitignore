@@ -40,3 +40,4 @@ paper/sat/data/residual_loo.csv
 paper/sat/data/field_soil_means.csv
 paper/sat/data/season/field_soil_means.csv
 paper/softwarex/data/rs_*
+paper/softwarex/data/farm_2024_ids.csv
