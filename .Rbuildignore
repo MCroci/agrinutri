@@ -29,3 +29,4 @@
 ^CITATION\.cff$
 ^NFert_.*\.tar\.gz$
 ^\.zenodo\.json$
+^TODO\.md$
