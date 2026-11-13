@@ -40,6 +40,10 @@ farm$source <- "None"; farm$fertorg_frequency <- "every year"; farm$location <- 
 farm$forg_quantity <- 0; farm$area_ha <- farm$ha
 out <- farm_balance(farm)
 stopifnot(all(is.na(out$balance_error)))
+# keep one field per crop and previous crop (the other three maize fields repeat the first)
+out <- out[!duplicated(paste(out$c2024, out$c2023)) & !(out$c2024 == "Maize" & out$plot != "P01"), ]
+out$plot <- sprintf("P%02d", seq_len(nrow(out)))
+stopifnot(out$id[1] == FOCUS)
 
 args <- c("expected_yield_tons_ha", "crop", "ccp", "sand", "clay", "Ntot", "SOM", "CN",
           "oxygen_availability", "winter_rain", "start_spring_rain", "prev_crop", "source",
@@ -57,7 +61,7 @@ cat("farm ha", round(sum(out$area_ha), 1), "| N total kg", round(sum(out$N_total
     "| over MAS:", paste(out$plot[!out$MAS_ok], collapse = ", "), "\n")
 
 # ---- figure ------------------------------------------------------------------------------
-lab <- st_drop_geometry(out)[, c("plot", "c2024")]
+lab <- st_drop_geometry(out)[, c("plot", "c2024", "c2023")]
 lab$name <- paste0(lab$plot, " ", lab$c2024)
 bb <- st_bbox(out); ctx <- geo[lengths(st_intersects(geo, st_as_sfc(bb))) > 0 & !geo$id %in% out$id, ]
 pa <- ggplot(out) + geom_sf(data = ctx, fill = "grey90", colour = "white", linewidth = 0.2) +   # neighbouring fields
@@ -77,7 +81,8 @@ pb <- ggplot(tl, aes(kg, plot, fill = term)) + geom_col(width = 0.65, colour = "
   geom_point(data = dose, aes(N, plot), inherit.aes = FALSE, shape = 23, fill = "white", size = 1.6) +
   scale_fill_manual(values = c(A = OKABE[[5]], C = OKABE[[3]], D = OKABE[[2]], B = OKABE[[4]],
                                E = OKABE[[7]], F = OKABE[[8]], G = "grey60"), name = NULL) +
-  scale_y_discrete(labels = setNames(paste0(lab$plot, "  ", lab$c2024), lab$plot)) +
+  scale_y_discrete(labels = setNames(paste0(lab$plot, "  ", lab$c2024, "
+after ", tolower(lab$c2023)), lab$plot)) +
   labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand and losses (+)"), y = NULL) +
   theme_sat() + theme(legend.position = "top", legend.key.size = unit(2.5, "mm")) +
   guides(fill = guide_legend(nrow = 1))

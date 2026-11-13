@@ -18,9 +18,10 @@ fm$standard <- vapply(fm$dpi, function(cr) dose_standard_N(cr)$dose_final, numer
 fl <- rbind(data.frame(plot = fm$plot, method = "DPI balance", N = fm$N_target),
             data.frame(plot = fm$plot, method = "Standard dose", N = fm$standard))
 fm$lab <- factor(paste0(fm$plot, "  ", fm$c2024), levels = rev(paste0(fm$plot, "  ", fm$c2024)))
-fl$plot_lab <- factor(paste0(fl$plot, "  ", fm$c2024[match(fl$plot, fm$plot)]),
-                      levels = rev(paste0(fm$plot, "  ", fm$c2024)))
-fm$plot_lab <- factor(paste0(fm$plot, "  ", fm$c2024), levels = levels(fl$plot_lab))
+fm$name <- paste0(fm$plot, "  ", fm$c2024, "
+after ", tolower(fm$c2023))
+fm$plot_lab <- factor(fm$name, levels = rev(fm$name))
+fl$plot_lab <- fm$plot_lab[match(fl$plot, fm$plot)]
 pa <- ggplot(fl, aes(plot_lab, N, fill = method)) +
   geom_col(position = position_dodge2(width = 0.75, reverse = TRUE), width = 0.7, colour = "grey20", linewidth = 0.15) +
   geom_errorbar(data = fm, aes(plot_lab, ymin = MAS_cap, ymax = MAS_cap), inherit.aes = FALSE,
