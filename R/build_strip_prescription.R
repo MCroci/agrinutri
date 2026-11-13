@@ -85,9 +85,11 @@
 #'   level dose is rescaled so the area-weighted mean matches
 #'   \code{n_target}. Guarantees mass-balance compliance with the
 #'   balance-based field ceiling.
-#' @param crs_metric EPSG code of a metric CRS used internally (default
-#'   3857, Web Mercator). Use a local UTM for higher accuracy on larger
-#'   fields.
+#' @param crs_metric EPSG code of the metric CRS in which strips are drawn.
+#'   `NULL` (default) uses the WGS 84 / UTM zone of the field centroid, so
+#'   `machine_width`, `cell_length` and `area_ha` are true ground distances
+#'   and areas. (Web Mercator, EPSG:3857, is not suitable: at 45 degrees
+#'   latitude it shrinks a 24 m width to about 17 m on the ground.)
 #'
 #' @return An \code{sf} object of strip polygons with columns
 #'   \code{strip_id}, \code{dose} (kg N ha\eqn{^{-1}}), \code{area_ha},
@@ -99,7 +101,7 @@
 #'   \code{\link{compute_NNI_from_S2}}
 #'
 #' @examplesIf requireNamespace("sf", quietly = TRUE)
-#' ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+#' ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 #' farm <- sf::st_read(ex, quiet = TRUE)
 #' field <- farm[1, ]  # 5.2 ha silage-maize plot
 #'
@@ -138,7 +140,7 @@ build_strip_prescription <- function(
   thr_hi        = 1.10,
   n_classes     = 5,
   preserve_mean = TRUE,
-  crs_metric    = 3857
+  crs_metric    = NULL
 ) {
   if (!requireNamespace("sf", quietly = TRUE))
     stop("Package 'sf' is required for build_strip_prescription().")
@@ -161,7 +163,8 @@ build_strip_prescription <- function(
   }
   crs_in <- sf::st_crs(field)
 
-  # Reproject to metric CRS
+  # Reproject to a metric CRS (local UTM zone by default)
+  if (is.null(crs_metric)) crs_metric <- .utm_epsg(field)
   fld <- sf::st_transform(field, crs_metric)
   if (!sf::st_is_valid(fld)) fld <- sf::st_make_valid(fld)
 
@@ -171,7 +174,7 @@ build_strip_prescription <- function(
   else .resolve_ab_azimuth(fld, ab_line, crs_metric)
 
   # Field centroid (rotation centre)
-  ctr <- sf::st_coordinates(sf::st_centroid(fld))[1, ]
+  ctr <- sf::st_coordinates(sf::st_centroid(sf::st_geometry(fld)))[1, ]
 
   # --- Rotate the field so the A-B line is parallel to the X axis --
   rot <- function(geom, angle, pivot) {
@@ -257,15 +260,11 @@ build_strip_prescription <- function(
   strips$dose[!is.finite(strips$dose)] <- n_target
   strips$dose <- pmin(pmax(strips$dose, min_dose), max_dose)
 
-  # Preserve the field-level mean (mass-balance constraint)
-  if (isTRUE(preserve_mean) && sum(strips$area_ha) > 0) {
-    mean_curr <- sum(strips$dose * strips$area_ha, na.rm = TRUE) /
-                 sum(strips$area_ha, na.rm = TRUE)
-    if (is.finite(mean_curr) && mean_curr > 0) {
-      strips$dose <- strips$dose * (n_target / mean_curr)
-      strips$dose <- pmin(pmax(strips$dose, min_dose), max_dose)
-    }
-  }
+  # Preserve the field-level mean (mass-balance constraint): area-weighted
+  # mean = n_target within [min_dose, max_dose]
+  if (isTRUE(preserve_mean) && sum(strips$area_ha) > 0)
+    strips$dose <- .preserve_mean(strips$dose, strips$area_ha, n_target,
+                                  lo = min_dose, hi = max_dose)
 
   strips$dose <- round(strips$dose, 1)
 
@@ -312,8 +311,8 @@ build_strip_prescription <- function(
   if (inherits(rast, "SpatRaster")) {
     if (!requireNamespace("terra", quietly = TRUE))
       stop("Package 'terra' is required for SpatRaster zonal stats.")
-    v <- terra::extract(rast, terra::vect(strips),
-                        fun = mean, na.rm = TRUE)
+    sv <- terra::project(terra::vect(strips), terra::crs(rast))
+    v <- terra::extract(rast, sv, fun = mean, na.rm = TRUE)
     # terra::extract returns a data.frame with ID + one column per band
     as.numeric(v[, 2])
   } else {
@@ -358,4 +357,11 @@ build_strip_prescription <- function(
     seq(min_dose, max_dose, length.out = n_classes)
   }
   doses[bin]
+}
+
+# EPSG code of the WGS 84 / UTM zone that contains the centroid of `x`.
+.utm_epsg <- function(x) {
+  ctr <- sf::st_coordinates(sf::st_centroid(sf::st_transform(sf::st_geometry(x), 4326)))[1, ]
+  zone <- floor((ctr[["X"]] + 180) / 6) + 1
+  as.integer(if (ctr[["Y"]] >= 0) 32600 + zone else 32700 + zone)
 }

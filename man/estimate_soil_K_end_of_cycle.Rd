@@ -11,7 +11,7 @@ estimate_soil_K_end_of_cycle(
   clay_pct,
   soil_group,
   depth_cm = 30,
-  texture_groups.table = nfert_data_get("texture_groups.table")
+  texture_groups.table = agrinutri_data_get("texture_groups.table")
 )
 }
 \arguments{

@@ -20,7 +20,7 @@
 
 tri2 <- function(clay = 10, sand = 35) {
 
-  tri2.table <- nfert_data_get("tri2.table")
+  tri2.table <- agrinutri_data_get("tri2.table")
 
   # Input Validation
   if (!is.numeric(clay) || clay < 0 || clay > 100) {
@@ -41,8 +41,8 @@ tri2 <- function(clay = 10, sand = 35) {
   }
 
   # Determine row and column indices (simplified)
-  row <- 101 - round(clay)
-  col <- 1 + round(sand)
+  row <- 101 - floor(clay)
+  col <- 1 + floor(sand)
 
   # Retrieve ID_Rag
   res <- tri2.table[row, col]

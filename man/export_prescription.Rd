@@ -70,8 +70,8 @@ following the ISOBUS ISO 11783-10 standard (VRT zones with DDI
 
 \examples{
 \dontrun{
-farm <- NFert::farm_balance(
-  system.file("extdata/example_farm.geojson", package = "NFert"))
+farm <- agrinutri::farm_balance(
+  system.file("extdata/example_farm.geojson", package = "agrinutri"))
 
 # Universal Shapefile
 export_prescription(farm, "field_rx.shp")

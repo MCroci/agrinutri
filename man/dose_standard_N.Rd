@@ -10,14 +10,14 @@ dose_standard_N(
   phase = NULL,
   decrements = numeric(),
   increments = numeric(),
-  mas.table = nfert_data_get("mas.table"),
+  mas.table = agrinutri_data_get("mas.table"),
   apply_mas_cap = TRUE
 )
 
 scheda_N(...)
 }
 \arguments{
-\item{crop}{Crop name exactly as in \code{NFert::mas.table$crop}.}
+\item{crop}{Crop name exactly as in \code{agrinutri::mas.table$crop}.}
 
 \item{phase}{Optional phase string (e.g. "Primaverile-estiva 100-130 gg") for crops
 with multiple fases. If \code{NULL} (default) and the crop has multiple rows, the
@@ -31,7 +31,7 @@ Missing names default to 0. Values are treated as positive and subtracted.}
 \code{yield_high}, \code{low_SOM}, \code{straw_burial}, \code{rain_surplus}, \code{compacted_no_till}.
 Missing names default to 0.}
 
-\item{mas.table}{Reference MAS lookup (default \code{NFert::mas.table}).}
+\item{mas.table}{Reference MAS lookup (default \code{agrinutri::mas.table}).}
 
 \item{apply_mas_cap}{Logical, default \code{TRUE}. Cap the final dose at
 \code{max_N_dose = standard_N + max_increment} from MAS.}

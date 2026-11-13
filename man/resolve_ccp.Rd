@@ -5,12 +5,12 @@
 \title{Resolve a \code{ccp} (crop calendar period) string with whitespace and dash
 normalisation}
 \usage{
-resolve_ccp(x, table = nfert_data_get("coef_time"))
+resolve_ccp(x, table = agrinutri_data_get("coef_time"))
 }
 \arguments{
 \item{x}{Character. The \code{ccp} string to resolve.}
 
-\item{table}{Lookup with column \code{ccp}; default \code{NFert::coef_time}.}
+\item{table}{Lookup with column \code{ccp}; default \code{agrinutri::coef_time}.}
 }
 \value{
 The canonical \code{ccp} string (as in \code{table$ccp}), or \code{x} unchanged

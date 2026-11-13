@@ -45,7 +45,9 @@ Formula:
   K2O da apportare = A (asportazione) + H (lisciviazione clay-based) + B1 (arricchimento)
                      + A2 (advance_allowed) - B2 (riduzione)
 }
-with A set to 0 in "Riduzione" strategy.
+where B1 (enrichment) and B2 (reduction) depend on the exchangeable-K class
+(see \code{\link[=soil_K_availability]{soil_K_availability()}}). The result is bounded to 0-300 kg K2O/ha as in
+Fert_Office.
 }
 \examples{
 K_balance(expected_yield_tons_ha = 6,

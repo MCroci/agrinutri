@@ -13,7 +13,8 @@ P_balance(
   clay = NULL,
   sand = NULL,
   advance_P2O5 = 0,
-  depth_cm = 30
+  depth_cm = 30,
+  total_carbonate = NULL
 )
 }
 \arguments{
@@ -33,6 +34,11 @@ via \code{calc_soil_group_and_id_rag()} and mapped to Italian Ragg.}
 \item{advance_P2O5}{Advance anni futuri (default 0 kg/ha).}
 
 \item{depth_cm}{Soil depth for enrichment calculation (default 30 cm).}
+
+\item{total_carbonate}{Total carbonate (CaCO3, percent). Sets the P
+immobilisation factor of the enrichment term as in Fert_Office (texture
+base + 0.02 x CaCO3); \code{NULL} keeps the legacy constant 1.6. See
+\code{\link[=soil_P_availability]{soil_P_availability()}}.}
 }
 \value{
 A data frame with A, B1, A2, B2, \code{strategy}, \code{ID_Gri_P}, \code{P2O5_required}.
@@ -46,11 +52,12 @@ Formula:
   P2O5 da apportare = A (asportazione) + B1 (arricchimento) + A2 (advance_allowed)
                        - B2 (riduzione)
 }
-with A set to 0 in "Riduzione" strategy and B2 used only as placeholder.
+where B2 is the excess over the normal availability range ("Riduzione"
+strategy). The result is bounded to 0-250 kg P2O5/ha as in Fert_Office.
 }
 \examples{
 P_balance(expected_yield_tons_ha = 6,
           crop = "Grano duro (pianta intera)",
           olsen_value = 15, olsen_unit = "P2O5",
-          clay = 18.5, sand = 15.5)
+          clay = 18.5, sand = 15.5, total_carbonate = 15)
 }

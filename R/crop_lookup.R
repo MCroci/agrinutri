@@ -3,7 +3,7 @@
 #' building the bundled data and when matching user input, so lookups stay
 #' accent-insensitive while the data remains ASCII (CRAN requirement).
 #' @noRd
-.nfert_ascii_fold <- function(s) {
+.agrinutri_ascii_fold <- function(s) {
   s <- as.character(s)
   # Build the non-ASCII characters from code points so this source file
   # stays pure ASCII. en/em dash -> hyphen; degree sign -> "o"; accented
@@ -44,9 +44,9 @@
 
 #' Resolve a crop name (Italian or English) to its canonical entry
 #'
-#' NFert reference tables (`uptake_table`, `mas.table`, `crops.table`,
+#' agrinutri reference tables (`uptake_table`, `mas.table`, `crops.table`,
 #' `standard_pk_doses.table`) carry the canonical English crop names in
-#' the column `crop` (since NFert 0.12.0), with the Italian translation
+#' the column `crop` (since agrinutri 0.12.0), with the Italian translation
 #' in `crop_it` and a duplicate of the English name in `crop_en` for
 #' backward compatibility. This helper accepts any of the three forms
 #' (case-insensitive, whitespace-normalised, exact match) and returns
@@ -56,7 +56,7 @@
 #' unchanged together with a warning.
 #'
 #' @param x Character. Crop name in Italian or English.
-#' @param table Lookup table; default `NFert::uptake_table`.
+#' @param table Lookup table; default `agrinutri::uptake_table`.
 #' @return Character. The canonical crop name (English, as in the
 #'   `crop` column).
 #' @examples
@@ -64,13 +64,13 @@
 #' resolve_crop("Grano duro (granella)")
 #' resolve_crop("Mais trinciato classe 700")
 #' @export
-resolve_crop <- function(x, table = nfert_data_get("uptake_table")) {
+resolve_crop <- function(x, table = agrinutri_data_get("uptake_table")) {
   if (!is.character(x) || length(x) != 1 || is.na(x)) {
     stop("`x` must be a single non-NA character.")
   }
   # Normalise: fold accents to ASCII, trim and collapse internal spaces, so
   # matching is accent-insensitive and works against the ASCII-folded data.
-  norm <- function(s) .nfert_ascii_fold(gsub("\\s+", " ", trimws(s)))
+  norm <- function(s) .agrinutri_ascii_fold(gsub("\\s+", " ", trimws(s)))
   xn <- norm(x)
 
   # Apply known aliases (rare names / alternate spellings)
@@ -115,19 +115,19 @@ resolve_crop <- function(x, table = nfert_data_get("uptake_table")) {
 #' }
 #'
 #' @param x Character. The `ccp` string to resolve.
-#' @param table Lookup with column `ccp`; default `NFert::coef_time`.
+#' @param table Lookup with column `ccp`; default `agrinutri::coef_time`.
 #' @return The canonical `ccp` string (as in `table$ccp`), or `x` unchanged
 #'   with a warning if not found.
 #' @examples
 #' resolve_ccp("Spring-summer crop 100\u2013130 days")  # em-dash
 #' resolve_ccp("autumn-winter crop <150 days")         # case
 #' @export
-resolve_ccp <- function(x, table = nfert_data_get("coef_time")) {
+resolve_ccp <- function(x, table = agrinutri_data_get("coef_time")) {
   if (!is.character(x) || length(x) != 1 || is.na(x)) {
     stop("`x` must be a single non-NA character.")
   }
   norm <- function(s) {
-    s <- .nfert_ascii_fold(s)             # degree / dash / accents -> ASCII
+    s <- .agrinutri_ascii_fold(s)             # degree / dash / accents -> ASCII
     s <- gsub("\\bcrop\\b", "", s, ignore.case = TRUE)  # optional "crop" word
     s <- gsub("\\s+", " ", trimws(s))
     tolower(s)
@@ -154,9 +154,31 @@ resolve_ccp <- function(x, table = nfert_data_get("coef_time")) {
 #' head(list_crops())
 #' @export
 list_crops <- function() {
-  ut <- nfert_data_get("uptake_table")
+  ut <- agrinutri_data_get("uptake_table")
   if (!('crop_en' %in% names(ut))) {
     return(data.frame(crop = ut$crop, crop_en = ut$crop, stringsAsFactors = FALSE))
   }
   data.frame(crop = ut$crop, crop_en = ut$crop_en, stringsAsFactors = FALSE)
+}
+
+# Crop attributes from crops.table (Fert_Office foglio "Coltura") used by the
+# N balance: proposed N-fixation share (%) and default ceiling on the dose.
+.crop_info <- function(crop) {
+  out <- list(n_fixation_pct = 0, N_limit = 340)
+  ct <- tryCatch(agrinutri_data_get("crops.table"), error = function(e) NULL)
+  if (is.null(ct)) return(out)
+  norm <- function(x) .agrinutri_ascii_fold(tolower(gsub("[[:space:]]+", " ", trimws(as.character(x)))))
+  key <- norm(crop)
+  i <- match(key, norm(ct$crop))
+  if (is.na(i) && "crop_it" %in% names(ct)) i <- match(key, norm(ct$crop_it))
+  if (is.na(i)) {
+    rc <- suppressWarnings(resolve_crop(crop))
+    i <- match(norm(rc), norm(ct$crop))
+  }
+  if (is.na(i)) return(out)
+  fp <- suppressWarnings(as.numeric(ct$n_fixation_pct[i]))
+  lim <- suppressWarnings(as.numeric(ct$N_limit[i]))
+  if (is.finite(fp)) out$n_fixation_pct <- fp
+  if (is.finite(lim)) out$N_limit <- lim
+  out
 }

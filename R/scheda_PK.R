@@ -14,7 +14,7 @@
 #' @param soil_K_class Same four levels for potassium (\code{K2O_<class>} columns).
 #' @param P_decrements,P_increments,K_decrements,K_increments Named numeric
 #'   vectors of adjustments (kg/ha). See `scheda_N()` for the same pattern.
-#' @param standard_pk_doses.table Lookup (default `NFert::standard_pk_doses.table`).
+#' @param standard_pk_doses.table Lookup (default `agrinutri::standard_pk_doses.table`).
 #'
 #' @return A named list with `dose_base_P2O5`, `dose_base_K2O`,
 #'   `dose_final_P2O5`, `dose_final_K2O`, and subtotals.
@@ -31,7 +31,7 @@ dose_standard_PK <- function(crop,
                       soil_K_class = c("normal","low","high","very_low"),
                       P_decrements = numeric(), P_increments = numeric(),
                       K_decrements = numeric(), K_increments = numeric(),
-                      standard_pk_doses.table = nfert_data_get("standard_pk_doses.table")) {
+                      standard_pk_doses.table = agrinutri_data_get("standard_pk_doses.table")) {
 
   soil_P_class <- match.arg(soil_P_class)
   soil_K_class <- match.arg(soil_K_class)
@@ -45,14 +45,14 @@ dose_standard_PK <- function(crop,
 
   # Locate crop row
   t <- standard_pk_doses.table
-  cf <- .nfert_ascii_fold(crop)
-  idx <- which(.nfert_ascii_fold(t$crop) == cf)
+  cf <- .agrinutri_ascii_fold(crop)
+  idx <- which(.agrinutri_ascii_fold(t$crop) == cf)
   if (length(idx) == 0) {
     stop(sprintf("Crop '%s' not found in standard_pk_doses.table.", crop))
   }
   if (!is.null(phase)) {
-    idx_p <- which(.nfert_ascii_fold(t$crop) == cf &
-                     .nfert_ascii_fold(t$phase) == .nfert_ascii_fold(phase))
+    idx_p <- which(.agrinutri_ascii_fold(t$crop) == cf &
+                     .agrinutri_ascii_fold(t$phase) == .agrinutri_ascii_fold(phase))
     if (length(idx_p) > 0) idx <- idx_p
   }
   if (length(idx) > 1) idx <- idx[1]

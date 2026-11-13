@@ -5,27 +5,44 @@
 # ---------------------------------------------------------------------------
 # get_MAS() / check_MAS() — DPI Allegato 9 benchmark (Reg. reg. 2/2024)
 # ---------------------------------------------------------------------------
-test_that("get_MAS returns DPI 2026 MAS benchmark values", {
-  expect_equal(get_MAS("Mais da granella")$mas_N,            260L)
-  expect_equal(get_MAS("Mais da insilato")$mas_N,            340L)
-  expect_equal(get_MAS("Frumento tenero (granella)")$mas_N,  200L)
-  expect_equal(get_MAS("Grano duro (granella)")$mas_N,       200L)
+test_that("get_MAS returns DPI 2026 MAS values (Fert_Office v1.26 MAS sheet)", {
+  # Column "MAS" of Fert_Office v1.26 (Reg. reg. 2/2024), not "teorico massimo"
+  expect_equal(get_MAS("Mais da granella 500-700 (granella)")$mas_N, 280L)
+  expect_equal(get_MAS("Mais trinciato classe 700")$mas_N,           280L)
+  expect_equal(get_MAS("Grano duro (granella)")$mas_N,               190L)
+  expect_equal(get_MAS("Grano tenero FF (granella)")$mas_N,          190L)
+  expect_equal(get_MAS("Grano tenero FP/FPS (granella)")$mas_N,      180L)
+  expect_equal(get_MAS("Orzo (granella)")$mas_N,                     150L)
+  expect_equal(get_MAS("Melo frutti, legno e foglie")$mas_N,         120L)
+  expect_equal(get_MAS("Actinidia polpa verde frutti, legno e foglie")$mas_N, 150L)
+  expect_equal(get_MAS("Soia (granella)")$mas_N,                      30L)
 })
 
-test_that("get_MAS edition 2025 differs from 2026 (ZVN Guida 2025)", {
+test_that("get_MAS maps legacy generic DPI names to a MAS row", {
+  expect_equal(get_MAS("Mais da granella")$crop, "Grain maize 500-700 (grain)")
+  expect_equal(get_MAS("Mais da insilato")$crop, "Silage maize (class 700)")
+  expect_equal(get_MAS("Mais trinciato (classe 700)")$mas_N, 280L)
+  expect_equal(get_MAS("Frumento tenero (granella)")$mas_N, 180L)
+})
+
+test_that("get_MAS edition 2025 keeps the Guida 2025 ZVN table", {
   expect_equal(get_MAS("Mais da granella", edition = "2025")$mas_N,           280L)
   expect_equal(get_MAS("Frumento tenero (granella)", edition = "2025")$mas_N, 180L)
 })
 
-test_that("get_MAS accepts the English crop alias", {
-  expect_equal(get_MAS("Durum wheat (grain)")$mas_N, 200L)
+test_that("get_MAS accepts English, Italian and accent-folded names", {
+  expect_equal(get_MAS("Durum wheat (grain)")$mas_N, 190L)
+  expect_equal(get_MAS("durum wheat (grain)")$mas_N, 190L)
+  expect_identical(get_MAS("Grano duro (granella)")$crop,
+                   get_MAS("Durum wheat (grain)")$crop)
 })
 
 test_that("get_MAS() with no crop returns the full table", {
   tab <- get_MAS()
   expect_s3_class(tab, "data.frame")
-  expect_true(all(c("crop", "mas_N") %in% names(tab)))
-  expect_gt(nrow(tab), 10L)
+  expect_true(all(c("crop", "crop_it", "mas_N") %in% names(tab)))
+  expect_gt(nrow(tab), 200L)
+  expect_false(anyDuplicated(tab$crop) > 0)
 })
 
 test_that("get_MAS warns and returns NULL for an unknown crop", {
@@ -34,13 +51,20 @@ test_that("get_MAS warns and returns NULL for an unknown crop", {
 })
 
 test_that("check_MAS flags doses above and within the MAS", {
-  expect_true(check_MAS("Mais da granella", 250)$ok)        # 250 <= 260
-  expect_false(check_MAS("Mais da granella", 300)$ok)       # 300 >  260
-  expect_false(check_MAS("Frumento tenero (granella)", 210)$ok)  # 210 > 200
+  expect_true(check_MAS("Mais da granella", 250)$ok)          # 250 <= 280
+  expect_false(check_MAS("Mais da granella", 300)$ok)         # 300 >  280
+  expect_false(check_MAS("Grano duro (granella)", 200)$ok)    # 200 >  190
+  expect_true(check_MAS("Grano duro (granella)", 190)$ok)
 })
 
-test_that("check_MAS treats a crop with no MAS_N (soya) as compliant", {
+test_that("check_MAS caps soya at 30 kg N/ha", {
   res <- check_MAS("Soia", 60)
+  expect_false(res$ok)
+  expect_equal(res$mas_N, 30L)
+})
+
+test_that("check_MAS treats a crop with no MAS_N as compliant", {
+  res <- check_MAS("Leaf beet", 60)
   expect_true(res$ok)
   expect_true(is.na(res$mas_N))
 })
@@ -50,7 +74,7 @@ test_that("check_MAS treats a crop with no MAS_N (soya) as compliant", {
 # ---------------------------------------------------------------------------
 test_that("farm_balance enriches the bundled example farm", {
   skip_if_not_installed("sf")
-  ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+  ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
   skip_if(!nzchar(ex), "no bundled example_farm.geojson")
 
   farm <- farm_balance(ex)
@@ -152,6 +176,16 @@ test_that("spatial_N_balance returns a SpatRaster with an N_to_apply layer", {
     prev_crop = "Maize stalks removed", source = "None", forg_quantity = 0)
   expect_s4_class(nm, "SpatRaster")
   expect_true("N_to_apply" %in% names(nm))
+
+  # The pixel dose is the dose of N_balance() + calculate_N_fertilization()
+  v <- terra::values(soil)[7, ]
+  b <- N_balance(expected_yield_tons_ha = 6, crop = "Grano duro (pianta intera)",
+                 ccp = "Spring-summer crop 100-130 days", sand = v[["Sand"]],
+                 clay = v[["Clay"]], Ntot = v[["TN"]], SOM = v[["SOM"]],
+                 CN = v[["CNratio"]], winter_rain = 150, start_spring_rain = 0,
+                 prev_crop = "Maize stalks removed", source = "None",
+                 forg_quantity = 0)
+  expect_equal(terra::values(nm[["N_to_apply"]])[7], calculate_N_fertilization(b))
 })
 
 # ---------------------------------------------------------------------------

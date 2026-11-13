@@ -7,7 +7,7 @@
 calc_crop_P_demand(
   expected_yield_tons_ha,
   crop,
-  uptake_table = nfert_data_get("uptake_table")
+  uptake_table = agrinutri_data_get("uptake_table")
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ calc_crop_P_demand(
 
 \item{crop}{Crop name (must match \code{uptake_table$crop}).}
 
-\item{uptake_table}{Lookup table (default \code{NFert::uptake_table}).}
+\item{uptake_table}{Lookup table (default \code{agrinutri::uptake_table}).}
 }
 \value{
 A list: \code{P2O5_requirement} (kg/ha), \code{unit_coef} (kg P2O5 / t yield), \code{crop}.

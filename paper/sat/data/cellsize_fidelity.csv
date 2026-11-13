@@ -1,0 +1,25 @@
+"strategy","cell_m","r2"
+"Calibration (inverse)",10,1
+"NNI zones",10,1
+"Quantile classes",10,1
+"Calibration (inverse)",15,0.635053978381622
+"NNI zones",15,0.551327986753452
+"Quantile classes",15,0.731826443003387
+"Calibration (inverse)",20,0.437176123039343
+"NNI zones",20,0.42221006292403
+"Quantile classes",20,0.559127361740472
+"Calibration (inverse)",24,0.522837488338089
+"NNI zones",24,0.460385141258383
+"Quantile classes",24,0.606082020678861
+"Calibration (inverse)",30,0.530523162656495
+"NNI zones",30,0.434837249667494
+"Quantile classes",30,0.603361398286285
+"Calibration (inverse)",40,0.374218613510658
+"NNI zones",40,0.334727699417875
+"Quantile classes",40,0.4643730050706
+"Calibration (inverse)",50,0.316912955283096
+"NNI zones",50,0.301570824236078
+"Quantile classes",50,0.427224976503026
+"Calibration (inverse)",60,0.235140346597807
+"NNI zones",60,0.260274411746993
+"Quantile classes",60,0.354800985145276

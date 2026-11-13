@@ -16,11 +16,11 @@ calc_crop_N_demand(
 
 \item{crop}{The name of the crop for which to calculate the
 requirement. Must be a valid value in the \code{crop} column of the
-\code{uptake_table} (English canonical names after NFert 0.12.0).}
+\code{uptake_table} (English canonical names after agrinutri 0.12.0).}
 
 \item{apply_n_fixation}{Logical. If \code{TRUE} (default) the gross
 demand is multiplied by \code{(1 - n_fixation_pct / 100)} using
-\code{NFert::crops.table}. Set to \code{FALSE} to recover the
+\code{agrinutri::crops.table}. Set to \code{FALSE} to recover the
 pre-0.12.1 behaviour (no fixation correction).}
 }
 \value{
@@ -39,12 +39,12 @@ A_gross = unit crop absorption (kg N / t yield) * yield (t / ha)
 A       = A_gross * (1 - n_fixation_pct / 100)
 }
 where \code{n_fixation_pct} is taken from
-\code{NFert::crops.table$n_fixation_pct} (0 for non-legumes, 85-100
+\code{agrinutri::crops.table$n_fixation_pct} (0 for non-legumes, 85-100
 for soybean, pea, faba bean, alfalfa, lupin, clover, etc.). Non-legume
 crops have \code{n_fixation_pct = 0}, so the correction is a no-op.
 }
 \note{
 The \code{uptake_table} should provide the unit crop absorption for
-the specified \code{crop}. The default table (\code{NFert::uptake_table}) may
+the specified \code{crop}. The default table (\code{agrinutri::uptake_table}) may
 not be suitable for all regions or specific crop varieties.
 }

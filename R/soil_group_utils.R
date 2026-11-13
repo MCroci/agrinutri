@@ -1,10 +1,10 @@
-#' Normalise a soil-group label across the three NFert conventions
+#' Normalise a soil-group label across the three agrinutri conventions
 #'
-#' NFert tables use three parallel naming conventions for the DPI 2026
+#' agrinutri tables use three parallel naming conventions for the DPI 2026
 #' texture grouping:
 #'
 #' \itemize{
-#'   \item English (legacy NFert 0.1.0): "Sandy textures",
+#'   \item English (legacy agrinutri 0.1.0): "Sandy textures",
 #'         "Loamy textures", "Clay textures".
 #'   \item Italian plural (canonical DPI; foglio B, SO, Gri_K):
 #'         "Sabbiosi", "Medio impasto", "Argillosi e limosi".
@@ -13,7 +13,7 @@
 #' }
 #'
 #' This helper accepts any of these forms (case-insensitive) and returns the
-#' canonical English form (used by NFert >= 0.4.0 lookup tables) plus the
+#' canonical English form (used by agrinutri >= 0.4.0 lookup tables) plus the
 #' universal `ID_Rag` integer key used internally to join the lookup tables.
 #'
 #' @param x Character string. Soil group name in any supported convention.

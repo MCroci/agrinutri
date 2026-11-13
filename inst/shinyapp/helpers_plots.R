@@ -1,5 +1,5 @@
 # helpers_plots.R
-# Reusable ggplot helpers for the NFert Shiny app.
+# Reusable ggplot helpers for the agrinutri Shiny app.
 # Loaded by global.R.
 
 # Synthetic demo rasters and helpers
@@ -7,7 +7,7 @@
 
 # Generate a plausible NDVI raster over a given sf polygon. Returns a
 # SpatRaster consumed by the terra-based pipeline.
-.nfert_demo_ndvi <- function(field, res_m = 5, seed = 42) {
+.agrinutri_demo_ndvi <- function(field, res_m = 5, seed = 42) {
   if (!requireNamespace("terra", quietly = TRUE) ||
       !requireNamespace("sf", quietly = TRUE)) return(NULL)
   set.seed(seed)
@@ -34,8 +34,8 @@
 }
 
 # A plausible NNI raster (0.7-1.25) synthesised the same way
-.nfert_demo_nni <- function(field, res_m = 5, seed = 7) {
-  r <- .nfert_demo_ndvi(field, res_m, seed)
+.agrinutri_demo_nni <- function(field, res_m = 5, seed = 7) {
+  r <- .agrinutri_demo_ndvi(field, res_m, seed)
   if (is.null(r)) return(NULL)
   # remap NDVI 0.3-0.9 -> NNI 0.7-1.25
   v <- terra::values(r, mat = FALSE)
@@ -61,7 +61,7 @@
 # Returns a ggplot that walks from term A (additive) to the net N*,
 # with connector segments between bars and the final Net bar highlighted.
 # ---------------------------------------------------------------------
-.nfert_waterfall <- function(df, net_value, mas_cap = NA) {
+.agrinutri_waterfall <- function(df, net_value, mas_cap = NA) {
   if (is.null(df) || !all(c("term", "value", "sign") %in% names(df)) ||
       nrow(df) == 0)
     return(ggplot2::ggplot() + ggplot2::theme_void() +
@@ -157,7 +157,7 @@
 # Traffic-light semicircular gauge for MAS / ZVN compliance.
 # 0-1 ratio, renders in ggplot.
 # ---------------------------------------------------------------------
-.nfert_gauge <- function(value, limit, label = "MAS",
+.agrinutri_gauge <- function(value, limit, label = "MAS",
                          ok_below = 0.80, warn_below = 1.00) {
   # Coerce NULL / length-0 / non-finite to scalar NA, then guard.
   value <- if (is.null(value) || length(value) == 0) NA_real_
@@ -229,7 +229,7 @@
 # ---------------------------------------------------------------------
 # Compliance panel: two gauges side by side.
 # ---------------------------------------------------------------------
-.nfert_compliance_pair <- function(net, mas, zvn_applied, zvn_limit = 170) {
+.agrinutri_compliance_pair <- function(net, mas, zvn_applied, zvn_limit = 170) {
   # Coerce NULL / length-0 / non-finite to scalar NA so the inner
   # gauge helpers can render the "no data" fallback without crashing.
   sc <- function(x) if (is.null(x) || length(x) == 0) NA_real_
@@ -239,10 +239,10 @@
   zvn_applied <- sc(zvn_applied)
   zvn_limit   <- sc(zvn_limit)
   if (!requireNamespace("patchwork", quietly = TRUE)) {
-    return(.nfert_gauge(net, mas, "Net N*  vs  MAS"))
+    return(.agrinutri_gauge(net, mas, "Net N*  vs  MAS"))
   }
-  g1 <- .nfert_gauge(net, mas, "Net N*  vs  MAS cap")
-  g2 <- .nfert_gauge(zvn_applied, zvn_limit,
+  g1 <- .agrinutri_gauge(net, mas, "Net N*  vs  MAS cap")
+  g2 <- .agrinutri_gauge(zvn_applied, zvn_limit,
                      "Livestock N  vs  ZVN 170 kg/ha")
   patchwork::wrap_plots(g1, g2, ncol = 2)
 }
@@ -250,7 +250,7 @@
 # ---------------------------------------------------------------------
 # Histogram of a raster layer, coloured by user-supplied bins.
 # ---------------------------------------------------------------------
-.nfert_raster_hist <- function(r, breaks, bin_colors = NULL,
+.agrinutri_raster_hist <- function(r, breaks, bin_colors = NULL,
                                xlab = "value", cumulative = TRUE) {
   vals <- tryCatch({
     v <- if (inherits(r, "SpatRaster"))
@@ -282,7 +282,7 @@
 # Area-per-zone summary for NNI zone rasters (1 deficient / 2 optimal /
 # 3 excessive).
 # ---------------------------------------------------------------------
-.nfert_zone_area <- function(zones_rast, pixel_area_m2 = NULL) {
+.agrinutri_zone_area <- function(zones_rast, pixel_area_m2 = NULL) {
   if (inherits(zones_rast, "SpatRaster")) {
     v <- terra::values(zones_rast, na.rm = TRUE)
     if (is.null(pixel_area_m2)) {
@@ -311,7 +311,7 @@
   )
 }
 
-.nfert_zone_bar <- function(zone_df) {
+.agrinutri_zone_bar <- function(zone_df) {
   zone_df$zone <- factor(zone_df$zone,
                          levels = c("Deficient", "Optimal", "Excessive"))
   ggplot2::ggplot(zone_df,
@@ -330,7 +330,7 @@
 # Stacked bar chart for the distribution plan (pre-sowing organic vs
 # mineral side-dress vs remaining target).
 # ---------------------------------------------------------------------
-.nfert_plan_stack <- function(applied_organic, applied_mineral,
+.agrinutri_plan_stack <- function(applied_organic, applied_mineral,
                               n_target, mas_cap = NA, zvn = 170) {
   d <- data.frame(
     source = c("Pre-sowing organic", "In-season mineral"),

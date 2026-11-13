@@ -11,7 +11,7 @@
 #'   elements are ignored.
 #' @param NNI_raster A `terra::SpatRaster` of NNI values for the field. Cells
 #'   with `NA` are excluded from the prescription.
-#' @param crop_params Either `NULL` (use [nfert_to_quefts_crop()] on
+#' @param crop_params Either `NULL` (use [agrinutri_to_quefts_crop()] on
 #'   `field_inputs$crop`), a character string (same lookup), or a named list of
 #'   QUEFTS crop parameters passed straight to [Rquefts::quefts()].
 #' @param fertilizers `data.frame` with columns `name`, `N`, `P`, `K`, and
@@ -100,10 +100,9 @@ optimize_VR_DPI <- function(field_inputs,
   bal <- do.call(N_balance, fi)
   bal <- bal[1L, , drop = FALSE]
 
-  # Explicit column references (not with(bal, ...)) so codetools does not flag
-  # the balance terms as undefined globals (R CMD check "no visible binding").
-  N_tot_DPI <- bal$A - bal$B + bal$C1 + bal$C2 + bal$D -
-    bal$E - bal$F - bal$Forg - bal$G
+  # Mineral N admitted by the balance, as reported by Fert_Office (phase
+  # share, crop ceiling, current-year organic N subtracted, never negative)
+  N_tot_DPI <- calculate_N_fertilization(bal)
 
   mas_row <- get_MAS(field_inputs$crop)
   if (is.null(mas_row) || nrow(mas_row) == 0L || is.na(mas_row$mas_N[1])) {
@@ -138,7 +137,7 @@ optimize_VR_DPI <- function(field_inputs,
 
   # --- Fertilizer table ----------------------------------------------------
   if (is.null(fertilizers)) {
-    f_path <- system.file("extdata", "fertilizers_IT.csv", package = "NFert")
+    f_path <- system.file("extdata", "fertilizers_IT.csv", package = "agrinutri")
     if (nzchar(f_path) && file.exists(f_path)) {
       fertilizers <- utils::read.csv(f_path, stringsAsFactors = FALSE)
     } else {
@@ -157,18 +156,20 @@ optimize_VR_DPI <- function(field_inputs,
     stop("fertilizers must contain price_kg (EUR/kg) for fertApp().", call. = FALSE)
   }
 
-  fert_opt <- fertilizers[, c("name", "N", "P", "K"), drop = FALSE]
+  # optApp() validates and optimises fertilizer cost, so it requires the
+  # price_kg column in addition to name, N, P, K (percentage nutrient contents).
+  fert_opt <- fertilizers[, c("name", "N", "P", "K", "price_kg"), drop = FALSE]
 
   # --- QUEFTS crop & soil --------------------------------------------------
   if (is.null(crop_params)) {
-    crop_pars <- nfert_to_quefts_crop(field_inputs$crop)
+    crop_pars <- agrinutri_to_quefts_crop(field_inputs$crop)
   } else if (is.list(crop_params) && "Yzero" %in% names(crop_params)) {
     crop_pars <- crop_params
   } else {
-    crop_pars <- nfert_to_quefts_crop(as.character(crop_params)[1L])
+    crop_pars <- agrinutri_to_quefts_crop(as.character(crop_params)[1L])
   }
 
-  soil_pars <- nfert_to_quefts_soil(as.numeric(bal$B))
+  soil_pars <- agrinutri_to_quefts_soil(as.numeric(bal$B))
 
   p_y <- if (!is.null(prices$p_y)) as.numeric(prices$p_y)[1L] else 280
   dm_crop_value <- p_y / 1000
@@ -177,38 +178,81 @@ optimize_VR_DPI <- function(field_inputs,
   eonr <- matrix(NA_real_, nrow = n_cells, ncol = 3L,
                  dimnames = list(NULL, c("N", "P", "K")))
 
+  # The QUEFTS economic optimisation (Rquefts::optApp, a cost optimisation over
+  # the fertilizer set) can still fail for an individual cell when the NNI-scaled
+  # attainable biomass drives the optimiser into a degenerate state. A single bad
+  # cell must not abort the whole field prescription, so each cell is evaluated
+  # defensively and left as NA on failure (mirroring the tryCatch used for
+  # fertApp()). optApp() returns the applied N, P and K already in kg/ha.
   for (i in seq_len(n_cells)) {
-    biom_i <- nfert_to_quefts_biom(
-      field_inputs$expected_yield_tons_ha,
-      nni_v[i],
-      crop_pars
-    )
-    qm <- Rquefts::quefts(
-      soil_pars,
-      crop_pars,
-      list(N = 0, P = 0, K = 0),
-      biom_i
-    )
-    res <- Rquefts::optApp(
-      qm,
-      fertilizers = fert_opt,
-      dm_crop_value = dm_crop_value
-    )
-    eonr[i, "N"] <- as.numeric(res$N) * 100
-    eonr[i, "P"] <- as.numeric(res$P) * 100
-    eonr[i, "K"] <- as.numeric(res$K) * 100
+    cell <- tryCatch({
+      biom_i <- agrinutri_to_quefts_biom(
+        field_inputs$expected_yield_tons_ha,
+        nni_v[i],
+        crop_pars
+      )
+      qm <- Rquefts::quefts(
+        soil_pars,
+        crop_pars,
+        list(N = 0, P = 0, K = 0),
+        biom_i
+      )
+      res <- Rquefts::optApp(
+        qm,
+        fertilizers = fert_opt,
+        dm_crop_value = dm_crop_value
+      )
+      c(
+        N = as.numeric(res$N)[1L],
+        P = as.numeric(res$P)[1L],
+        K = as.numeric(res$K)[1L]
+      )
+    }, error = function(e) c(N = NA_real_, P = NA_real_, K = NA_real_))
+    eonr[i, ] <- cell
   }
 
-  N_cap_cell <- pmin(N_tot_field * w_norm, N_MAS)
-  N_cell <- pmin(eonr[, "N"], N_cap_cell)
+  # --- Field target and NNI redistribution (mass-balance constraint) -------
+  # Semantics: the economic optimum sets the applied field level, the regulatory
+  # budget (DPI dose, MAS, ZVN) is a CEILING and not a target, and the NNI weights
+  # redistribute that level in space. The applied field mean is therefore the
+  # economic optimum, capped by the regulatory budget only where the latter binds.
 
-  # --- Mass-balance projection on field mean ------------------------------
+  # Cells whose economic optimum could not be computed fall back to the
+  # regulatory field budget, so the field mean stays defined even when the
+  # optional QUEFTS optimiser fails on some cells/platforms.
+  failed <- !is.finite(eonr[, "N"])
+  if (any(failed)) {
+    warning(sprintf(
+      paste0("optimize_VR_DPI(): QUEFTS economic optimisation failed for %d of ",
+             "%d cell(s); using the DPI budget for those cell(s)."),
+      sum(failed), n_cells
+    ), call. = FALSE)
+    eonr[failed, "N"] <- N_tot_field
+  }
+
+  eonr_mean_N     <- mean(eonr[, "N"])
+  regulatory_bind <- eonr_mean_N > N_tot_field
+  # The regulatory budget can be zero or negative when organic inputs already
+  # meet (or exceed) crop demand: in that case no mineral N is applied.
+  N_field_target  <- max(0, min(eonr_mean_N, N_tot_field))
+
+  # Redistribute the field target by the NNI weights (mean(w_norm) == 1, so the
+  # field mean is preserved), then water-fill to respect the per-cell MAS ceiling
+  # and non-negativity while holding the target field sum.
+  target_sum <- N_field_target * n_cells
+  N_cell <- N_field_target * w_norm
   for (.iter in seq_len(max_iter)) {
-    delta <- N_tot_field - mean(N_cell)
-    if (abs(delta) < tol) break
-    step <- delta * w_norm * min(1, 0.8 / max(w_norm))
-    N_cell <- pmax(0, pmin(N_cell + step, pmin(N_MAS, N_cap_cell)))
+    over  <- N_cell > N_MAS
+    under <- N_cell < 0
+    N_cell[over]  <- N_MAS
+    N_cell[under] <- 0
+    free    <- !(over | under)
+    sw      <- sum(w_norm[free])
+    deficit <- target_sum - sum(N_cell)
+    if (!any(free) || sw <= 0 || abs(deficit) < tol * n_cells) break
+    N_cell[free] <- N_cell[free] + deficit * w_norm[free] / sw
   }
+  N_cell <- pmax(0, pmin(N_cell, N_MAS))
 
   # --- fertApp (optional) --------------------------------------------------
   nutrients <- data.frame(
@@ -235,10 +279,8 @@ optimize_VR_DPI <- function(field_inputs,
   K2O_cell  <- eonr[, "K"] * 1.205
 
   .fill_rst <- function(template, idx_logical, vals) {
-    r <- terra::rast(template)
-    vv <- terra::values(r, mat = FALSE)
-    if (is.matrix(vv)) vv <- vv[, 1L]
-    vv[] <- NA_real_
+    r <- terra::rast(template, nlyrs = 1L)
+    vv <- rep(NA_real_, terra::ncell(r))
     vv[idx_logical] <- vals
     terra::values(r) <- vv
     r
@@ -257,19 +299,22 @@ optimize_VR_DPI <- function(field_inputs,
     K_prescription = K_rast,
     fertilizer_mix = mix,
     economics = list(
-      mean_dose    = mean(N_cell),
-      p_y          = p_y,
+      mean_dose     = mean(N_cell),
+      eonr_mean_N   = eonr_mean_N,
+      p_y           = p_y,
       dm_eur_per_kg = dm_crop_value
     ),
     compliance = list(
-      DPI_cap_kg_ha   = N_tot_DPI,
-      MAS_kg_ha       = if (is.finite(N_MAS)) N_MAS else NA_real_,
-      ZVN_active      = isTRUE(zvn),
-      ZVN_cap_kg_ha   = if (isTRUE(zvn)) 170 else NA_real_,
-      applied_cap_kg_ha = N_tot_field,
-      mass_balance_ok = abs(mean(N_cell) - N_tot_field) < max(tol, 0.05),
-      max_cell_N      = max(N_cell),
-      mean_field_N    = mean(N_cell)
+      DPI_cap_kg_ha      = N_tot_DPI,
+      MAS_kg_ha          = if (is.finite(N_MAS)) N_MAS else NA_real_,
+      ZVN_active         = isTRUE(zvn),
+      ZVN_cap_kg_ha      = if (isTRUE(zvn)) 170 else NA_real_,
+      applied_cap_kg_ha  = N_tot_field,
+      field_target_kg_ha = N_field_target,
+      regulatory_binding = regulatory_bind,
+      mass_balance_ok    = abs(mean(N_cell) - N_field_target) < max(tol, 0.05),
+      max_cell_N         = max(N_cell),
+      mean_field_N       = mean(N_cell)
     )
   )
 }

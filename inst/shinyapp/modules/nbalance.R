@@ -5,11 +5,11 @@ nBalanceUI <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(4,
-      .nfert_card(
+      .agrinutri_card(
         h3("Crop and field inputs"),
         selectInput(ns("crop"), "Crop",
-                    choices = .nfert_crop_choices(),
-                    selected = .nfert_default_crop()),
+                    choices = .agrinutri_crop_choices(),
+                    selected = .agrinutri_default_crop()),
         fluidRow(
           column(6, numericInput(ns("yield"), "Expected yield (t ha\u207B\u00B9)",
                                   value = 60, min = 0.1, step = 1)),
@@ -63,9 +63,9 @@ nBalanceUI <- function(id) {
         conditionalPanel(
           condition = "output.research",
           ns = ns,
-          .nfert_research_box(
+          .agrinutri_research_box(
             h4("Research overrides"),
-            p(class = "nfert-muted",
+            p(class = "agrinutri-muted",
               "Override the DPI 2026 default coefficients. Leave blank to use",
               "the bundled tables."),
             fluidRow(
@@ -85,8 +85,8 @@ nBalanceUI <- function(id) {
       )
     ),
     column(8,
-      .nfert_card(
-        tags$ul(class = "nfert-stepbar",
+      .agrinutri_card(
+        tags$ul(class = "agrinutri-stepbar",
           tags$li(class = "active", "1. Balance"),
           tags$li("2. Distribution plan"),
           tags$li("3. Precision / VRT")),
@@ -94,7 +94,7 @@ nBalanceUI <- function(id) {
         uiOutput(ns("summary_box")),
         tags$hr(),
         h4("Waterfall from crop demand (A) to net mineral N to apply"),
-        p(class = "nfert-muted",
+        p(class = "agrinutri-muted",
           "Each red segment adds to the N requirement; each green segment",
           "reduces it; the running total lands on the blue bar (Net N*).",
           "The dashed line is the MAS cap for the selected crop."),
@@ -119,7 +119,7 @@ nBalanceUI <- function(id) {
       conditionalPanel(
         condition = "output.research",
         ns = ns,
-        .nfert_research_box(
+        .agrinutri_research_box(
           h4("Raw N_balance() object"),
           verbatimTextOutput(ns("raw_print"))
         )
@@ -135,7 +135,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
 
     bal <- eventReactive(input$run, {
       withProgress(message = "Computing N balance...", value = 0.3, {
-        # All dropdowns return English canonical keys (NFert >= 0.12.0
+        # All dropdowns return English canonical keys (agrinutri >= 0.12.0
         # reference tables are English-primary).
         args <- list(
           crop                 = input$crop,
@@ -156,7 +156,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
           location             = input$location,
           forg_quantity        = input$forg_q
         )
-        tryCatch(do.call(NFert::N_balance, args),
+        tryCatch(do.call(agrinutri::N_balance, args),
                  error = function(e) {
                    showNotification(conditionMessage(e), type = "error",
                                     duration = 10); NULL
@@ -173,18 +173,18 @@ nBalanceServer <- function(id, research_mode, app_state) {
                   if (net > mas) "!" else "ok"
                 } else "--"
       tagList(
-        div(class = "nfert-kpi-row",
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value",
-                   .nfert_fmt(net, 0)),
-              span(class = "nfert-kpi-label",
+        div(class = "agrinutri-kpi-row",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value",
+                   .agrinutri_fmt(net, 0)),
+              span(class = "agrinutri-kpi-label",
                    "Net N* (kg N ha\u207B\u00B9)")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mas, 0)),
-              span(class = "nfert-kpi-label", "MAS cap")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", check),
-              span(class = "nfert-kpi-label", "MAS check"))
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mas, 0)),
+              span(class = "agrinutri-kpi-label", "MAS cap")),
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", check),
+              span(class = "agrinutri-kpi-label", "MAS check"))
         )
       )
     })
@@ -217,12 +217,12 @@ nBalanceServer <- function(id, research_mode, app_state) {
     }
     net_value <- reactive({
       b <- bal(); req(b)
-      .as_scalar(tryCatch(NFert::calculate_N_fertilization(b),
+      .as_scalar(tryCatch(agrinutri::calculate_N_fertilization(b),
                           error = function(e) NA_real_))
     })
     mas_value <- reactive({
       v <- tryCatch(
-        suppressWarnings(NFert::get_MAS(crop = input$crop)),
+        suppressWarnings(agrinutri::get_MAS(crop = input$crop)),
         error = function(e) NULL)
       if (is.null(v)) return(NA_real_)
       .as_scalar(v$mas_N)
@@ -233,7 +233,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
       # use absolute values for the helper (it re-applies sign)
       df$value <- abs(df$value)
       df$term  <- factor(df$term, levels = df$term)
-      .nfert_waterfall(df, net_value = net_value(), mas_cap = mas_value())
+      .agrinutri_waterfall(df, net_value = net_value(), mas_cap = mas_value())
     })
 
     output$gauge_plot <- renderPlot({
@@ -248,7 +248,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
           na.rm = TRUE))
         if (!is.finite(v)) 0 else v
       }, error = function(e) 0)
-      .nfert_compliance_pair(net = nv, mas = mv,
+      .agrinutri_compliance_pair(net = nv, mas = mv,
                               zvn_applied = f_contrib,
                               zvn_limit = 170)
     })
@@ -264,11 +264,11 @@ nBalanceServer <- function(id, research_mode, app_state) {
       b <- bal(); req(b); print(b)
     })
 
-    output$dl_csv <- .nfert_download_csv(NULL, terms_df, "Nbalance_terms")
+    output$dl_csv <- .agrinutri_download_csv(NULL, terms_df, "Nbalance_terms")
 
     output$dl_report <- downloadHandler(
       filename = function()
-        sprintf("NFert_report_%s.html",
+        sprintf("agrinutri_report_%s.html",
                 format(Sys.time(), "%Y%m%d_%H%M")),
       content = function(file) {
         if (!requireNamespace("rmarkdown", quietly = TRUE)) {
@@ -276,11 +276,11 @@ nBalanceServer <- function(id, research_mode, app_state) {
           df <- terms_df()
           writeLines(c(
             "<!doctype html><html><head><meta charset='utf-8'>",
-            "<title>NFert balance report</title>",
+            "<title>agrinutri balance report</title>",
             "<style>body{font-family:sans-serif;margin:40px}",
             "table{border-collapse:collapse}td,th{padding:4px 10px;",
             "border-bottom:1px solid #ddd}</style></head><body>",
-            sprintf("<h1>NFert balance report - %s</h1>",
+            sprintf("<h1>agrinutri balance report - %s</h1>",
                     format(Sys.time(), "%Y-%m-%d %H:%M")),
             sprintf("<p><b>Crop:</b> %s &middot; <b>Yield:</b> %.1f t/ha</p>",
                     input$crop, input$yield),
@@ -303,12 +303,12 @@ nBalanceServer <- function(id, research_mode, app_state) {
         render_env$report_mas   <- mas_value()
         render_env$report_crop  <- input$crop
         render_env$report_yield <- input$yield
-        render_env$.nfert_waterfall <- .nfert_waterfall
+        render_env$.agrinutri_waterfall <- .agrinutri_waterfall
 
         tpl <- tempfile(fileext = ".Rmd")
         writeLines(c(
           "---",
-          "title: \"NFert balance report\"",
+          "title: \"agrinutri balance report\"",
           sprintf("date: \"%s\"", format(Sys.time(), "%Y-%m-%d %H:%M")),
           "output:",
           "  html_document:",
@@ -333,7 +333,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
           "df <- report_terms",
           "df$value <- abs(df$value)",
           "df$term  <- factor(df$term, levels = df$term)",
-          ".nfert_waterfall(df, net_value = report_net, mas_cap = report_mas)",
+          ".agrinutri_waterfall(df, net_value = report_net, mas_cap = report_mas)",
           "```",
           "",
           "### Breakdown",
@@ -357,11 +357,11 @@ nBalanceServer <- function(id, research_mode, app_state) {
     observeEvent(input$push_to_plan, {
       b <- bal(); req(b)
       app_state$n_bal_obj <- b
-      app_state$n_target  <- tryCatch(NFert::calculate_N_fertilization(b),
+      app_state$n_target  <- tryCatch(agrinutri::calculate_N_fertilization(b),
                                       error = function(e) NA)
       app_state$crop      <- input$crop
       app_state$mas_cap   <- tryCatch(
-        NFert::get_MAS(crop = input$crop)$mas_N,
+        agrinutri::get_MAS(crop = input$crop)$mas_N,
         error = function(e) NA)
       showNotification("N target sent to Distribution plan tab.",
                        type = "message", duration = 3)

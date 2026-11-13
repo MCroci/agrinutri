@@ -1,6 +1,6 @@
 #' CERZOO example datasets (real field, ready to test the functions)
 #'
-#' NFert ships a small, real-world example from the CERZOO experimental farm of
+#' agrinutri ships a small, real-world example from the CERZOO experimental farm of
 #' the Universita Cattolica del Sacro Cuore (Po Valley, Piacenza, Italy) so that
 #' users can run the full pipeline on actual data out of the box. The files are
 #' stored under `inst/extdata` and accessed with [system.file()]:
@@ -24,11 +24,11 @@
 #' @examples
 #' \dontrun{
 #' field <- sf::st_read(system.file("extdata/cerzoo_field.geojson",
-#'                                  package = "NFert"), quiet = TRUE)
+#'                                  package = "agrinutri"), quiet = TRUE)
 #' field3 <- field[field$id == 3, ]
 #'
 #' s2   <- terra::rast(system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
-#'                                 package = "NFert"))
+#'                                 package = "agrinutri"))
 #' ndvi <- compute_vi(s2, "NDVI", scale_factor = 10000)
 #'
 #' rx <- build_strip_prescription(

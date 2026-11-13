@@ -9,7 +9,9 @@ leaching_loss(
   start_spring_rain = 40,
   oxygen_availability = "Normal",
   id_rag = 3,
-  b1 = 29.16
+  b1 = 29.16,
+  perennial = FALSE,
+  autumn_loss = TRUE
 )
 }
 \arguments{
@@ -20,51 +22,53 @@ leaching_loss(
 \item{oxygen_availability}{Oxygen availability level in the soil: one of
 \code{ca.table$availability} (e.g. \code{"Normal"}, \code{"Slow"}, \code{"Fast"}).}
 
-\item{id_rag}{Soil drainage index (\code{ID_Rag}); retained for backward
-compatibility with earlier NFert signatures (not used in the \eqn{C_a}/\eqn{C_b}
-formulas above).}
+\item{id_rag}{Soil texture group index (\code{ID_Rag}); retained for backward
+compatibility (not used in the formulas).}
 
 \item{b1}{Readily available nitrogen in the soil (kg N/ha).}
+
+\item{perennial}{Logical; \code{TRUE} for perennial crops in production
+(time coefficient 1), whose leachable pool is fixed at 30 kg N/ha.}
+
+\item{autumn_loss}{Logical; \code{FALSE} sets \eqn{C_a} to 0.}
 }
 \value{
 A list containing:
 \item{C1}{Autumn--winter leaching loss (kg N/ha).}
-\item{C2}{February leaching loss (kg N/ha).}
+\item{C2}{End-of-winter leaching loss (kg N/ha).}
 \item{surplus_pluviometrico}{Logical. \code{TRUE} when
 \code{winter_rain + start_spring_rain >= 300} mm (DPI 2026 scheda a
 dose standard: surplus-pluviometric flag).}
 }
 \description{
 DPI 2026 (Allegato 2; foglio \verb{C&D} di Fert_Office v1.26): loss of readily
-available mineral nitrogen (\eqn{b_1}) from leaching.
+available mineral nitrogen ("N pronto") from leaching.
 }
 \details{
+Let \eqn{N_p} be the leachable N pronto: \code{b1} for crops with a cycle
+shorter than one year, or a fixed 30 kg N/ha for perennial crops in
+production (\code{perennial = TRUE}, i.e. time coefficient 1).
+
 \describe{
 \item{\strong{C1} (\eqn{C_a}, autumn--winter)}{
-Depends on winter rainfall (1 October -- 31 January), \code{winter_rain} (mm):
-\itemize{
-\item \eqn{\leq 150} mm \eqn{\rightarrow} no loss (0);
-\item \eqn{(150,\,250]} mm \eqn{\rightarrow} linear fraction of \eqn{b_1}:
-\eqn{b_1 \times (R_{\mathrm{win}} - 150) / 100};
-\item \eqn{> 250} mm \eqn{\rightarrow} loss of the entire \eqn{b_1} pool
-(cannot exceed \eqn{b_1}).
+Depends on winter rainfall \eqn{y} (1 October -- 31 January,
+\code{winter_rain}, mm): \eqn{N_p \times \min(\max(y - 150, 0), 100)/100},
+i.e. no loss up to 150 mm and the whole pool above 250 mm. It is 0 when
+\code{autumn_loss = FALSE} (first phase of a crop cycle, e.g. a second
+crop or pre-planting, as in Fert_Office).}
+\item{\strong{C2} (\eqn{C_b}, end of winter)}{
+With \eqn{s = y + f - 250}, where \eqn{f} is February rainfall
+(\code{start_spring_rain}): when \eqn{s > 0} the N pronto not yet lost
+(\eqn{N_p - C_a}) is lost, plus 1 kg N/ha for every 10 mm of \eqn{s} if
+\eqn{y > 150} mm.}
 }
-}
-\item{\strong{C2} (\eqn{C_b}, February)}{
-Additional loss from February rainfall (\code{start_spring_rain}, mm) applied
-only to the \emph{residual} readily available N after \eqn{C_1}, and only if
-\code{winter_rain > 150}. Formula: \eqn{\min(\code{start_spring_rain}/10,\, b_1 - C_1)}.
-}
-}
-
-Invariant: \eqn{C_1 + C_2 \leq b_1}.
 
 \code{oxygen_availability} is validated against \code{\link{ca.table}} for
-consistency with other balance terms; the rainfall formulas above do not use
-the legacy tabular column \code{cb.table$C} (that column referred to the old,
-incorrect assignment of a fixed loss independent of rainfall).
+consistency with other balance terms; the leaching formulas do not use it.
 }
 \examples{
 leaching_loss(winter_rain = 160, start_spring_rain = 40,
               oxygen_availability = "Normal", id_rag = 3, b1 = 29.16)
+leaching_loss(winter_rain = 300, start_spring_rain = 20, b1 = 0,
+              perennial = TRUE)
 }

@@ -5,10 +5,10 @@ welcomeUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(column(10, offset = 1,
-      .nfert_card(
+      .agrinutri_card(
         h2(tags$strong("Transparent, balance-based N, P and K management")),
-        p(class = "nfert-lead",
-          "NFert computes legally-compliant field N, P and K doses from the",
+        p(class = "agrinutri-lead",
+          "agrinutri computes legally-compliant field N, P and K doses from the",
           "Emilia-Romagna DPI 2026 balance, splits them into organic and",
           "mineral applications, and -- when a Sentinel-2 scene or UAV",
           "multispectral raster is available -- redistributes the N target",
@@ -17,13 +17,13 @@ welcomeUI <- function(id) {
         fluidRow(
           column(4, actionButton(ns("go_nbal"),
             tagList(icon("leaf"), " New N balance"),
-            class = "btn btn-lg btn-primary nfert-btn-cta", width = "100%")),
+            class = "btn btn-lg btn-primary agrinutri-btn-cta", width = "100%")),
           column(4, actionButton(ns("go_plan"),
             tagList(icon("truck"), " Distribution plan"),
-            class = "btn btn-lg btn-default nfert-btn-cta", width = "100%")),
+            class = "btn btn-lg btn-default agrinutri-btn-cta", width = "100%")),
           column(4, actionButton(ns("go_prec"),
             tagList(icon("satellite"), " Variable-rate + NNI"),
-            class = "btn btn-lg btn-default nfert-btn-cta", width = "100%"))
+            class = "btn btn-lg btn-default agrinutri-btn-cta", width = "100%"))
         ),
         tags$hr(),
         h4("What happens behind each button"),
@@ -48,11 +48,11 @@ welcomeUI <- function(id) {
 
 welcomeServer <- function(id, parent_session) {
   moduleServer(id, function(input, output, session) {
-    observeEvent(input$go_nbal, updateNavbarPage(parent_session, "nfert_nav",
+    observeEvent(input$go_nbal, updateNavbarPage(parent_session, "agrinutri_nav",
                                                  selected = "N balance"))
-    observeEvent(input$go_plan, updateNavbarPage(parent_session, "nfert_nav",
+    observeEvent(input$go_plan, updateNavbarPage(parent_session, "agrinutri_nav",
                                                  selected = "Distribution plan"))
-    observeEvent(input$go_prec, updateNavbarPage(parent_session, "nfert_nav",
+    observeEvent(input$go_prec, updateNavbarPage(parent_session, "agrinutri_nav",
                                                  selected = "Precision N"))
   })
 }

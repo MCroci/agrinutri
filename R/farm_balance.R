@@ -1,4 +1,4 @@
-#' Apply the NFert balance to every plot of a farm
+#' Apply the agrinutri balance to every plot of a farm
 #'
 #' Reads a vector layer (GeoJSON, Shapefile, GeoPackage, or an in-memory
 #' \code{sf} object) in which each feature is an agronomic plot, runs
@@ -29,7 +29,7 @@
 #' \code{area_ha} \tab 5.2 \tab used to derive \code{N_total_kg}
 #' }
 #' Italian aliases (Frumento tenero, Liquame bovino, Cereali vernini -
-#' paglia asportata, ...) are accepted because the underlying NFert
+#' paglia asportata, ...) are accepted because the underlying agrinutri
 #' functions carry the translation layer.
 #'
 #' @section Output columns added to the layer:
@@ -64,7 +64,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+#' ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 #' farm <- farm_balance(ex)
 #' print(farm[, c("plot_id", "crop", "area_ha",
 #'                 "N_target", "MAS_cap", "N_total_kg")])
@@ -122,15 +122,15 @@ farm_balance <- function(x,
 
   for (i in seq_len(n_feat)) {
     row <- farm[i, , drop = TRUE]
-    # Reference tables are English-canonical since NFert 0.12.0, so no
+    # Reference tables are English-canonical since agrinutri 0.12.0, so no
     # translation is needed for ordinary input. Legacy Italian strings
-    # are still accepted: they are routed through nfert_it2en() then
+    # are still accepted: they are routed through agrinutri_it2en() then
     # ignored if the English lookup succeeds.
     coerce_en <- function(x, kind)
       if (is.null(x) || length(x) == 0 || is.na(x)) NA_character_
       else {
-        xen <- suppressWarnings(nfert_it2en(as.character(x), kind = kind))
-        # nfert_it2en returns the input unchanged when no alias match
+        xen <- suppressWarnings(agrinutri_it2en(as.character(x), kind = kind))
+        # agrinutri_it2en returns the input unchanged when no alias match
         # is found, so we simply keep whatever we get.
         xen
       }
@@ -143,7 +143,7 @@ farm_balance <- function(x,
       Ntot                   = as.numeric(row$Ntot),
       SOM                    = as.numeric(row$SOM),
       CN                     = as.numeric(row$CN),
-      oxygen_availability    = nfert_normalize_oxygen(
+      oxygen_availability    = agrinutri_normalize_oxygen(
         as.character(row$oxygen_availability %||% "Normal")
       ),
       winter_rain            = as.numeric(row$winter_rain),

@@ -9,9 +9,9 @@ precisionUI <- function(id) {
     tabPanel("Strip prescription (machine width)",
       fluidRow(
         column(4,
-          .nfert_card(
+          .agrinutri_card(
             h3(icon("truck"), " Strip builder inputs"),
-            p(class = "nfert-muted",
+            p(class = "agrinutri-muted",
               "Generate machine-width strips along an A-B line inside a",
               "farm plot and assign a dose per strip. Output is ready to",
               "be exported in any tractor-monitor format."),
@@ -47,7 +47,7 @@ precisionUI <- function(id) {
             conditionalPanel(
               condition = sprintf("input['%s'] == 'click'", ns("ab_source")),
               leaflet::leafletOutput(ns("ab_map"), height = "240px"),
-              div(class = "nfert-muted",
+              div(class = "agrinutri-muted",
                 "Click once for A, again for B. Click a third time to reset."),
               actionButton(ns("ab_reset"), "Reset A-B points",
                             class = "btn btn-default btn-sm")
@@ -101,7 +101,7 @@ precisionUI <- function(id) {
           )
         ),
         column(8,
-          .nfert_card(
+          .agrinutri_card(
             h3("Prescription strips"),
             plotOutput(ns("strip_plot_out"), height = "380px"),
             h4("Dose summary"),
@@ -131,7 +131,7 @@ precisionUI <- function(id) {
     tabPanel("Variable-rate N (NDVI / NDRE)",
       fluidRow(
         column(4,
-          .nfert_card(
+          .agrinutri_card(
             h3(icon("satellite"), " VRT inputs"),
             fileInput(ns("vi_file"),
                       "Normalised 0-1 VI raster (GeoTIFF)",
@@ -158,7 +158,7 @@ precisionUI <- function(id) {
             conditionalPanel(
               condition = "output.research",
               ns = ns,
-              .nfert_research_box(
+              .agrinutri_research_box(
                 h4("Research overrides"),
                 fluidRow(
                   column(6, numericInput(ns("ndvi_ref"),
@@ -176,7 +176,7 @@ precisionUI <- function(id) {
           )
         ),
         column(8,
-          .nfert_card(
+          .agrinutri_card(
             h3("VRT prescription map"),
             plotOutput(ns("vi_plot"),  height = "220px"),
             plotOutput(ns("vrt_plot"), height = "260px"),
@@ -195,9 +195,9 @@ precisionUI <- function(id) {
     tabPanel("NNI (empirical, VI-based)",
       fluidRow(
         column(4,
-          .nfert_card(
+          .agrinutri_card(
             h3(icon("seedling"), " VI -> NNI (no GPR)"),
-            p(class = "nfert-muted",
+            p(class = "agrinutri-muted",
               "Derive an NNI map directly from one vegetation index",
               "using a published linear regression. No GPR models",
               "or model-directory path required. Suggested when you",
@@ -223,9 +223,9 @@ precisionUI <- function(id) {
             conditionalPanel(
               condition = "output.research",
               ns = ns,
-              .nfert_research_box(
+              .agrinutri_research_box(
                 h4("Override regression coefficients"),
-                p(class = "nfert-muted",
+                p(class = "agrinutri-muted",
                   "If you have locally calibrated slope / intercept",
                   "values, override the defaults here."),
                 fluidRow(
@@ -242,7 +242,7 @@ precisionUI <- function(id) {
           )
         ),
         column(8,
-          .nfert_card(
+          .agrinutri_card(
             h3("NNI map and zones"),
             plotOutput(ns("emp_nni_plot"),   height = "300px"),
             plotOutput(ns("emp_zones_plot"), height = "240px"),
@@ -255,7 +255,7 @@ precisionUI <- function(id) {
     tabPanel("NNI (S2 L2A, GPR)",
       fluidRow(
         column(4,
-          .nfert_card(
+          .agrinutri_card(
             h3(icon("seedling"), " Sentinel-2 -> NNI"),
             selectInput(ns("nni_crop"), "Crop",
                         choices = .NNI_CROP_CHOICES,
@@ -274,9 +274,9 @@ precisionUI <- function(id) {
             conditionalPanel(
               condition = "output.research",
               ns = ns,
-              .nfert_research_box(
+              .agrinutri_research_box(
                 h4("Parameter overrides"),
-                p(class = "nfert-muted",
+                p(class = "agrinutri-muted",
                   "Leave blank to use the crop defaults from",
                   "crop_params_NNI()."),
                 fluidRow(
@@ -303,7 +303,7 @@ precisionUI <- function(id) {
           )
         ),
         column(8,
-          .nfert_card(
+          .agrinutri_card(
             h3("NNI map and zones"),
             plotOutput(ns("nni_plot"),   height = "300px"),
             h4("Distribution of NNI values"),
@@ -332,9 +332,9 @@ precisionServer <- function(id, research_mode, app_state) {
     })
     observeEvent(input$vi_demo, {
       if (!requireNamespace("sf", quietly = TRUE)) return()
-      ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+      ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
       fd <- sf::st_read(ex, quiet = TRUE)[1, ]
-      vi_rast_val(.nfert_demo_ndvi(fd))
+      vi_rast_val(.agrinutri_demo_ndvi(fd))
       showNotification("Demo NDVI raster loaded.",
                        type = "message", duration = 3)
     })
@@ -359,7 +359,7 @@ precisionServer <- function(id, research_mode, app_state) {
                    else .as_num(app_state$mas_cap)
 
       withProgress(message = "Computing VRT...", value = 0.5, {
-        tryCatch(NFert::variable_rate_N(
+        tryCatch(agrinutri::variable_rate_N(
           ndvi_raster = r,
           n_dose      = n_target,
           method      = method,
@@ -392,7 +392,7 @@ precisionServer <- function(id, research_mode, app_state) {
                 .is_ok_num(app_state$n_target))
               .as_num(app_state$n_target)
             else .as_num(input$n_dose)
-      .nfert_raster_hist(r, breaks = nt,
+      .agrinutri_raster_hist(r, breaks = nt,
                          xlab = "N rate (kg N/ha)")
     })
     `%||%` <- function(a, b) if (is.null(a)) b else a
@@ -403,16 +403,16 @@ precisionServer <- function(id, research_mode, app_state) {
       mn <- terra::global(r, "mean", na.rm = TRUE)[1,1]
       mi <- terra::global(r, "min",  na.rm = TRUE)[1,1]
       ma <- terra::global(r, "max",  na.rm = TRUE)[1,1]
-      div(class = "nfert-kpi-row",
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mn, 0)),
-              span(class = "nfert-kpi-label", "mean")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mi, 0)),
-              span(class = "nfert-kpi-label", "min")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(ma, 0)),
-              span(class = "nfert-kpi-label", "max")))
+      div(class = "agrinutri-kpi-row",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mn, 0)),
+              span(class = "agrinutri-kpi-label", "mean")),
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mi, 0)),
+              span(class = "agrinutri-kpi-label", "min")),
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(ma, 0)),
+              span(class = "agrinutri-kpi-label", "max")))
     })
 
     output$dl_tif <- downloadHandler(
@@ -432,10 +432,10 @@ precisionServer <- function(id, research_mode, app_state) {
     })
     observeEvent(input$emp_vi_demo, {
       if (!requireNamespace("sf", quietly = TRUE)) return()
-      ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+      ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
       fd <- sf::st_read(ex, quiet = TRUE)[1, ]
       # Re-range NDVI 0.3-0.9 -> NDRE 0.15-0.55
-      r  <- .nfert_demo_ndvi(fd)
+      r  <- .agrinutri_demo_ndvi(fd)
       v  <- terra::values(r, mat = FALSE)
       v  <- 0.15 + (v - 0.30) / (0.90 - 0.30) * (0.55 - 0.15)
       terra::values(r) <- v
@@ -449,7 +449,7 @@ precisionServer <- function(id, research_mode, app_state) {
       sl <- if (.is_ok_num(input$emp_slope)) .as_num(input$emp_slope) else NULL
       it <- if (.is_ok_num(input$emp_intercept)) .as_num(input$emp_intercept)
              else NULL
-      tryCatch(NFert::nni_from_vi_empirical(
+      tryCatch(agrinutri::nni_from_vi_empirical(
         vi_raster = r,
         index     = input$emp_index,
         crop      = input$emp_crop,
@@ -475,24 +475,24 @@ precisionServer <- function(id, research_mode, app_state) {
     output$emp_summary <- renderUI({
       o <- emp_nni_out(); req(o)
       mn <- terra::global(o$NNI, "mean", na.rm = TRUE)[1,1]
-      div(class = "nfert-kpi-row",
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mn, 2)),
-              span(class = "nfert-kpi-label", "mean NNI")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value",
+      div(class = "agrinutri-kpi-row",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mn, 2)),
+              span(class = "agrinutri-kpi-label", "mean NNI")),
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value",
                    sprintf("%.2f", o$slope)),
-              span(class = "nfert-kpi-label",
+              span(class = "agrinutri-kpi-label",
                    sprintf("slope (%s)", o$index))),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value",
                    sprintf("%.2f", o$intercept)),
-              span(class = "nfert-kpi-label", "intercept")))
+              span(class = "agrinutri-kpi-label", "intercept")))
     })
 
     # ---- NNI (GPR) --------------------------------------------------
     output$nni_caveats <- renderUI({
-      div(class = "nfert-alert nfert-alert-info",
+      div(class = "agrinutri-alert agrinutri-alert-info",
           tags$strong("Calibration caveat. "),
           "Defaults for alpha_leaf and k (N:Chl) usually introduce",
           tags$b("15-30 % bias"), " in operational NNI. A minimal local",
@@ -502,7 +502,7 @@ precisionServer <- function(id, research_mode, app_state) {
 
     # Detect bundled GPR models (inst/extdata/SENTINEL2_L2A_*.json)
     .bundled_model_dir <- reactive({
-      d <- system.file("extdata", package = "NFert")
+      d <- system.file("extdata", package = "agrinutri")
       if (!nzchar(d)) return(NA_character_)
       needed <- paste0("SENTINEL2_L2A_",
                         c("LAI","Cm","Cw","FVC","Cab","laiCab",
@@ -521,17 +521,17 @@ precisionServer <- function(id, research_mode, app_state) {
       user_path <- trimws(input$model_dir %||% "")
       bundled   <- .bundled_model_dir()
       if (nzchar(user_path)) {
-        div(class = "nfert-alert nfert-alert-info",
+        div(class = "agrinutri-alert agrinutri-alert-info",
             tags$strong("Using user path: "), user_path)
       } else if (!is.na(bundled)) {
-        div(class = "nfert-alert nfert-alert-ok",
+        div(class = "agrinutri-alert agrinutri-alert-ok",
             tags$strong("Bundled GPR models detected. "),
             tags$br(),
             "Found 8 PROSAIL-trained .json files in ",
             tags$code(bundled),
             ". The pipeline will use them automatically.")
       } else {
-        div(class = "nfert-alert nfert-alert-warn",
+        div(class = "agrinutri-alert agrinutri-alert-warn",
             tags$strong("GPR models not found. "),
             tags$br(),
             "Either supply the path manually, copy the 8 .json files ",
@@ -557,7 +557,7 @@ precisionServer <- function(id, research_mode, app_state) {
         showNotification("Install 'terra' to run the NNI pipeline.",
                          type = "error"); return(NULL)
       }
-      params <- tryCatch(NFert::crop_params_NNI(input$nni_crop),
+      params <- tryCatch(agrinutri::crop_params_NNI(input$nni_crop),
                          error = function(e) list())
       if (.is_ok_num(input$alpha_leaf))
         params$alpha_leaf <- .as_num(input$alpha_leaf)
@@ -569,7 +569,7 @@ precisionServer <- function(id, research_mode, app_state) {
                                        CNC_Cab   = "CNC_Cab"),
                 "FVC")
       withProgress(message = "Running S2 -> NNI pipeline...", value = 0.3, {
-        maps <- tryCatch(NFert::estimate_biophysical(
+        maps <- tryCatch(agrinutri::estimate_biophysical(
           raster_path = input$s2_file$datapath,
           output_dir  = tempfile("nni_", fileext = ""),
           variables   = vars,
@@ -579,7 +579,7 @@ precisionServer <- function(id, research_mode, app_state) {
                            duration = 10); NULL
         })
         if (is.null(maps)) return(NULL)
-        tryCatch(NFert::compute_NNI_from_S2(
+        tryCatch(agrinutri::compute_NNI_from_S2(
           lai_rast  = maps$LAI,
           cm_rast   = maps$Cm,
           cnc_rast  = maps[[input$nni_path]],
@@ -609,7 +609,7 @@ precisionServer <- function(id, research_mode, app_state) {
     # ---- Strip prescription builder ---------------------------------
     demo_field <- reactive({
       if (!requireNamespace("sf", quietly = TRUE)) return(NULL)
-      ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+      ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
       farm <- sf::st_read(ex, quiet = TRUE)
       idx <- as.integer(input$strip_plot %||% 1)
       farm[idx, , drop = FALSE]
@@ -619,13 +619,13 @@ precisionServer <- function(id, research_mode, app_state) {
 
     observeEvent(input$strip_load_ndvi, {
       fd <- demo_field(); req(fd)
-      demo_ndvi(.nfert_demo_ndvi(fd))
+      demo_ndvi(.agrinutri_demo_ndvi(fd))
       showNotification("Demo NDVI raster loaded.",
                        type = "message", duration = 3)
     })
     observeEvent(input$strip_load_nni, {
       fd <- demo_field(); req(fd)
-      demo_nni(.nfert_demo_nni(fd))
+      demo_nni(.agrinutri_demo_nni(fd))
       showNotification("Demo NNI raster loaded.",
                        type = "message", duration = 3)
     })
@@ -708,7 +708,7 @@ precisionServer <- function(id, research_mode, app_state) {
       cell_l  <- if (.is_ok_num(input$cell_len) &&
                      .as_num(input$cell_len) > 0)
                     .as_num(input$cell_len) else NULL
-      tryCatch(NFert::build_strip_prescription(
+      tryCatch(agrinutri::build_strip_prescription(
         field         = fd,
         machine_width = .as_num(input$machine_w),
         cell_length   = cell_l,
@@ -772,22 +772,22 @@ precisionServer <- function(id, research_mode, app_state) {
       s <- strip_out(); req(s)
       mean_d <- weighted.mean(s$dose, s$area_ha)
       total_kg <- sum(s$dose * s$area_ha)
-      div(class = "nfert-kpi-row",
-        div(class = "nfert-kpi",
-            span(class = "nfert-kpi-value", nrow(s)),
-            span(class = "nfert-kpi-label", "strips")),
-        div(class = "nfert-kpi",
-            span(class = "nfert-kpi-value",
-                 .nfert_fmt(sum(s$area_ha), 2)),
-            span(class = "nfert-kpi-label", "total ha")),
-        div(class = "nfert-kpi",
-            span(class = "nfert-kpi-value",
-                 .nfert_fmt(mean_d, 0)),
-            span(class = "nfert-kpi-label", "mean dose (kg/ha)")),
-        div(class = "nfert-kpi",
-            span(class = "nfert-kpi-value",
-                 .nfert_fmt(total_kg, 0)),
-            span(class = "nfert-kpi-label", "total kg N")))
+      div(class = "agrinutri-kpi-row",
+        div(class = "agrinutri-kpi",
+            span(class = "agrinutri-kpi-value", nrow(s)),
+            span(class = "agrinutri-kpi-label", "strips")),
+        div(class = "agrinutri-kpi",
+            span(class = "agrinutri-kpi-value",
+                 .agrinutri_fmt(sum(s$area_ha), 2)),
+            span(class = "agrinutri-kpi-label", "total ha")),
+        div(class = "agrinutri-kpi",
+            span(class = "agrinutri-kpi-value",
+                 .agrinutri_fmt(mean_d, 0)),
+            span(class = "agrinutri-kpi-label", "mean dose (kg/ha)")),
+        div(class = "agrinutri-kpi",
+            span(class = "agrinutri-kpi-value",
+                 .agrinutri_fmt(total_kg, 0)),
+            span(class = "agrinutri-kpi-label", "total kg N")))
     })
 
     output$dl_strip_zip <- downloadHandler(
@@ -803,7 +803,7 @@ precisionServer <- function(id, research_mode, app_state) {
         }
         tmpdir <- tempfile("strips_"); dir.create(tmpdir)
         tryCatch(
-          NFert::export_prescription_all(
+          agrinutri::export_prescription_all(
             s, output_dir = tmpdir, basename = "strip_prescription",
             formats = fmts, dose_field = "dose",
             isoxml_opts = list(task_name = "Strip prescription",
@@ -821,39 +821,39 @@ precisionServer <- function(id, research_mode, app_state) {
     )
     output$nni_hist <- renderPlot({
       o <- nni_out(); req(o)
-      .nfert_raster_hist(o$NNI,
+      .agrinutri_raster_hist(o$NNI,
                          breaks = c(input$thr_lo, input$thr_hi),
                          xlab = "NNI")
     })
     output$zones_bar <- renderPlot({
       o <- nni_out(); req(o)
-      z <- .nfert_zone_area(o$zones)
-      .nfert_zone_bar(z)
+      z <- .agrinutri_zone_area(o$zones)
+      .agrinutri_zone_bar(z)
     })
     output$nni_summary <- renderUI({
       o <- nni_out(); req(o)
       mn <- terra::global(o$NNI, "mean", na.rm = TRUE)[1,1]
-      z  <- .nfert_zone_area(o$zones)
-      div(class = "nfert-kpi-row",
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mn, 2)),
-              span(class = "nfert-kpi-label", "mean NNI")),
-          div(class = "nfert-kpi kpi-deficient",
-              span(class = "nfert-kpi-value",
+      z  <- .agrinutri_zone_area(o$zones)
+      div(class = "agrinutri-kpi-row",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mn, 2)),
+              span(class = "agrinutri-kpi-label", "mean NNI")),
+          div(class = "agrinutri-kpi kpi-deficient",
+              span(class = "agrinutri-kpi-value",
                    sprintf("%.1f%%", z$percent[z$zone == "Deficient"])),
-              span(class = "nfert-kpi-label",
+              span(class = "agrinutri-kpi-label",
                    sprintf("deficient (%.1f ha)",
                            z$ha[z$zone == "Deficient"]))),
-          div(class = "nfert-kpi kpi-optimal",
-              span(class = "nfert-kpi-value",
+          div(class = "agrinutri-kpi kpi-optimal",
+              span(class = "agrinutri-kpi-value",
                    sprintf("%.1f%%", z$percent[z$zone == "Optimal"])),
-              span(class = "nfert-kpi-label",
+              span(class = "agrinutri-kpi-label",
                    sprintf("optimal (%.1f ha)",
                            z$ha[z$zone == "Optimal"]))),
-          div(class = "nfert-kpi kpi-excessive",
-              span(class = "nfert-kpi-value",
+          div(class = "agrinutri-kpi kpi-excessive",
+              span(class = "agrinutri-kpi-value",
                    sprintf("%.1f%%", z$percent[z$zone == "Excessive"])),
-              span(class = "nfert-kpi-label",
+              span(class = "agrinutri-kpi-label",
                    sprintf("excessive (%.1f ha)",
                            z$ha[z$zone == "Excessive"]))))
     })

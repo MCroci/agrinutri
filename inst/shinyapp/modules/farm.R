@@ -7,9 +7,9 @@ farmUI <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(4,
-      .nfert_card(
+      .agrinutri_card(
         h3(icon("tractor"), " Farm / Azienda"),
-        p(class = "nfert-lead",
+        p(class = "agrinutri-lead",
           "Carica un GeoJSON dove ogni feature \u00E8 un appezzamento. ",
           tags$br(),
           "Ogni feature deve avere le colonne richieste da ", tags$code("N_balance()"),
@@ -46,7 +46,7 @@ farmUI <- function(id) {
           class = "btn btn-default"),
         tags$hr(),
         h4("Prescription map export for on-board monitors"),
-        p(class = "nfert-muted",
+        p(class = "agrinutri-muted",
           "Write the N_target layer in the format accepted by the",
           "target tractor monitor. Select one or more and click",
           "Download: the result is a zip of the chosen formats."),
@@ -75,7 +75,7 @@ farmUI <- function(id) {
       )
     ),
     column(8,
-      .nfert_card(
+      .agrinutri_card(
         h3("Plot map"),
         conditionalPanel(
           condition = sprintf("typeof output['%s'] !== 'undefined'",
@@ -104,7 +104,7 @@ farmServer <- function(id, research_mode, app_state) {
 
     input_path <- reactive({
       if (identical(input$source_sel, "demo")) {
-        p <- system.file("extdata/example_farm.geojson", package = "NFert")
+        p <- system.file("extdata/example_farm.geojson", package = "agrinutri")
         if (!nzchar(p)) NULL else p
       } else {
         req(input$farm_file)
@@ -125,7 +125,7 @@ farmServer <- function(id, research_mode, app_state) {
         return(NULL)
       }
       withProgress(message = "Running per-plot balance...", value = 0.3, {
-        tryCatch(NFert::farm_balance(
+        tryCatch(agrinutri::farm_balance(
           p, p_balance = isTRUE(input$run_p),
              k_balance = isTRUE(input$run_k)),
           error = function(e) {
@@ -142,21 +142,21 @@ farmServer <- function(id, research_mode, app_state) {
       total_ha <- sum(as.numeric(f$area_ha), na.rm = TRUE)
       total_N  <- sum(as.numeric(f$N_total_kg), na.rm = TRUE)
       n_mas_ko <- sum(!isTRUE(all(f$MAS_ok)) & !f$MAS_ok, na.rm = TRUE)
-      div(class = "nfert-kpi-row",
-        div(class = "nfert-kpi",
-          span(class = "nfert-kpi-value", n_plots),
-          span(class = "nfert-kpi-label", "plots")),
-        div(class = "nfert-kpi",
-          span(class = "nfert-kpi-value",
-               .nfert_fmt(total_ha, 1)),
-          span(class = "nfert-kpi-label", "total ha")),
-        div(class = "nfert-kpi",
-          span(class = "nfert-kpi-value",
-               .nfert_fmt(total_N, 0)),
-          span(class = "nfert-kpi-label", "total kg N")),
-        div(class = "nfert-kpi",
-          span(class = "nfert-kpi-value", n_mas_ko),
-          span(class = "nfert-kpi-label", "MAS breaches")))
+      div(class = "agrinutri-kpi-row",
+        div(class = "agrinutri-kpi",
+          span(class = "agrinutri-kpi-value", n_plots),
+          span(class = "agrinutri-kpi-label", "plots")),
+        div(class = "agrinutri-kpi",
+          span(class = "agrinutri-kpi-value",
+               .agrinutri_fmt(total_ha, 1)),
+          span(class = "agrinutri-kpi-label", "total ha")),
+        div(class = "agrinutri-kpi",
+          span(class = "agrinutri-kpi-value",
+               .agrinutri_fmt(total_N, 0)),
+          span(class = "agrinutri-kpi-label", "total kg N")),
+        div(class = "agrinutri-kpi",
+          span(class = "agrinutri-kpi-value", n_mas_ko),
+          span(class = "agrinutri-kpi-label", "MAS breaches")))
     })
 
     # ---- Leaflet map --------------------------------------------------
@@ -267,7 +267,7 @@ farmServer <- function(id, research_mode, app_state) {
     # ---- Downloads ----------------------------------------------------
     output$dl_geojson <- downloadHandler(
       filename = function()
-        sprintf("NFert_farm_%s.geojson",
+        sprintf("agrinutri_farm_%s.geojson",
                 format(Sys.time(), "%Y%m%d_%H%M")),
       content = function(file) {
         f <- farm_obj(); req(f)
@@ -277,7 +277,7 @@ farmServer <- function(id, research_mode, app_state) {
     )
     output$dl_csv <- downloadHandler(
       filename = function()
-        sprintf("NFert_farm_summary_%s.csv",
+        sprintf("agrinutri_farm_summary_%s.csv",
                 format(Sys.time(), "%Y%m%d_%H%M")),
       content = function(file) {
         df <- summary_df(); req(df)
@@ -288,7 +288,7 @@ farmServer <- function(id, research_mode, app_state) {
     # Prescription-map bundle (multi-format zip)
     output$dl_rx <- downloadHandler(
       filename = function()
-        sprintf("NFert_prescription_%s.zip",
+        sprintf("agrinutri_prescription_%s.zip",
                 format(Sys.time(), "%Y%m%d_%H%M")),
       content = function(file) {
         f <- farm_obj(); req(f, nrow(f) > 0)
@@ -302,7 +302,7 @@ farmServer <- function(id, research_mode, app_state) {
                     product   = input$rx_product,
                     unit      = input$rx_unit)
         tryCatch(
-          NFert::export_prescription_all(
+          agrinutri::export_prescription_all(
             f, output_dir = tmpdir, basename = "prescription",
             formats = formats,
             dose_field = "N_target",

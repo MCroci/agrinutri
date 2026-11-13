@@ -18,28 +18,28 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-This vignette demonstrates the full NFert spatial workflow:
+This vignette demonstrates the full agrinutri spatial workflow:
 
 1. **Load** real soil-property rasters (bundled with the package)
 2. **Compute** a spatially-explicit nitrogen balance with `spatial_N_balance()`
 3. **Generate** a variable-rate (VRT) prescription with `variable_rate_N()` (Holland & Schepers method)
 
-The workflow implements the pipeline described in Section 2.2 of the NFert
+The workflow implements the pipeline described in Section 2.2 of the agrinutri
 SoftwareX article: the field-scale balance provides the regulatory-compliant N
 target, and the VRT functions redistribute it in space under a mass-balance
 constraint.
 
 ## 1. Load the Cremonesi field rasters
 
-NFert ships with six GeoTIFF rasters for a 12-ha arable field near Cremona
+agrinutri ships with six GeoTIFF rasters for a 12-ha arable field near Cremona
 (Northern Italy), at ~3.5 m resolution: total nitrogen (TN, %), soil organic
 matter (SOM, %), clay, sand and silt content (%), and the C/N ratio.
 
 ```{r load-rasters}
-library(NFert)
+library(agrinutri)
 library(terra)
 
-ext <- system.file("extdata", package = "NFert")
+ext <- system.file("extdata", package = "agrinutri")
 
 # Read individually: the bundled GeoTIFFs may have sub-pixel extent
 # mismatches from separate acquisitions, so we resample to a common
@@ -209,7 +209,7 @@ dose derived from the VRT raster (or from NNI / VI directly):
 
 ```{r strips, eval=FALSE}
 # Field polygon from the same farm GeoJSON
-ex    <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex    <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 field <- sf::st_read(ex, quiet = TRUE)[1, ]
 
 rx_strip <- build_strip_prescription(

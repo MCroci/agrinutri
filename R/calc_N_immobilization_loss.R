@@ -16,7 +16,7 @@
 #' @return The estimated nitrogen immobilization loss (D) in kg/ha.
 #' @export
 #'
-#' @details This function uses lookup tables (`ca.table` and `cb.table`) from the `NFert` package
+#' @details This function uses lookup tables (`ca.table` and `cb.table`) from the `agrinutri` package
 #' to determine the immobilization correction factor (`fc_D`) based on soil drainage and oxygen
 #' availability. The nitrogen immobilization loss is then calculated as:
 #'
@@ -32,9 +32,9 @@ calc_N_immobilization_loss <- function(B = 50, oxygen_availability = "Normal",
                                        id_rag = 1, greenhouse = FALSE,
                                        E_residual = 0) {
 
-  oxygen_availability <- nfert_normalize_oxygen(oxygen_availability)
-  ca.table <- nfert_data_get("ca.table")
-  cb.table <- nfert_data_get("cb.table")
+  oxygen_availability <- agrinutri_normalize_oxygen(oxygen_availability)
+  ca.table <- agrinutri_data_get("ca.table")
+  cb.table <- agrinutri_data_get("cb.table")
 
   # Get ID_Dre corresponding to oxygen_availability
   avail <- trimws(as.character(ca.table$availability))

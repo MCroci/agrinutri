@@ -26,7 +26,8 @@ N_balance(
   distribution_efficiency = NULL,
   soil_seeding = c("traditional", "no-till"),
   greenhouse = FALSE,
-  E_to_D = TRUE
+  E_to_D = TRUE,
+  n_fixation_pct = NULL
 )
 }
 \arguments{
@@ -79,43 +80,63 @@ so current-year organic (\code{Forg}) follows the same texture as \code{B}.}
 when not specified). Ignored for \code{Forg} when \code{forg_quantity == 0}.}
 
 \item{soil_seeding}{One of \code{"traditional"} (default) or \code{"no-till"}. If \code{"no-till"},
-DPI 2026 applies a 3 kg/ha reduction to b1 (readily available N).}
+the soil supply B is reduced by 10 kg/ha (DPI Allegato 2), for crops with
+a cycle shorter than one year where the DPI allows it.}
 
 \item{greenhouse}{Logical. If \code{TRUE}, 2 kg/ha are added to D (DPI 2026 greenhouse factor).
 Default \code{FALSE}.}
 
 \item{E_to_D}{Logical. If \code{TRUE} (default), negative \code{E} (e.g. buried stalks = -40) is
 added to \code{D} as in Fert_Office v1.26 sheet C&D, and \code{E} in the output is set to 0.
-If \code{FALSE}, \code{E} stays negative and the balance uses \code{calculate_N_fertilization()}.}
+If \code{FALSE}, \code{E} stays negative and the balance uses \code{calculate_N_fertilization()}.
+\code{E} is counted only for crop phases where the DPI counts the precession
+(\code{coef_time$precession_to_count}), i.e. not for perennial crops in production.}
+
+\item{n_fixation_pct}{Share (\%) of the legume N demand covered by biological
+fixation. \code{NULL} (default) uses the value proposed for the crop
+(\code{crops.table$n_fixation_pct}). It is booked under \code{G} when the balance is
+positive, as in Fert_Office; a value lower than the crop's default (lacking
+inoculation) lowers the dose ceiling to 120 kg N/ha.}
 }
 \value{
 A data frame containing the calculated nitrogen balance components (all in kg/ha):
 \itemize{
 \item A: Total nitrogen demand of the crop (kg/ha).
-\item B: Total soil nitrogen supply (sum of b1 and b2) (kg/ha).
+\item B: Total soil nitrogen supply, b1 + b2 - no-till reduction (kg/ha).
 \item b1: Readily available mineral nitrogen (DPI B2) (kg/ha).
 \item b2: Mineralizable N from soil organic matter (DPI B1) (kg/ha).
-\item C1: Nitrogen leaching loss in winter (kg/ha).
-\item C2: Nitrogen leaching loss in spring (kg/ha).
+\item C1: Nitrogen leaching loss in autumn-winter (Ca) (kg/ha).
+\item C2: Nitrogen leaching loss at the end of winter (Cb) (kg/ha).
 \item D: Nitrogen immobilization loss (kg/ha). Includes the abs(E) contribution
-if \code{E_to_D = TRUE} and E < 0, and \code{+2} if \code{greenhouse = TRUE}.
+if \code{E_to_D = TRUE} and E < 0, and \code{+2} if \code{greenhouse = TRUE}
+(not part of the Fert_Office v1.26 balance sheet).
 \item E: Nitrogen from previous crop residues (kg/ha). If \code{E_to_D = TRUE} and
 the raw value is negative, this column reports 0 (moved to D).
 \item F: Nitrogen from previous years' organic fertilization (kg/ha).
 \item Forg: Nitrogen from organic fertilizer (current year, efficient N) (kg/ha).
-\item G: Natural nitrogen contribution (e.g., from rainfall) (kg/ha).
+\item G: Natural contributions (kg/ha): \code{G_deposition} (atmospheric
+deposition x time coefficient) plus \code{G_fixation} (legume N fixation).
+\item no_till_reduction: Reduction of B for no-till seeding (kg/ha).
+\item C_tempo, N_pct, N_limit: time coefficient of the phase, share
+of the balance admitted for the phase and dose ceiling (kg/ha),
+used by \code{\link[=calculate_N_fertilization]{calculate_N_fertilization()}}.
 \item surplus_pluviometrico: Logical flag (DPI 2026 standard sheet, surplus rain).
 }
 }
 \description{
-Calculates the nitrogen balance of a crop considering various soil and environmental factors.
+Calculates the nitrogen balance of a crop with the DPI Emilia-Romagna 2026
+balance method (Allegato 2), reproducing the regional tool Fert_Office v1.26
+term by term. Where the printed DPI tables and Fert_Office differ, agrinutri
+follows Fert_Office (see \code{vignette("agrinutri-PK-and-distribution")}).
 }
 \details{
 The nitrogen fertilization requirement (DPI formula) is:
-N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+N = A - B + C1 + C2 + D - E - F - G, scaled by \code{N_pct}, bounded to
+; the current-year organic N \code{Forg} is then subtracted
+to give the mineral N (\code{\link[=calculate_N_fertilization]{calculate_N_fertilization()}}).
 }
 \examples{
-N_balance(expected_yield_tons_ha = 15, crop = "Mais trinciato (classe 700)",
+N_balance(expected_yield_tons_ha = 60, crop = "Mais trinciato (classe 700)",
           ccp = "Spring-summer crop 100-130 days", sand = 50, clay = 35,
           Ntot = 1.2, SOM = 1.2, CN = 9.5, oxygen_availability = "Normal",
           winter_rain = 160, start_spring_rain = 40,

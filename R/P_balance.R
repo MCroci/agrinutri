@@ -7,7 +7,8 @@
 #'   P2O5 da apportare = A (asportazione) + B1 (arricchimento) + A2 (advance_allowed)
 #'                        - B2 (riduzione)
 #' }
-#' with A set to 0 in "Riduzione" strategy and B2 used only as placeholder.
+#' where B2 is the excess over the normal availability range ("Riduzione"
+#' strategy). The result is bounded to 0-250 kg P2O5/ha as in Fert_Office.
 #'
 #' @param expected_yield_tons_ha Expected yield (t/ha).
 #' @param crop Crop name (matches `uptake_table$crop`).
@@ -18,13 +19,17 @@
 #' @param clay,sand Soil clay/sand percentages (%).
 #' @param advance_P2O5 Advance anni futuri (default 0 kg/ha).
 #' @param depth_cm Soil depth for enrichment calculation (default 30 cm).
+#' @param total_carbonate Total carbonate (CaCO3, percent). Sets the P
+#'   immobilisation factor of the enrichment term as in Fert_Office (texture
+#'   base + 0.02 x CaCO3); `NULL` keeps the legacy constant 1.6. See
+#'   [soil_P_availability()].
 #'
 #' @return A data frame with A, B1, A2, B2, `strategy`, `ID_Gri_P`, `P2O5_required`.
 #' @examples
 #' P_balance(expected_yield_tons_ha = 6,
 #'           crop = "Grano duro (pianta intera)",
 #'           olsen_value = 15, olsen_unit = "P2O5",
-#'           clay = 18.5, sand = 15.5)
+#'           clay = 18.5, sand = 15.5, total_carbonate = 15)
 #' @export
 P_balance <- function(expected_yield_tons_ha,
                       crop,
@@ -33,7 +38,8 @@ P_balance <- function(expected_yield_tons_ha,
                       soil_group = NULL,
                       clay = NULL, sand = NULL,
                       advance_P2O5 = 0,
-                      depth_cm = 30) {
+                      depth_cm = 30,
+                      total_carbonate = NULL) {
   olsen_unit <- match.arg(olsen_unit)
 
   if (is.null(soil_group)) {
@@ -57,13 +63,17 @@ P_balance <- function(expected_yield_tons_ha,
   avail <- soil_P_availability(olsen_value = olsen_value, unit = olsen_unit,
                                soil_group = soil_group,
                                A_demand_P2O5 = A,
-                               depth_cm = depth_cm)
+                               depth_cm = depth_cm,
+                               total_carbonate = total_carbonate)
 
-  P2O5_required <- max(0,
-                       avail$A_mantenimento + avail$B1 + advance_P2O5 - avail$B2)
+  # Reported value: non-negative and capped at 250 kg P2O5/ha
+  # (Fert_Office foglio "Valori da riportare", F3:F7)
+  P2O5_required <- min(max(0,
+                           avail$A_mantenimento + avail$B1 + advance_P2O5 - avail$B2),
+                       250)
 
   data.frame(
-    A  = avail$A_mantenimento,   # asportazione effettiva (0 se Riduzione)
+    A  = avail$A_mantenimento,   # crop removal (asportazione)
     A_fabbisogno = A,
     B1 = avail$B1,
     A2 = advance_P2O5,

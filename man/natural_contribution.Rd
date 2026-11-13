@@ -7,8 +7,8 @@
 natural_contribution(
   location = "Plain adjacent to urbanized areas",
   ccp = "Autumn-winter crop <150 days",
-  g.table = nfert_data_get("g.table"),
-  coef_time = nfert_data_get("coef_time")
+  g.table = agrinutri_data_get("g.table"),
+  coef_time = agrinutri_data_get("coef_time")
 )
 }
 \arguments{
@@ -18,11 +18,11 @@ natural_contribution(
 
 \item{g.table}{A data frame containing annual nitrogen deposition rates for different locations.
 It should have at least two columns: \code{location} (character) and \code{annual_deposition} (numeric).
-Defaults to \code{NFert::g.table}.}
+Defaults to \code{agrinutri::g.table}.}
 
 \item{coef_time}{A data frame containing adjustment factors (C_tempo) based on crop category and planting period.
 It should have at least two columns: \code{ccp} (character) and \code{C_tempo} (numeric).
-Defaults to \code{NFert::coef_time}.}
+Defaults to \code{agrinutri::coef_time}.}
 }
 \value{
 The estimated natural nitrogen contribution in kg/ha, or \code{NA} if input values are not found in the respective tables.

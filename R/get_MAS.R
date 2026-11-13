@@ -6,17 +6,26 @@
 #' values are binding; they can be exceeded if production over 3 years exceeds
 #' the reference yield.
 #'
-#' @param crop Character. Crop name (as in DPI nomenclature). Use
-#'   `get_MAS(NULL)` or `get_MAS()` to list all crops.
-#' @param mas_table Data frame with columns `crop`, `mas_N`, `reference_yield`, `type`.
-#'   If NULL, uses the built-in table for the chosen `edition`.
-#' @param edition Character. `"2026"` (default) or `"2025"`. 2025 = Guida DPI
-#'   2025 (ZVN table); 2026 = FertDPI / Allegato 9 style.
+#' The DPI 2026 values (default) are read from the bundled [mas.table]
+#' dataset, which mirrors the "MAS" sheet of Fert_Office v1.26 (239 crops).
 #'
-#' @return For `get_MAS(crop)`: a one-row data frame with columns
-#'   `crop`, `mas_N`, `reference_yield` (and if present `mas_P2O5`, `yield_ref_min`,
-#'   `yield_ref_max`), `type`, or all rows if `crop` is NULL. For `check_MAS`: a list with
-#'   `ok` (logical), `mas_N`, `N_planned`, `message`.
+#' @param crop Character. Crop name, in English (canonical, as in
+#'   `uptake_table$crop`) or Italian (Fert_Office label); matching is case- and
+#'   accent-insensitive, and a few generic DPI names (e.g. `"Mais da
+#'   insilato"`, `"Frumento tenero (granella)"`) are mapped to the
+#'   corresponding table row. Use `get_MAS()` to list all crops.
+#' @param mas_table Optional data frame with at least columns `crop` and
+#'   `mas_N` (and optionally `crop_it`, `crop_en`). If NULL, uses the built-in
+#'   table for the chosen `edition`.
+#' @param edition Character. `"2026"` (default; DPI 2026 / Fert_Office v1.26,
+#'   Reg. reg. 2/2024) or `"2025"` (Guida DPI 2025, ZVN table, 17 crops).
+#'
+#' @return For `get_MAS(crop)`: a one-row data frame with columns `crop`,
+#'   `crop_it`, `crop_en`, `phase`, `mas_N` (kg N/ha; `NA` when the DPI sets
+#'   no MAS), `reference_yield` (t/ha), `max_theoretical_N`, `standard_N`,
+#'   `max_N_dose` and `note` (edition 2026), or all rows if `crop` is NULL.
+#'   For `check_MAS`: a list with `ok` (logical), `mas_N`, `N_planned`,
+#'   `message`.
 #'
 #' @references
 #' DPI Emilia-Romagna - Norme Generali 2025, Allegato 9; Guida alla
@@ -25,22 +34,29 @@
 #'
 #' @export
 #' @examples
-#' get_MAS("Frumento tenero (granella)")
+#' get_MAS("Grano duro (granella)")
+#' get_MAS("Silage maize (class 700)")$mas_N
 #' get_MAS("Frumento tenero (granella)", edition = "2025")  # ZVN 2025
-#' get_MAS()  # list all
+#' head(get_MAS())  # full table
 #' check_MAS("Mais da granella", 250)
-#' check_MAS("Frumento tenero (granella)", 210)  # over MAS
+#' check_MAS("Grano duro (granella)", 210)  # over MAS
 get_MAS <- function(crop = NULL, mas_table = NULL, edition = c("2026", "2025")) {
   edition <- match.arg(edition)
   if (is.null(mas_table)) mas_table <- if (edition == "2025") .mas_table_dpi2025() else .mas_table_dpi2026()
   if (is.null(crop)) return(mas_table)
   crop <- as.character(crop)
-  # Accept English crop name if mas_table has crop_en
-  if ('crop_en' %in% names(mas_table) && !(crop %in% mas_table$crop)) {
-    j <- which(tolower(mas_table$crop_en) == tolower(crop))
-    if (length(j) > 0) crop <- as.character(mas_table$crop[j[1]])
+  # Legacy generic DPI names (e.g. "Mais da insilato") map to a table row
+  amap <- c(.mas_crop_alias(), .crop_alias_to_canonical())
+  ia <- match(tolower(.agrinutri_ascii_fold(trimws(crop))), tolower(names(amap)))
+  if (!is.na(ia) && !(crop %in% mas_table$crop)) crop <- unname(amap[ia])
+  # Accent-insensitive match on crop, then on the Italian / English aliases
+  norm <- function(s) tolower(.agrinutri_ascii_fold(gsub("\\s+", " ", trimws(as.character(s)))))
+  key <- norm(crop)
+  i <- NA_integer_
+  for (col in intersect(c("crop", "crop_it", "crop_en"), names(mas_table))) {
+    j <- which(norm(mas_table[[col]]) == key)
+    if (length(j) > 0) { i <- j[1]; break }
   }
-  i <- match(crop, mas_table$crop)
   if (is.na(i)) {
     warning("Crop '", crop, "' not found in MAS table. Return NULL. Use get_MAS() to see available crops.")
     return(NULL)
@@ -118,59 +134,53 @@ check_MAS <- function(crop, N_planned, mas_table = NULL, edition = c("2026", "20
 #' Built-in MAS table (DPI 2026 / FertDPI style)
 #' @noRd
 .mas_table_dpi2026 <- function() {
-  data.frame(
-    crop = c(
-      "Frumento tenero (granella)",
-      "Grano tenero FF (granella)",   # alias used in NFert uptake_table
-      "Frumento tenero (pianta intera)",
-      "Grano duro (granella)",
-      "Mais da granella",
-      "Mais da insilato",
-      "Shredded corn class 700",       # alias for maize silage
-      "Orzo",
-      "Girasole",
-      "Soia",
-      "Pomodoro da industria",
-      "Melo",
+  # DPI 2026 MAS (Allegato 9, Reg. reg. 2/2024) as shipped in the bundled
+  # `mas.table` dataset, which mirrors the "MAS" sheet of Fert_Office v1.26
+  # (column "MAS", not the "teorico massimo" column).
+  m <- agrinutri_data_get("mas.table")
+  ref <- m$reference_yield_t_ha
+  ref[!is.na(ref) & ref <= 0] <- NA_real_
+  out <- data.frame(
+    crop              = as.character(m$crop),
+    crop_it           = as.character(m$crop_it),
+    crop_en           = as.character(m$crop_en),
+    phase             = as.character(m$phase),
+    mas_N             = as.integer(m$MAS_N),
+    reference_yield   = ref,
+    max_theoretical_N = as.integer(m$max_theoretical_N),
+    standard_N        = m$standard_N,
+    max_N_dose        = m$max_N_dose,
+    note              = as.character(m$note),
+    stringsAsFactors  = FALSE
+  )
+  out[!duplicated(out$crop), , drop = FALSE]
+}
+
+# Generic DPI crop names used by earlier agrinutri releases and in the DPI text,
+# mapped to the corresponding row of the DPI 2026 MAS table.
+.mas_crop_alias <- function() {
+  stats::setNames(
+    c("Soft wheat FP/FPS (grain)", "Soft wheat FP/FPS (whole plant)",
+      "Durum wheat (grain)", "Durum wheat (grain)",
+      "Grain maize 500-700 (grain)", "Silage maize (class 700)",
+      "Silage maize (class 700)", "Barley (grain)", "Sunflower (achenes)",
+      "Soybean (grain)", "Sugar beet (roots)",
+      "Processing tomato (medium yield)", "Apple - fruit, wood and leaves",
+      "Pear (medium yield) - fruit, wood and leaves",
+      "Peach - fruit, wood and leaves",
+      "Vineyard (plain) - grapes, wood and leaves",
+      "Kiwifruit (green flesh) - fruit, wood and leaves",
+      "Cherry - fruit, wood and leaves"),
+    c("Frumento tenero (granella)", "Frumento tenero (pianta intera)",
+      "Frumento duro (granella)", "Grano duro",
+      "Mais da granella", "Mais da insilato",
+      "Shredded corn class 700", "Orzo", "Girasole",
+      "Soia", "Barbabietola da zucchero",
+      "Pomodoro da industria", "Melo",
       "Pero",
       "Pesco e Nettarine",
       "Vite (uva da vino)",
       "Actinidia",
-      "Ciliegio"
-    ),
-    # English aliases used by the canonical `crop` column of uptake_table
-    # after the 0.12.0 rebuild. get_MAS() matches against both `crop` and
-    # `crop_en` (case-insensitive) so either language can be supplied.
-    crop_en = c(
-      "Soft wheat (grain)",
-      "Soft wheat FF - strong (grain)",
-      "Soft wheat (whole plant)",
-      "Durum wheat (grain)",
-      "Grain maize 500-700 (grain)",
-      "Silage maize (class 700)",
-      "Silage maize (class 700)",
-      "Barley (grain)",
-      "Sunflower (achenes)",
-      "Soybean (grain)",
-      "Processing tomato (medium yield)",
-      "Apple",
-      "Pear",
-      "Peach and Nectarine",
-      "Vineyard (plain) - grapes, wood and leaves",
-      "Kiwifruit (green flesh) - fruit, wood and leaves",
-      "Cherry"
-    ),
-    mas_N = c(200L, 200L, 200L, 200L, 260L, 340L, 340L, 180L, 160L, NA_integer_,
-              200L, 340L, 340L, 340L, 120L, 340L, 340L),
-    mas_P2O5 = c(100L, 100L, 100L, 100L, 150L, 150L, 150L, 90L, 90L, 100L,
-                 130L, 120L, 120L, 175L, 60L, 150L, 120L),
-    yield_ref_min = c(6, 6, 6, 5, 10, 40, 40, 5, 2, 3, 70, 35, 30, 25, 8, 25, 9),
-    yield_ref_max = c(8, 8, 8, 6, 13, 50, 50, 7, 3, 4, 100, 35, 30, 25, 12, 25, 9),
-    type = c(
-      "Erbacee", "Erbacee", "Erbacee", "Erbacee", "Erbacee", "Erbacee", "Erbacee",
-      "Erbacee", "Erbacee", "Erbacee", "Orticole",
-      "Arboree", "Arboree", "Arboree", "Arboree", "Arboree", "Arboree"
-    ),
-    stringsAsFactors = FALSE
+      "Ciliegio")
   )
 }

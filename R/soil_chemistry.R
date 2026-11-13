@@ -10,12 +10,16 @@
 #'   \item alcalino: 8.2 - 8.6
 #'   \item fortemente alcalino: > 8.6
 #' }
+#' The class is found as in Fert_Office (`VLOOKUP` on the lower thresholds
+#' 0, 5.4, 6.0, 6.7, 7.3, 8.1, 8.61), so a value equal to a threshold falls in
+#' the upper class: for instance pH 6.0 is "leggermente acido". The ranges
+#' above are those printed in the DPI table for one-decimal pH readings.
 #' @param pH Numeric.
-#' @param ph.table Lookup (default `NFert::ph.table`).
+#' @param ph.table Lookup (default `agrinutri::ph.table`).
 #' @return List with `ID_pH` and `class`.
 #' @examples classify_pH(8.3)
 #' @export
-classify_pH <- function(pH, ph.table = nfert_data_get("ph.table")) {
+classify_pH <- function(pH, ph.table = agrinutri_data_get("ph.table")) {
   if (!is.numeric(pH) || length(pH) != 1 || is.na(pH)) {
     stop("`pH` must be a single numeric.")
   }
@@ -34,7 +38,7 @@ classify_pH <- function(pH, ph.table = nfert_data_get("ph.table")) {
 #' @return List with `ID` and `class`.
 #' @examples classify_carbonate_tot(15)
 #' @export
-classify_carbonate_tot <- function(caco3_tot, total_carbonate.table = nfert_data_get("total_carbonate.table")) {
+classify_carbonate_tot <- function(caco3_tot, total_carbonate.table = agrinutri_data_get("total_carbonate.table")) {
   if (!is.numeric(caco3_tot) || length(caco3_tot) != 1 || is.na(caco3_tot)) {
     stop("`caco3_tot` must be a single numeric.")
   }
@@ -55,7 +59,7 @@ classify_carbonate_tot <- function(caco3_tot, total_carbonate.table = nfert_data
 #' @return List with `ID` and `class`.
 #' @examples classify_carbonate_att(6.8)
 #' @export
-classify_carbonate_att <- function(caco3_att, active_carbonate.table = nfert_data_get("active_carbonate.table")) {
+classify_carbonate_att <- function(caco3_att, active_carbonate.table = agrinutri_data_get("active_carbonate.table")) {
   if (!is.numeric(caco3_att) || length(caco3_att) != 1 || is.na(caco3_att)) {
     stop("`caco3_att` must be a single numeric.")
   }
@@ -113,7 +117,9 @@ ratio_Mg_K <- function(mg_ppm, k_ppm) {
 #' @examples ratio_K_CEC(k_meq_per_100g = 0.38, csc_meq = 18)
 #' @export
 ratio_K_CEC <- function(k_meq_per_100g, csc_meq) {
-  if (any(!is.numeric(c(k_meq_per_100g, csc_meq))) || csc_meq <= 0) {
+  if (!is.numeric(k_meq_per_100g) || !is.numeric(csc_meq) ||
+      length(k_meq_per_100g) != 1L || length(csc_meq) != 1L ||
+      is.na(k_meq_per_100g) || is.na(csc_meq) || csc_meq <= 0) {
     return(list(pct = NA_real_, class = "non calcolato"))
   }
   pct <- 100 * k_meq_per_100g / csc_meq

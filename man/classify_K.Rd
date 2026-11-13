@@ -8,7 +8,7 @@ classify_K(
   value,
   unit = c("K", "K2O"),
   soil_group,
-  k_availability.table = nfert_data_get("k_availability.table")
+  k_availability.table = agrinutri_data_get("k_availability.table")
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ classify_K(
 
 \item{soil_group}{Texture grouping (must match \code{k_availability.table$group}).}
 
-\item{k_availability.table}{Lookup table, default \code{NFert::k_availability.table}.}
+\item{k_availability.table}{Lookup table, default \code{agrinutri::k_availability.table}.}
 }
 \value{
 A list with \code{value_ppm_K}, \code{value_ppm_K2O}, \code{ID_Gri_K}, \code{rating},

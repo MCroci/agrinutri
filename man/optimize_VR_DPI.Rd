@@ -23,7 +23,7 @@ elements are ignored.}
 \item{NNI_raster}{A \code{terra::SpatRaster} of NNI values for the field. Cells
 with \code{NA} are excluded from the prescription.}
 
-\item{crop_params}{Either \code{NULL} (use \code{\link[=nfert_to_quefts_crop]{nfert_to_quefts_crop()}} on
+\item{crop_params}{Either \code{NULL} (use \code{\link[=agrinutri_to_quefts_crop]{agrinutri_to_quefts_crop()}} on
 \code{field_inputs$crop}), a character string (same lookup), or a named list of
 QUEFTS crop parameters passed straight to \code{\link[Rquefts:quefts]{Rquefts::quefts()}}.}
 

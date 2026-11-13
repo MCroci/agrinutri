@@ -23,7 +23,7 @@ build_strip_prescription(
   thr_hi = 1.1,
   n_classes = 5,
   preserve_mean = TRUE,
-  crs_metric = 3857
+  crs_metric = NULL
 )
 }
 \arguments{
@@ -84,9 +84,11 @@ level dose is rescaled so the area-weighted mean matches
 \code{n_target}. Guarantees mass-balance compliance with the
 balance-based field ceiling.}
 
-\item{crs_metric}{EPSG code of a metric CRS used internally (default
-3857, Web Mercator). Use a local UTM for higher accuracy on larger
-fields.}
+\item{crs_metric}{EPSG code of the metric CRS in which strips are drawn.
+\code{NULL} (default) uses the WGS 84 / UTM zone of the field centroid, so
+\code{machine_width}, \code{cell_length} and \code{area_ha} are true ground distances
+and areas. (Web Mercator, EPSG:3857, is not suitable: at 45 degrees
+latitude it shrinks a 24 m width to about 17 m on the ground.)}
 }
 \value{
 An \code{sf} object of strip polygons with columns
@@ -145,7 +147,7 @@ defines the driving direction.
 
 \examples{
 \dontshow{if (requireNamespace("sf", quietly = TRUE)) withAutoprint(\{ # examplesIf}
-ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 field <- farm[1, ]  # 5.2 ha silage-maize plot
 

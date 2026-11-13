@@ -39,10 +39,17 @@ test_that("soil_fertility returns correct structure", {
   )
   
   expect_type(result, "list")
-  expect_named(result, c("b1", "b2", "units"))
+  expect_named(result, c("b1", "b2", "b1_potential", "no_till_reduction", "B",
+                         "C_tempo", "units"))
   expect_true(is.numeric(result$b1))
   expect_true(is.numeric(result$b2))
   expect_equal(result$units, "kg/ha")
   expect_true(result$b1 >= 0)
   expect_true(result$b2 >= 0)
+})
+
+test_that("tri3.table holds only codes of soil.table (no typo cells)", {
+  codes <- unique(stats::na.omit(as.vector(tri3.table)))
+  expect_true(all(codes %in% soil.table$ID_Suo))
+  expect_identical(unname(tri3(22, 27)), "FL")   # silt loam; was the typo "FSS"
 })

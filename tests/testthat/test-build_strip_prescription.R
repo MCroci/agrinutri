@@ -2,7 +2,7 @@
 
 test_that("build_strip_prescription uniform returns sf with target dose", {
   skip_if_not_installed("sf")
-  ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+  ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
   skip_if(!nzchar(ex), "no bundled example_farm.geojson")
   farm <- sf::st_read(ex, quiet = TRUE)
   field <- farm[1, , drop = FALSE]
@@ -23,7 +23,7 @@ test_that("build_strip_prescription uniform returns sf with target dose", {
 test_that("build_strip_prescription calibration inverse vs not changes dose order", {
   skip_if_not_installed("sf")
   skip_if_not_installed("terra")
-  ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+  ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
   skip_if(!nzchar(ex), "no bundled example_farm.geojson")
   farm <- sf::st_read(ex, quiet = TRUE)
   field <- farm[1, , drop = FALSE]
@@ -79,4 +79,21 @@ test_that("build_strip_prescription rejects non-sf field", {
     build_strip_prescription(list(a = 1), variability = "uniform", n_target = 100),
     regexp = "must be an sf"
   )
+})
+
+test_that("strips have the true machine width and area (local UTM, not Web Mercator)", {
+  skip_if_not_installed("sf")
+  # 240 m x 300 m rectangle at 45 deg N, built in UTM 32N and passed as lon/lat
+  rect <- sf::st_sfc(sf::st_polygon(list(rbind(
+    c(560000, 4985000), c(560240, 4985000), c(560240, 4985300),
+    c(560000, 4985300), c(560000, 4985000)))), crs = 32632)
+  field <- sf::st_sf(id = 1, geometry = sf::st_transform(rect, 4326))
+  rx <- build_strip_prescription(field, machine_width = 24, angle_deg = 90,
+                                 variability = "uniform", n_target = 150)
+  # strips are centred on the field centroid: 9 full 24 m strips + 2 halves
+  expect_equal(nrow(rx), 11L)
+  expect_equal(max(rx$area_ha), 24 * 300 / 1e4, tolerance = 1e-3)
+  expect_equal(sum(rx$area_ha), 7.2, tolerance = 1e-3)         # 240 x 300 m
+  expect_equal(sum(rx$area_ha),
+               sum(as.numeric(sf::st_area(rx))) / 1e4, tolerance = 5e-3)
 })

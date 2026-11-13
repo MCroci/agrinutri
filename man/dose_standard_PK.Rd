@@ -14,7 +14,7 @@ dose_standard_PK(
   P_increments = numeric(),
   K_decrements = numeric(),
   K_increments = numeric(),
-  standard_pk_doses.table = nfert_data_get("standard_pk_doses.table")
+  standard_pk_doses.table = agrinutri_data_get("standard_pk_doses.table")
 )
 
 scheda_PK(...)
@@ -32,7 +32,7 @@ Selects the \code{P2O5_<class>} column in \code{standard_pk_doses.table}.}
 \item{P_decrements, P_increments, K_decrements, K_increments}{Named numeric
 vectors of adjustments (kg/ha). See \code{scheda_N()} for the same pattern.}
 
-\item{standard_pk_doses.table}{Lookup (default \code{NFert::standard_pk_doses.table}).}
+\item{standard_pk_doses.table}{Lookup (default \code{agrinutri::standard_pk_doses.table}).}
 
 \item{...}{Passed to \code{dose_standard_PK()}.}
 }

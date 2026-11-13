@@ -1,6 +1,6 @@
-#' English alias dictionaries for the NFert reference tables
+#' English alias dictionaries for the agrinutri reference tables
 #'
-#' Starting with NFert 0.12.0 every bundled reference table
+#' Starting with agrinutri 0.12.0 every bundled reference table
 #' (\code{uptake_table}, \code{mas.table}, \code{e.table},
 #' \code{organic_fertilizers.table}, \code{cycle_modality.table},
 #' \code{distribution_modalities.table}, ...) uses the English name as
@@ -10,20 +10,20 @@
 #'
 #' The dictionaries below survive from the transitional 0.11 release and
 #' are now a convenience for users who still want to pass Italian
-#' strings: \code{\link{nfert_en2it}()} and \code{\link{nfert_it2en}()}
+#' strings: \code{\link{agrinutri_en2it}()} and \code{\link{agrinutri_it2en}()}
 #' translate either direction. Most code bases do not need to call them
 #' any longer - the tables accept English strings natively.
 #'
 #' Five dictionaries are exported:
 #' \code{crop_en2it}, \code{prev_crop_en2it}, \code{source_en2it},
 #' \code{modality_epoch_en2it} and \code{level_en2it}. The helpers
-#' \code{nfert_translate()} and \code{nfert_en2it()} take an English
+#' \code{agrinutri_translate()} and \code{agrinutri_en2it()} take an English
 #' string (or a vector) and return the corresponding Italian canonical
 #' string, falling back to the input unchanged when no match is found.
 #'
 #' @section Adding new aliases:
 #' The dictionaries are plain named character vectors. Extending them in
-#' user code is a matter of \code{c(NFert::crop_en2it, "My Crop" = "Mia
+#' user code is a matter of \code{c(agrinutri::crop_en2it, "My Crop" = "Mia
 #' coltura")}. The helpers match case-insensitively so users don't need
 #' to worry about capitalisation.
 #'
@@ -32,7 +32,7 @@ NULL
 
 # ---- Dictionaries ---------------------------------------------------
 # All names are English aliases; all values are the exact Italian strings
-# found in the corresponding NFert reference table.
+# found in the corresponding agrinutri reference table.
 
 #' @rdname i18n
 #' @export
@@ -137,7 +137,7 @@ source_en2it <- c(
   "Humoscam pellet"        = "humoscam pellet amm. Veg. Fermentato",
   "Agri-food sludges"      = "fanghi agroalimentari",
   "Tioscam 50"             = "tioscam 50 amm. Base ferro e zolfo",
-  # Common aliases used historically in the NFert code base
+  # Common aliases used historically in the agrinutri code base
   "Cattle slurry"          = "liquami bovini da carne",
   "Digestate"              = "Digestato t.q. biomasse o con effl. bovini",
   "Farmyard manure"        = "letame bovino",
@@ -196,9 +196,9 @@ level_en2it <- c(
   x
 }
 
-#' Translate an English alias into its canonical Italian NFert key
+#' Translate an English alias into its canonical Italian agrinutri key
 #'
-#' Case-insensitive lookup in one of the NFert translation dictionaries
+#' Case-insensitive lookup in one of the agrinutri translation dictionaries
 #' (\code{\link{crop_en2it}}, \code{\link{prev_crop_en2it}},
 #' \code{\link{source_en2it}}, \code{\link{modality_epoch_en2it}},
 #' \code{\link{level_en2it}}). Falls back to the input unchanged when no
@@ -214,10 +214,10 @@ level_en2it <- c(
 #' @return A character vector the same length as \code{x}.
 #' @export
 #' @examples
-#' nfert_en2it("Silage maize (class 700)",  kind = "crop")
-#' nfert_en2it("Maize stalks removed",       kind = "prev_crop")
-#' nfert_en2it(c("Dairy cattle slurry", "None"), kind = "source")
-nfert_en2it <- function(x, kind = c("crop", "prev_crop", "source",
+#' agrinutri_en2it("Silage maize (class 700)",  kind = "crop")
+#' agrinutri_en2it("Maize stalks removed",       kind = "prev_crop")
+#' agrinutri_en2it(c("Dairy cattle slurry", "None"), kind = "source")
+agrinutri_en2it <- function(x, kind = c("crop", "prev_crop", "source",
                                     "modality_epoch", "level")) {
   kind <- match.arg(kind)
   dict <- switch(kind,
@@ -238,15 +238,15 @@ nfert_en2it <- function(x, kind = c("crop", "prev_crop", "source",
   out
 }
 
-#' Translate an Italian NFert canonical key into its English alias
+#' Translate an Italian agrinutri canonical key into its English alias
 #' @param x Character vector of Italian canonical strings.
 #' @param kind One of \code{"crop"}, \code{"prev_crop"}, \code{"source"},
 #'   \code{"modality_epoch"}, \code{"level"}.
 #' @return A character vector of English aliases.
 #' @export
 #' @examples
-#' nfert_it2en("Mais trinciato classe 700", kind = "crop")
-nfert_it2en <- function(x, kind = c("crop", "prev_crop", "source",
+#' agrinutri_it2en("Mais trinciato classe 700", kind = "crop")
+agrinutri_it2en <- function(x, kind = c("crop", "prev_crop", "source",
                                     "modality_epoch", "level")) {
   kind <- match.arg(kind)
   dict <- switch(kind,

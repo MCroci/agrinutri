@@ -7,6 +7,6 @@
 # https://www.apache.org/licenses/LICENSE-2.0
 
 library(testthat)
-library(NFert)
+library(agrinutri)
 
-test_check("NFert")
+test_check("agrinutri")

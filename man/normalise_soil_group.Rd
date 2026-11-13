@@ -2,7 +2,7 @@
 % Please edit documentation in R/soil_group_utils.R
 \name{normalise_soil_group}
 \alias{normalise_soil_group}
-\title{Normalise a soil-group label across the three NFert conventions}
+\title{Normalise a soil-group label across the three agrinutri conventions}
 \usage{
 normalise_soil_group(x)
 }
@@ -14,12 +14,12 @@ A list with \code{id_rag} (1 = Sandy, 2 = Loamy, 3 = Clay), \code{en}
 (canonical English), \code{it_plural}, \code{it_singular}.
 }
 \description{
-NFert tables use three parallel naming conventions for the DPI 2026
+agrinutri tables use three parallel naming conventions for the DPI 2026
 texture grouping:
 }
 \details{
 \itemize{
-\item English (legacy NFert 0.1.0): "Sandy textures",
+\item English (legacy agrinutri 0.1.0): "Sandy textures",
 "Loamy textures", "Clay textures".
 \item Italian plural (canonical DPI; foglio B, SO, Gri_K):
 "Sabbiosi", "Medio impasto", "Argillosi e limosi".
@@ -28,7 +28,7 @@ texture grouping:
 }
 
 This helper accepts any of these forms (case-insensitive) and returns the
-canonical English form (used by NFert >= 0.4.0 lookup tables) plus the
+canonical English form (used by agrinutri >= 0.4.0 lookup tables) plus the
 universal \code{ID_Rag} integer key used internally to join the lookup tables.
 }
 \examples{

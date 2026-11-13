@@ -5,7 +5,7 @@ test_that("calc_crop_N_demand returns correct structure", {
   )
 
   expect_type(result, "list")
-  # Since NFert 0.12.1 the list includes `n_fixation_pct` (0 for
+  # Since agrinutri 0.12.1 the list includes `n_fixation_pct` (0 for
   # non-legumes). Use `expect_setequal()` so the test survives future
   # additions to the return value.
   expect_setequal(names(result),

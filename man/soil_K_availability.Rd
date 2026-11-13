@@ -11,7 +11,8 @@ soil_K_availability(
   A_demand_K2O,
   clay_pct,
   include_leaching = TRUE,
-  k_availability.table = nfert_data_get("k_availability.table")
+  k_availability.table = agrinutri_data_get("k_availability.table"),
+  texture_groups.table = agrinutri_data_get("texture_groups.table")
 )
 }
 \arguments{
@@ -23,7 +24,17 @@ soil_K_availability(
 
 \item{include_leaching}{Logical, add K leaching to mantenimento term. Default TRUE.}
 
-\item{k_availability.table}{Lookup table.}
+\item{k_availability.table, texture_groups.table}{Lookup tables.
+
+As in Fert_Office v1.26 (foglio \code{Gri_K}), with K2O the analytical value and
+W the soil weight of the 30 cm layer (t/ha):
+\itemize{
+\item Arricchimento (low / very low): B1 = (lower bound of the "media"
+class - K2O) x W / 1000 x (1 + 0.018 x clay);
+\item Mantenimento: A + H;
+\item Riduzione (high): B2 = (K2O - upper bound of the "media" class) x
+W / 1000, subtracted from A + H.
+}}
 }
 \value{
 A list with \code{strategy}, \code{ID_Gri_K}, \code{B1}, \code{A_mantenimento} (asportazione + H),

@@ -50,7 +50,7 @@ A list with:
 }
 \description{
 Bridges the constant-rate output of \code{N_balance()} / \code{calculate_N_fertilization()}
-or \code{scheda_N()} with the spatial NDVI-based variable-rate estimators of NFert
+or \code{scheda_N()} with the spatial NDVI-based variable-rate estimators of agrinutri
 (\code{estimate_N_rate_from_calibration_curve()} and
 \code{estimate_N_rate_from_holland_schepers()}).
 }
@@ -66,13 +66,13 @@ used as the \strong{base N rate} of the H&S sufficiency-index algorithm.
 }
 
 The output preserves the field-average dose computed by the balance: the
-raster of variable rates integrates (mean) to approximately the input
-\code{n_dose}, ensuring the agronomic constraint (MAS, ZVN) is respected.
+raster of variable rates has a mean equal to the input \code{n_dose} (water-filling
+rescaling within ), so the agronomic constraint (MAS, ZVN) is kept.
 }
 \examples{
 \dontrun{
 library(terra)
-library(NFert)
+library(agrinutri)
 # NDVI raster
 data(s2.rast)
 ndvi <- terra::rast(s2.rast)   # s2.rast is a PackedSpatRaster; unwrap it
@@ -89,11 +89,11 @@ bal <- N_balance(expected_yield_tons_ha = 6,
                  source = "None", fertorg_frequency = "every year",
                  location = "Plain adjacent to urbanized areas",
                  forg_quantity = 0)
-n_dose <- calculate_N_fertilization(bal)   # ~142 kg/ha
+n_dose <- calculate_N_fertilization(bal)   # ~128 kg/ha
 
 # 2) Spatialise via NDVI calibration
 vr <- variable_rate_N(ndvi, n_dose = n_dose, method = "calibration",
-                      mas_cap = get_MAS("Grano duro (pianta intera)")$N_max)
+                      mas_cap = get_MAS("Grano duro (pianta intera)")$mas_N)
 terra::plot(vr$rate_raster)
 vr$mean_kg_ha
 }

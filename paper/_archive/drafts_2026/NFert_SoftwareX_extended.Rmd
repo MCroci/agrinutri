@@ -1,0 +1,300 @@
+---
+title: "NFert: an open-source R package for transparent and reproducible crop fertilization planning based on nutrient balances"
+author:
+  - name: Michele Croci
+    affiliation: a
+    email: michele.croci@unicatt.it
+    corresponding: true
+  - name: Andrea Ferrarini
+    affiliation: a
+  - name: Andrea Fiorini
+    affiliation: a
+  - name: Manuele Ragazzi
+    affiliation: a
+  - name: Nicolaj Franceschi
+    affiliation: a
+  - name: Vincenzo Tabaglio
+    affiliation: a
+  - name: Stefano Amaducci
+    affiliation: a
+affiliations:
+  - name: Department of Sustainable Crop Production (DI.PRO.VE.S.), Universita Cattolica del Sacro Cuore, via Emilia Parmense 84, 29122 Piacenza, Italy
+    index: a
+abstract: |
+  The NFert R package is open-source software that computes nitrogen (N),
+  phosphorus (P2O5) and potassium (K2O) fertilization requirements for
+  herbaceous and tree crops using balance-based and simplified-dose methods.
+  NFert implements (i) a full crop nutrient balance accounting for crop demand,
+  soil supply, leaching, immobilization, previous-crop effects and organic
+  amendments, (ii) simplified standard-dose schemes with decrement and increment
+  adjustments, (iii) soil texture, P, K and chemistry classifiers, (iv)
+  regulatory checks including maximum allowed N doses and the 170 kg N per
+  hectare ceiling of the EU Nitrates Directive in Nitrate Vulnerable Zones, (v)
+  a fertilization distribution plan that combines organic and mineral
+  fertilizers, (vi) a spatially explicit balance applied pixel by pixel to
+  soil-property rasters, and (vii) remote-sensing variable-rate algorithms tied
+  to the balance through a mass-balance constraint, including a multi-index
+  vegetation engine, Gaussian-process retrieval of canopy traits from Sentinel-2
+  and the Nitrogen Nutrition Index. Coefficient tables are exposed as standard R
+  objects and can be edited or substituted, so the package is portable across
+  regulatory contexts. NFert ships with a reference parameterization for the
+  Emilia-Romagna Integrated Production Guidelines (DPI 2026) and a real case
+  study on the CERZOO experimental farm.
+keywords: "R package; Nutrient balance; Decision-support system; Precision agriculture; Fertilizer management; Remote sensing"
+date: "`r Sys.Date()`"
+bibliography: references.bib
+output:
+  pdf_document:
+    template: null
+    keep_tex: true
+    citation_package: natbib
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+geometry: margin=2.5cm
+fontsize: 11pt
+linestretch: 1.5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE, warning = FALSE, message = FALSE)
+```
+
+**Michele Croci**^a,\*^, **Andrea Ferrarini**^a^, **Andrea Fiorini**^a^, **Manuele Ragazzi**^a^, **Nicolaj Franceschi**^a^, **Vincenzo Tabaglio**^a^, **Stefano Amaducci**^a^
+
+^a^ Department of Sustainable Crop Production (DI.PRO.VE.S.), Universita Cattolica del Sacro Cuore, via Emilia Parmense 84, 29122 Piacenza, Italy
+
+^\*^ Corresponding author. E-mail: michele.croci@unicatt.it
+
+# Code metadata
+
+| Nr | Code metadata description | Value |
+|----|---------------------------|-------|
+| C1 | Current code version | v0.14.0 |
+| C2 | Permanent link to code/repository | \url{https://github.com/mcroci/NFert} |
+| C3 | Permanent link to reproducible capsule | (Zenodo DOI to be minted at release) |
+| C4 | Legal code license | MIT |
+| C5 | Code versioning system used | git |
+| C6 | Software code languages, tools and services used | R |
+| C7 | Compilation requirements, operating environments and dependencies | R (>= 4.0); imports terra; optional Suggests on sf, jsonlite, Rquefts, shiny, knitr, rmarkdown, testthat; tested on Windows, macOS and Linux |
+| C8 | Link to developer documentation/manual | \url{https://mcroci.github.io/NFert/} |
+| C9 | Support email for questions | michele.croci@unicatt.it |
+
+: Code metadata for the NFert package {#tbl:metadata}
+
+# Motivation and significance
+
+Nitrogen, phosphorus and potassium fertilization is one of the most consequential agronomic decisions in European agriculture. Excess nitrogen contaminates surface and groundwater, drives nitrous oxide emissions and erodes nitrogen use efficiency, while insufficient supply limits yield, quality and farm profitability [@oenema2003]. Phosphorus and potassium dynamics are strongly buffered by soil texture, and long-term fertilization plans must consider availability classes and legacy stocks to avoid either depletion or unwanted accumulation [@johnston2009].
+
+Many regulatory and advisory frameworks encode these principles into formal fertilization plans, based either on a crop nutrient balance or on simplified standard-dose schemes. These plans are typically distributed through closed, spreadsheet-based decision-support tools that, although widely used by farm advisors, are difficult to version, not suited to batch analysis and hard to couple with remote-sensing data. One such example is the Emilia-Romagna Disciplinari di Produzione Integrata (DPI) 2026 [@dpi2026], whose balance method (Allegato 2) and simplified standard-dose scheme are operationalized in the regional spreadsheet application FertDPI / Fert_Office (v1.26) [@fertoffice2026]; comparable frameworks exist across Europe and in other continents, typically sharing the same underlying balance logic with locally calibrated coefficients.
+
+Progress has been made on data accessibility and on tools bringing open documentation of fertilization protocols to stakeholders, for example the FRST initiative in the United States [@lyons2020], but, to our knowledge, no open software combines a full balance-based planner with regulatory N-dose checks and native variable-rate support in a reproducible way. This gap impedes the adoption of integrated-fertilization methods beyond the individual advisory communities that maintain each closed tool, and limits the ability of researchers to replicate fertilization plans at scale [@seibold2021].
+
+We therefore developed NFert, an R package [@rcore2025] that implements a full balance-based fertilization planner for N, P2O5 and K2O. Every coefficient, classification threshold and lookup table is stored as a standard, lazy-loaded R object, so the package is portable: by editing or replacing those objects the same balance machinery can be repurposed for other national or regional guidelines. NFert ships with a reference parameterization drawn from the DPI 2026 guidelines [@dpi2026; @guida2026] as a first fully-worked case study. Default regulatory constraints, including the maximum allowed N doses and the 170 kg N per hectare ceiling that implements the European Nitrates Directive [@nitrates1991] in Nitrate Vulnerable Zones, are taken in the current release from Emilia-Romagna Regulations 2/2024 [@rr2_2024] and 3/2017 [@rr3_2017], but the tables are user-editable and can be repopulated for other jurisdictions. For precision-agriculture applications, NFert integrates the sufficiency-index approach of Holland and Schepers [@holland2010], one of the most widely adopted NDVI-based algorithms for in-season nitrogen management. Compared with generic process models such as DSSAT or APSIM, NFert is intentionally lightweight: it is a balance-based decision-support tool, not a dynamic simulator, and is therefore particularly suited to operational planning, regulatory compliance and teaching. NFert allows agronomists, researchers and extension services to compute fertilization plans for hundreds of fields reproducibly, to couple them with spatial data, and to test scenarios that cannot be explored within spreadsheet-based tools.
+
+# Software description
+
+NFert is a pure-R package (R >= 4.0) whose only hard dependency is terra [@terra2024] for spatial input and output; optional functionality is provided through Suggests (sf, jsonlite, Rquefts, shiny, knitr, rmarkdown, testthat). The package exports roughly seventy-five functions and ships internal datasets, lazy-loaded R objects such as `uptake_table`, `mas.table` and `mineral_fertilizers.table`, plus a small set of bundled rasters in `inst/extdata`. All internal datasets carry English canonical names and are designed to be transparent and user-modifiable; identifiers from the source parameterization are retained in `_it` companion columns to preserve traceability to the official documents.
+
+The package is organized into six loosely coupled modules: the N balance, the P and K balances, the simplified standard-dose scheme, the fertilization distribution plan, the soil-chemistry classifiers, and the precision-agriculture module (Figure 1). The agronomic core produces a field-scale nitrogen target that the precision module then spatializes under a mass-balance constraint.
+
+![NFert architecture. The agronomic core composes the per-term DPI balance into N_balance() (and the P and K balances), applies the MAS caps and the organic plus mineral distribution plan, and produces a field-level target dose; this dose flows, under the mass-balance constraint, into the precision-agriculture module, which derives vegetation indices and Gaussian-process canopy traits, the Nitrogen Nutrition Index, mass-balance-constrained variable-rate prescriptions and machine-ready exports. The DPI 2026 coefficient tables underpin the package.](figures/fig1_architecture.pdf){width=100%}
+
+## Functions in NFert
+
+### N_balance()
+
+`N_balance()` implements a full crop nitrogen balance in the formulation of DPI Allegato 2 [@dpi2026]. It computes the terms A (crop demand), B1 and B2 (soil nitrogen supply from mineralization and ready N), C1 and C2 (leaching), D (immobilization), E (previous crop), F and Forg (organic contributions from previous and current years) and G (natural deposition), returning the mineral N to apply (Figure 2). Every term is expressed as efficient N (N utile) available to the crop in the current growing season: the current-year organic contribution Forg is obtained by multiplying the total N delivered by the organic matrix by an efficiency coefficient that is a function of effluent type, soil texture (sandy, loamy or clay) and distribution technique (high for injection or incorporation within four hours, medium for surface application with incorporation, low for surface spreading without incorporation), while the previous-years contribution F applies multi-year recovery coefficients (for example 30, 15 and 10 percent for cattle slurry in the first, second and third year after application; 50, 30 and 20 percent for composted manure). Leaching (C1, C2) is a time-dependent function of autumn-winter and early-spring rainfall, with a surplus-pluviometric flag activated when their sum exceeds 300 mm, and immobilization (D) is modulated by the oxygen-availability and drainage coefficient from the DPI reference table. Options include `soil_seeding = "no-till"` (a 3 kg per hectare reduction on B1), `greenhouse = TRUE` (a 2 kg per hectare addition on D), and automatic folding of a negative E term into D.
+
+![Conceptual scheme of the crop nitrogen balance computed by N_balance(). The terms that raise the requirement (crop demand A, leaching C, immobilization D) and those that lower it (soil supply B, previous crop E, organic contributions F and Forg, natural deposition G) combine into the residual mineral N to apply, which is returned together with every intermediate term.](figures/nbalance_scheme.pdf){width=85%}
+
+### P_balance() and K_balance()
+
+The phosphorus and potassium balances follow the DPI 2026 Allegato 2 formulation. Unlike the nitrogen balance, which is a multi-term mass budget, they are driven by a soil-availability strategy that determines whether the field needs nutrient enrichment, maintenance of current stocks, or a reduction of inputs. `P_balance()` first classifies the analytical Olsen P value into five DPI availability classes. Low availability triggers an enrichment strategy: the crop P2O5 demand A is augmented by a term proportional to the distance between the measured value and the upper bound of the low class, the soil weight at 30 cm depth and a P immobilization factor (1.6 in the current parameterization). Normal availability activates maintenance (only the crop uptake A is returned), and high availability triggers reduction (A is set to zero). `K_balance()` works analogously on four texture-dependent K classes and adds a clay-driven leaching term (60, 30, 20 or 10 kg K2O per hectare for clay content up to 5, 5 to 15, 15 to 25 or above 25 percent). Both functions return a diagnostic data frame with every intermediate term, the identified strategy and the final P2O5 or K2O to apply.
+
+### dose_standard_N() and dose_standard_PK()
+
+These implement the simplified standard-dose scheme with a full catalogue of decrements and increments (yield deviation, rainfall, previous crop, organic legacy), populated by default with the DPI 2026 values. The standard nitrogen dose is capped by the maximum allowed N dose (MAS).
+
+### plan_distribution()
+
+`plan_distribution()` builds the fertilization distribution plan by combining organic matrices (N efficiency coefficients by soil group, dose and sector) and mineral fertilizers (a 146-entry catalogue), returning excess or deficit alerts and enforcing the 170 kg N per hectare check in Nitrate Vulnerable Zones [@nitrates1991]. Consistently with the DPI convention, mineral fertilizers are assumed to deliver fully efficient N when applied in-season at crop demand, while each organic application is converted to efficient N through the soil-group and dose-level coefficient, so that the plan total can be checked against the mineral N target returned by `N_balance()` on a like-for-like basis.
+
+### Soil chemistry, MAS and end-of-cycle prediction
+
+Functions such as `classify_pH()`, `classify_carbonate_tot()`, `classify_CEC()`, `classify_SOM()`, `ratio_Mg_K()` and `ratio_K_CEC()` return soil-chemistry classes used as modifiers of the balance. `get_MAS()` and `check_MAS()` return and enforce the maximum allowed N doses per crop [@rr2_2024]. `estimate_soil_P_end_of_cycle()` and `estimate_soil_K_end_of_cycle()` project Olsen P and exchangeable K at the end of the crop cycle, enabling multi-year planning.
+
+### Precision nitrogen fertilization
+
+The precision-agriculture module turns the N target produced by `N_balance()` or `dose_standard_N()` into a spatially explicit variable-rate prescription. NFert implements two complementary algorithms widely adopted in the literature and in commercial farm-management software: a user-defined calibration-curve method and the sufficiency-index method of Holland and Schepers [@holland2010]. Both accept a single-band vegetation-index raster and return a prescription raster (kg N per hectare) of the same geometry, ready for GIS or farm-management software. The calibration method (`estimate_N_rate_from_calibration_curve()`) fits a two- or three-point linear regression between user-defined N rates and the observed index extremes and applies it pixel-wise; the Holland and Schepers method (`estimate_N_rate_from_holland_schepers()`) lowers the rate as the index approaches an N-rich reference strip. Figure 3 shows the response function of each method. In most cases the user calls the higher-level wrapper `variable_rate_N()`, which anchors the field-mean rate to the balance-based target, clips each pixel to user-defined bounds and, optionally, caps it at the crop-specific MAS limit.
+
+![Response functions of the variable-rate methods. (a) Calibration ramp: a two-point linear function maps the vegetation index to the nitrogen rate, in the inverse form (higher NDVI, less nitrogen) or the direct form, clipped to the dose envelope (here 165 to 235 kg N per hectare between the NDVI anchors 0.35 and 0.80). (b) Holland and Schepers: the rate decreases as the NDVI approaches the N-rich reference strip (NDVIref, sufficiency index SI = 1). In both cases the per-strip rates are rescaled so the field mean matches the balance target.](figures/cerzoo_vrt_response.pdf){width=100%}
+
+### Bilingual crop handling
+
+`resolve_crop()` and `list_crops()` accept either the Italian canonical name or an English alias for the crops of the reference catalogue. All public functions route user input through `resolve_crop()`, and matching is accent-insensitive, so downstream code is language-agnostic and Italian or English input resolves to the same canonical row.
+
+## From the field balance to the variable-rate prescription
+
+The balance-based and precision modules of NFert are designed to operate as a single coherent pipeline. The field-scale nitrogen target N* produced by `N_balance()` and refined by `plan_distribution()` is the mass-balance constraint that the spatial prescription must respect: for a raster of n equal-area pixels, the per-pixel rates satisfy a field mean equal to N* subject to user-defined minimum and maximum bounds, so the field-averaged rate of the variable-rate map coincides, by construction, with the regulatory-compliant target. This constraint is enforced by `variable_rate_N()`, which rescales the raster returned by the low-level estimators so that its pixel mean equals N*. Under it the index-based redistribution changes where fertilizer is delivered within the field, but never how much is delivered overall, which keeps the prescription compliant with the Nitrates Directive ceiling [@nitrates1991] and with crop-specific MAS limits [@rr2_2024] whenever these are respected at the balance stage.
+
+This coupling supports two complementary use cases. At the pre-sowing stage, the balance is computed with uniform field-level inputs and split by `plan_distribution()` into organic and mineral applications; when an index raster becomes available in-season, the residual mineral share is redistributed without altering the field total. At the post-season stage, the spatial dispersion of the index and its correlation with soil-texture or organic-history maps provides a cell-level diagnostic of which balance terms deserve refinement for the following season, enabling data-driven updates of the coefficient tables. To our knowledge, no other open-source tool implements this round-trip between a full DPI-compliant balance and an index-driven prescription under a shared mass-balance invariant.
+
+## Remote-sensing diagnosis: vegetation indices and the Nitrogen Nutrition Index
+
+The variable-rate pipeline assumes a normalised 0 to 1 vegetation index as input, and the reference literature has historically adopted NDVI for its operational simplicity. NDVI, however, saturates at leaf area index greater than 3 to 4, so in mid- and late-vegetative stages, precisely the canopy stages at which a side-dressing application is made on cereals (GS30 to GS32 for wheat; V8 to V10 for maize), its sensitivity to canopy nitrogen status drops markedly. The remote-sensing literature has converged on the red-edge region as the preferred spectral band for nitrogen diagnosis in closed canopies, with indices such as NDRE and CIred-edge providing almost linear sensitivity up to a leaf area index of about 6. NFert therefore exposes the six most widely adopted indices, NDVI, NDRE, GNDVI, CIred-edge, MCARI and MSAVI2, through a single multi-index engine, `compute_vi()`, that takes a multi-band `terra::SpatRaster` and returns the selected index as a single-layer raster. The engine is band-agnostic: the user maps the index inputs (red, red-edge, NIR, green) to layer names or indices, with Sentinel-2 L2A naming as the default, and an optional scale factor rescales integer reflectance on the fly. Because the variable-rate functions accept any normalised index, the same balance-to-prescription pipeline can be driven by NDRE or CIred-edge at later stages without any change in the calling code.
+
+A vegetation index remains a proxy for canopy nitrogen content. Moving from proxy to biophysical diagnosis requires the Nitrogen Nutrition Index (NNI) framework of Lemaire and Gastal [@lemaire1997], rooted on the species-specific critical-N dilution curve Nc = a W^(-b) (Nc in percent dry matter, W aboveground dry biomass in t DM per hectare) and defined as the ratio of actual to critical nitrogen concentration. The NNI is dimensionless, biomass-normalised and directly interpretable: below 0.90 it indicates deficiency, between 0.90 and 1.10 an optimal status, and above 1.10 luxury consumption [@houles2007]. NFert implements the framework through `critical_N_curve()`, which returns the (a, b, W_min) coefficients for the main Italian arable crops with literature parameterizations (wheat a = 5.35, b = 0.44, Justes et al. 1994; maize a = 3.40, b = 0.37, Plenet and Lemaire 2000; rice, rapeseed, sorghum and sunflower also bundled), `compute_NNI()`, which accepts nitrogen content, biomass and crop and returns a scalar, a vector or a raster, and `diagnose_N_status()`, which classifies the NNI into deficient, optimal and excessive zones and reports the field fraction in each class (Figure 4).
+
+![Critical-nitrogen dilution curves (Lemaire and Gastal framework) for maize (Nc = 3.40 W^-0.37) and wheat (Nc = 5.35 W^-0.44), on a biomass versus N-concentration plane. The shaded band, bounded by the 0.90 and 1.10 multiples of Nc, is the optimal NNI zone (shown for maize); field points above it are in luxury consumption (NNI above 1.10) and points below it are deficient (NNI below 0.90).](figures/critical_n_curves.pdf){width=70%}
+
+### GPR retrieval of canopy variables from Sentinel-2
+
+The NNI requires two quantities not routinely measured on farms: aboveground dry biomass and plant nitrogen concentration. NFert closes this gap with `estimate_biophysical()`, a pure-R port of the pyeogpr Gaussian-process regression pipeline of Estevez et al. [@estevez2022], adapted so it runs as a regular R function without any Python or Google Earth Engine dependency. The function takes a 10-band Sentinel-2 Level-2A surface-reflectance raster in canonical band order (B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12) and applies pre-trained PROSAIL-based GPR models, one per trait, stored as JSON files; for each trait it writes the posterior mean and, where available, the per-pixel standard deviation. Retrievable variables include leaf area index, leaf dry-matter and water content, fractional vegetation cover, chlorophyll and two canopy-nitrogen products. The implementation was benchmarked against the reference Python code on 200 random pixels and matches at a correlation of 1.0 with a maximum relative error below 1.4e-8, that is, differences only in the last digits of double precision, and processes full tiles in bounded memory through row blocking.
+
+The end-to-end wrapper `compute_NNI_from_S2()` combines these retrievals with a crop-specific dilution curve in a single call. Leaf dry matter per unit ground is derived as LAI times Cm, rescaled to total aboveground biomass through a leaf-allocation coefficient alpha_leaf (about 0.30 to 0.45, crop and stage dependent), and canopy nitrogen is taken from the protein-based retrieval or, on the chlorophyll path, through a canopy N:chlorophyll ratio. The two locally sensitive parameters, alpha_leaf and the N:chlorophyll ratio, are known to introduce biases of 15 to 30 percent in operational settings when adopted without local verification [@houles2007]; a minimal recalibration dataset of 30 to 50 plot-level samples of oven-dried biomass and total plant nitrogen, paired with the nearest cloud-free acquisition, is recommended. Two masks are applied before the NNI is computed: pixels with biomass below w_min (default 1 t DM per hectare) are dropped because the dilution curve is undefined at the seedling stage, and pixels with fractional vegetation cover below a threshold are discarded because the soil background contaminates the signal; the Sentinel-2 scene classification layer can be supplied to exclude cloud, shadow and snow. The pipeline returns a named list of rasters (biomass, actual and critical nitrogen, NNI and zones) that can be written with `terra::writeRaster()` or fed directly to `variable_rate_N()`.
+
+# Illustrative example
+
+## System requirements and installation
+
+NFert operates within the R environment. After installing R 4.0 or later, the development version is installed from GitHub, with all dependencies installed automatically; a CRAN release is planned for 2026.
+
+```{r install}
+# install.packages("remotes")
+remotes::install_github("mcroci/NFert")
+library(NFert)
+```
+
+## Nitrogen balance and regulatory check
+
+The following example uses the default DPI 2026 parameterization to compute the nitrogen balance for a silage maize targeted at 60 t per hectare of fresh product on a medium-textured soil with cattle slurry applied every year, and checks the result against the regulatory maximum.
+
+```{r n-balance}
+n_bal <- N_balance(
+  expected_yield_tons_ha = 60, crop = "Shredded corn class 700",
+  ccp = "Spring-summer crop 100-130 days", sand = 50, clay = 35,
+  Ntot = 1.2, SOM = 1.2, CN = 9.5, oxygen_availability = "Normal",
+  winter_rain = 160, start_spring_rain = 40,
+  prev_crop = "Winter cereals straw removal", source = "Cattle slurry",
+  fertorg_frequency = "every year", location = "Plain adjacent to urbanized areas",
+  forg_quantity = 100)
+print(n_bal)                                   # all terms: A, B, C1, C2, D, E, F, Forg, G
+n_target <- calculate_N_fertilization(n_bal)   # mineral N to apply
+check_MAS("Mais da insilato", n_target)        # within the DPI maximum?
+```
+
+The object returned by `N_balance()` exposes every intermediate term (Figure 2), so the user can audit each contribution and compare scenarios. The same field can be assessed for phosphorus and potassium with `P_balance()` and `K_balance()` from a soil test.
+
+## End-to-end fertilization plan
+
+After the balances, `plan_distribution()` distributes the required doses across a pre-sowing organic application and an in-season mineral application, and refuses to exceed the 170 kg N per hectare ceiling from livestock effluents when the Nitrate Vulnerable Zone check is enabled.
+
+```{r plan}
+plan <- plan_distribution(
+  soil_group = "Loamy textures", n_balance = n_target,
+  organic_rows = list(list(fertilizer = "liquame bovino", quantity_t_ha = 30,
+                           year = 2026, modality_epoch = 1, level = "media")),
+  mineral_rows = list(list(fertilizer = "UREA AGRICOLA PRIL.46%",
+                           quantity_q_ha = 3, modality_epoch = 11)),
+  zvn = TRUE)
+plan$alerts        # Excess / Deficit / ZVN 170 kg N/ha
+```
+
+## Case study: in-season diagnosis and variable-rate prescription at CERZOO
+
+We demonstrate the full pipeline on a real field of the CERZOO experimental farm of the Universita Cattolica del Sacro Cuore, in the Po Valley near Piacenza (about 45.0 degrees N, 9.7 degrees E). Field 3 is a 3.24 ha silage maize plot (second harvest), on a clay-rich soil (37 percent clay, 16.8 percent sand, 1.74 percent organic matter, C/N 8.84), with a target yield of 60 t per hectare and a Sentinel-2 Level-2A time series for the 2024 and 2025 seasons. The field boundary and a cropped Sentinel-2 scene ship with the package, so the case study runs out of the box, and all quantities below are produced by NFert from these inputs.
+
+For every acquisition, `estimate_biophysical()` retrieves the canopy traits, and their field means and standard deviations are interpolated over the season (Figure 5). `compute_NNI()` then derives the Nitrogen Nutrition Index from the maize critical-N curve for dates with sufficient biomass. Reading the NNI against the leaf area index (Figure 6) makes the diagnosis interpretable: within the two maize cycles, where LAI is high, the canopy moves between deficiency, the optimal band and luxury consumption, whereas the off-season scatter and gaps fall where LAI is near zero and no crop is present, and should be disregarded.
+
+![Field-mean seasonal trajectory of the canopy biophysical variables (LAI, Cm, canopy nitrogen content, FVC) retrieved from the Sentinel-2 time series by Gaussian-process regression for CERZOO Field 3. Points are the field mean plus or minus one standard deviation at each acquisition; lines are the natural-spline interpolation.](figures/cerzoo_biophysical_ts.pdf){width=100%}
+
+![Seasonal Nitrogen Nutrition Index (NNI, left axis) for CERZOO Field 3, read against the canopy leaf area index (LAI, right axis, green area). NNI is derived from the maize critical-nitrogen curve for dates with sufficient biomass; the shaded band and dashed lines mark the optimal range (0.90 to 1.10). The two LAI peaks are the maize cycles in which NNI is agronomically reliable, whereas the off-season scatter and gaps correspond to low LAI when no crop canopy is present.](figures/cerzoo_nni_ts.pdf){width=100%}
+
+The same NDVI scene drives the variable-rate prescription. Each variability method is a response function that maps the per-strip vegetation index, or the NNI zone, to a nitrogen rate (Figure 3). The prescription map is built in three steps: the field is tiled into operational strips, the mean index of each strip is run through the chosen response, and the whole map is rescaled so that its area-weighted mean equals the agronomic target, the step that keeps every map mass-balance compliant.
+
+```{r cerzoo-prescription}
+library(NFert); library(sf); library(terra)
+farm  <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"),
+                     quiet = TRUE)
+field <- farm[farm$id == 3, ]
+s2    <- terra::rast(system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
+                                 package = "NFert"))
+ndvi  <- compute_vi(s2, "NDVI", scale_factor = 10000)
+rx <- build_strip_prescription(field, machine_width = 24, cell_length = 30,
+                               variability = "calibration", vi_raster = ndvi,
+                               vi_low = 0.35, vi_high = 0.80,
+                               n_target = 200, min_dose = 165, max_dose = 235)
+# export_prescription_all(rx, "rx_maps", "cerzoo_field3", formats = c("geojson", "isoxml"))
+```
+
+The resulting prescription maps (Figure 7) all reproduce the field-mean target of 200 kg N per hectare, confirming the mass-balance constraint, but differ markedly in the within-field contrast they create (Table 2): the quantile-class method spreads the dose most widely (standard deviation 24.6 kg per hectare), the NNI-zone method concentrates the variation where the in-season diagnosis flags deficiency (19.8), and the direct NDVI ramp is the most conservative (4.8). The choice of method is therefore a deliberate agronomic decision about how much, and on what evidence, to vary nitrogen across the field, which NFert makes explicit and reproducible.
+
+![Variable-rate nitrogen prescriptions for CERZOO Field 3 (Sentinel-2 scene of 13 August 2024) under the prescription methods of Table 2, each constrained to the same field-mean dose of 200 kg N per hectare.](figures/cerzoo_prescription_strategies.pdf){width=100%}
+
+Table: Per-strip nitrogen dose (kg N per hectare) for CERZOO Field 3 under each prescription method (328 strips), all constrained to the same field-mean target. {#tbl:strategies}
+
+| Prescription method | Min | Mean | Max | SD |
+|---------------------|-----|------|-----|----|
+| Uniform | 200.0 | 200.0 | 200.0 | 0.0 |
+| NDVI calibration, inverse | 198.1 | 200.7 | 235.0 | 6.5 |
+| NDVI calibration, direct | 171.4 | 199.5 | 201.4 | 4.8 |
+| NDVI quantile classes (5) | 165.6 | 200.7 | 235.0 | 24.6 |
+| NNI zones (3) | 186.2 | 201.0 | 235.0 | 19.8 |
+
+## Spatial nitrogen balance on a real field
+
+NFert also applies the balance pixel by pixel. The package ships soil-property rasters for a 12-ha arable field near Cremona (very clayey soils, 50 to 65 percent clay). `spatial_N_balance()` runs `N_balance()` on every pixel of a `terra::SpatRaster` of soil properties while keeping crop, climate and management parameters uniform, and returns one layer per balance term.
+
+```{r spatial}
+library(terra)
+ext  <- system.file("extdata", package = "NFert")
+soil <- terra::rast(c(file.path(ext, "Cremonesi_TN.tif"),
+                      file.path(ext, "Cremonesi_SOM.tif"),
+                      file.path(ext, "Cremonesi_Clay.tif"),
+                      file.path(ext, "Cremonesi_Sand.tif"),
+                      file.path(ext, "Cremonesi_CNratio.tif")))
+names(soil) <- c("TN", "SOM", "Clay", "Sand", "CNratio")
+n_map <- spatial_N_balance(soil, expected_yield_tons_ha = 60,
+                           crop = "Shredded corn class 700",
+                           ccp = "Spring-summer crop 100-130 days",
+                           winter_rain = 160, start_spring_rain = 40,
+                           prev_crop = "Winter cereals straw removal",
+                           source = "Cattle slurry", forg_quantity = 100)
+terra::plot(n_map[["N_to_apply"]])
+```
+
+On this relatively homogeneous field the mineral N to apply is around 103 kg N per hectare with a narrow within-field range, but the same machinery resolves much larger gradients on heterogeneous fields, and its output feeds the variable-rate functions directly. The `spatial-balance` vignette shipped with the package walks through the full spatial balance and prescription on this field.
+
+# Impact
+
+NFert fills a practical gap between balance-based fertilization theory and operational decision-support, a space historically occupied by closed, region-specific spreadsheet tools. By re-expressing the full workflow in R and exposing every coefficient table as a user-editable object, it benefits three communities.
+
+For researchers, NFert enables batch computation of fertilization plans over hundreds of fields and multi-year scenarios. It supports new questions on the environmental and economic trade-offs of alternative organic amendments, on benchmarking balance-based recommendations against crop-growth models, and on quantifying nutrient-surplus variability across farm typologies. Because every intermediate term of the balance is exposed as an R object, the package also supports methodological work aimed at refining the default coefficients with local field data or at deriving parameterizations for other agro-climatic contexts.
+
+For extension services and agronomic consultants, NFert accelerates the daily workflow of producing fertilization plans. A script of a few dozen lines can read a spreadsheet of soil analyses, compute the N, P and K balances for each field, select suitable fertilizers and export a compliant plan, while version control with git makes it possible to audit the entire recommendation chain across crop cycles, which is impractical with spreadsheet-based tools.
+
+For farmers and precision-agriculture service providers, NFert is the bridge between a compliant fertilization plan and a variable-rate application map. The same N target that appears on the regulatory plan is redistributed in space according to vegetation indices or the NNI, reducing in-field variability and nutrient losses while maintaining full traceability. To our knowledge, NFert is the first R package combining a complete balance-based planner, regulatory N-dose checks and native remote-sensing-driven variable-rate support in a single open-source tool. The software is hosted on GitHub under the MIT license, documented through a README, vignettes and function-level help, and distributed with a testthat test suite; a CRAN submission is in preparation.
+
+# Conclusions
+
+NFert provides a transparent, reproducible and extensible R implementation of balance-based fertilization planning for nitrogen, phosphorus and potassium. It ships with a reference parameterization for the Emilia-Romagna DPI 2026 guidelines as a first fully-worked case study, but its coefficient tables and thresholds are user-editable, so the same machinery can be repurposed for other national or regional frameworks. By combining the balance method, the simplified standard-dose scheme, the distribution plan and remote-sensing-driven variable-rate algorithms in a single package, NFert lowers the barrier to compliant, science-based and precision-oriented nutrient management. Future developments will extend the English crop-translation catalogue and add bundled parameterizations for other fertilization guidelines.
+
+# Declaration of competing interest
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+# Data availability
+
+The code and bundled data of NFert are available in the GitHub repository (\url{https://github.com/mcroci/NFert}) under the MIT License.
+
+# Acknowledgements
+
+The authors thank the Servizio Agricoltura Sostenibile of Regione Emilia-Romagna for publishing the DPI 2026 guidelines and the FertDPI reference tool (v1.26), used as the first case study for NFert.
+
+# Funding
+
+This work was supported by the EOAGRITWIN project.
+
+# References

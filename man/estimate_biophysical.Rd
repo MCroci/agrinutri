@@ -9,7 +9,7 @@ estimate_biophysical(
   output_dir,
   variables = c("LAI", "Cm", "Cw", "FVC", "Cab", "laiCab", "CNC_Cab", "CNC_Cprot"),
   model_dir = NULL,
-  apply_offset = TRUE,
+  apply_offset = FALSE,
   offset = -1000,
   scale = 10000,
   nodata_in = 0,
@@ -28,11 +28,18 @@ Created if missing.}
 
 \item{model_dir}{Directory containing the \code{*.json} GPR model files.}
 
-\item{apply_offset}{Logical. If \code{TRUE} (default) the raster is
-shifted by \code{offset} and divided by \code{scale} before inference.}
+\item{apply_offset}{Logical. If \code{TRUE} the raster is shifted by
+\code{offset} before being divided by \code{scale}. Default \code{FALSE}:
+the input is treated as offset-applied reflectance (reflectance = DN /
+scale), matching \code{\link{compute_vi}} and the bundled scenes. Set
+\code{TRUE} only for raw baseline-04.00 L2A DN (see the Inputs and
+outputs section).}
 
-\item{offset, scale}{Radiometric conversion from DN to surface reflectance.
-Defaults match ESA S2 L2A processor baseline 04.00 onwards.}
+\item{offset, scale}{Radiometric conversion from DN to surface reflectance:
+reflectance = (DN + offset) / scale when \code{apply_offset = TRUE}, else
+DN / scale. \code{offset = -1000} matches the ESA S2 L2A processor
+baseline 04.00 \code{BOA_ADD_OFFSET} and is only used when
+\code{apply_offset = TRUE}.}
 
 \item{nodata_in}{Integer. Pixel value treated as nodata in the input.}
 
@@ -66,10 +73,21 @@ simulations and are distributed as \code{*.json} files.
 }
 \section{Inputs and outputs}{
 
-The S2 raster is expected to store DN values with the ESA L2A convention
-(offset \code{-1000}, scale \code{10000}). By default the function applies
-this rescaling; pass \code{apply_offset = FALSE} if the raster is already
-in surface-reflectance units (0-1.5).
+The S2 raster is expected to store surface reflectance scaled by
+\code{scale} (default \code{10000}), i.e. reflectance = DN / scale in the
+0-1.5 range. This "harmonized" / offset-applied convention is shared with
+\code{\link{compute_vi}}, matches the bundled example scenes and most
+analysis-ready L2A products (Copernicus harmonized, Google Earth Engine
+\code{HARMONIZED}, sen2r), and is the reflectance range the bundled GPR
+models were trained on (per-band training means 0.04-0.41). Accordingly
+\strong{no additive offset is applied by default} (\code{apply_offset =
+FALSE}). Only for \emph{raw} Processing Baseline 04.00+ L2A DN, where the
+\code{BOA_ADD_OFFSET} of -1000 has not yet been applied, set
+\code{apply_offset = TRUE} (with \code{offset = -1000}) so the function
+computes reflectance = (DN + offset) / scale. Getting this wrong shifts
+every band by ~0.1 reflectance and can drive all pixels out of the valid
+range, in which case the GPR returns empty (all-\code{NA}) maps; the
+function warns when most valid pixels fall outside 0-1.5.
 
 One GeoTIFF is written per requested variable (plus an \code{_unc.tif}
 file with prediction standard deviation for variables whose model exposes
@@ -77,7 +95,7 @@ the pre-computed \code{Linv_pre_calc} matrix). Output rasters inherit the
 geometry (CRS, extent, resolution) of the input.
 }
 
-\section{Use within NFert}{
+\section{Use within agrinutri}{
 
 Two of the outputs are directly usable as inputs to
 \code{\link{compute_NNI}}:
@@ -96,13 +114,16 @@ The helper \code{\link{biophysical_to_NNI_inputs}} wraps this conversion.
 
 \examples{
 \dontshow{if (requireNamespace("terra", quietly = TRUE) && requireNamespace("jsonlite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
-scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "NFert")
+\donttest{
+# Loading the Gaussian-process model takes a few seconds
+scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "agrinutri")
 if (nzchar(scene)) {
   od <- tempfile()
   dir.create(od)
   maps <- estimate_biophysical(scene, od, variables = "LAI", block_rows = 32)
   stopifnot(inherits(maps$LAI, "SpatRaster"),
             file.exists(attr(maps, "paths")$LAI))
+}
 }
 \dontshow{\}) # examplesIf}
 }

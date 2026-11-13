@@ -13,7 +13,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       warning = FALSE, message = FALSE)
 ```
 
-This vignette walks through the end-to-end workflow that NFert v0.13
+This vignette walks through the end-to-end workflow that agrinutri v0.13
 supports:
 
   1. Load a farm layout (GeoJSON) with per-plot agronomic inputs.
@@ -29,9 +29,9 @@ The package ships with a fictitious 35.5 ha farm near Piacenza with 8
 plots carrying all the columns required by `N_balance()`:
 
 ```{r eval = requireNamespace("sf", quietly = TRUE)}
-library(NFert)
+library(agrinutri)
 library(sf)
-ex   <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex   <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 farm[, c("plot_id", "plot_name", "crop", "area_ha")]
 ```
@@ -133,5 +133,5 @@ export_prescription_all(rx_uni, "rx_bundle", "campo_grande",
   formats = c("shp", "isoxml", "johndeere"))
 ```
 
-The Shiny interface (`NFert::run_app()`) exposes the same flow with
+The Shiny interface (`agrinutri::run_app()`) exposes the same flow with
 interactive forms and a leaflet preview.

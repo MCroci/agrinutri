@@ -137,8 +137,8 @@ nni_from_vi_empirical <- function(vi_raster,
              "riso" = "rice")
   if (key %in% names(it_en)) key <- unname(it_en[[key]])
   if (!key %in% c("wheat","maize","rice","barley"))
-    stop(sprintf("Unsupported crop '%s' for empirical NNI. ",
-                 "Use wheat / maize / rice / barley, or override ",
-                 "slope and intercept manually.", crop))
+    stop(sprintf(paste0("Unsupported crop '%s' for empirical NNI. ",
+                        "Use wheat / maize / rice / barley, or override ",
+                        "slope and intercept manually."), crop))
   key
 }

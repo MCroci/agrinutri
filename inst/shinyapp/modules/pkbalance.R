@@ -5,11 +5,11 @@ pkBalanceUI <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(6,
-      .nfert_card(
+      .agrinutri_card(
         h3(icon("flask"), " P balance"),
         selectInput(ns("p_crop"), "Crop",
-                    choices = .nfert_crop_choices(),
-                    selected = .nfert_default_crop()),
+                    choices = .agrinutri_crop_choices(),
+                    selected = .agrinutri_default_crop()),
         fluidRow(
           column(6, numericInput(ns("p_yield"),
                                   "Expected yield (t ha\u207B\u00B9)",
@@ -34,11 +34,11 @@ pkBalanceUI <- function(id) {
       )
     ),
     column(6,
-      .nfert_card(
+      .agrinutri_card(
         h3(icon("flask"), " K balance"),
         selectInput(ns("k_crop"), "Crop",
-                    choices = .nfert_crop_choices(),
-                    selected = .nfert_default_crop()),
+                    choices = .agrinutri_crop_choices(),
+                    selected = .agrinutri_default_crop()),
         fluidRow(
           column(6, numericInput(ns("k_yield"),
                                   "Expected yield (t ha\u207B\u00B9)",
@@ -77,7 +77,7 @@ pkBalanceServer <- function(id, research_mode, app_state) {
   moduleServer(id, function(input, output, session) {
 
     pbal <- eventReactive(input$p_run, {
-      tryCatch(NFert::P_balance(
+      tryCatch(agrinutri::P_balance(
         crop = input$p_crop,
         expected_yield_tons_ha = input$p_yield,
         olsen_value = input$p_olsen,
@@ -90,7 +90,7 @@ pkBalanceServer <- function(id, research_mode, app_state) {
     })
 
     kbal <- eventReactive(input$k_run, {
-      tryCatch(NFert::K_balance(
+      tryCatch(agrinutri::K_balance(
         crop = input$k_crop,
         expected_yield_tons_ha = input$k_yield,
         k_value = input$k_value,
@@ -109,15 +109,15 @@ pkBalanceServer <- function(id, research_mode, app_state) {
       val <- if (length(nm)) b[[nm]] else
              tryCatch(b[[paste0(target_name, "_required")]],
                       error = function(e) NA)
-      div(class = "nfert-kpi-row",
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(val, 0)),
-              span(class = "nfert-kpi-label",
+      div(class = "agrinutri-kpi-row",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(val, 0)),
+              span(class = "agrinutri-kpi-label",
                    paste0(target_name, " to apply (kg ha\u207B\u00B9)"))),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value",
                    as.character(b$strategy %||% "--")),
-              span(class = "nfert-kpi-label", "Strategy")))
+              span(class = "agrinutri-kpi-label", "Strategy")))
     }
     `%||%` <- function(a, b) if (is.null(a)) b else a
 

@@ -5,9 +5,9 @@ spatialUI <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(4,
-      .nfert_card(
+      .agrinutri_card(
         h3(icon("map"), " Spatial N balance"),
-        p(class = "nfert-muted",
+        p(class = "agrinutri-muted",
           "Apply N_balance() pixel-by-pixel to a stack of soil rasters",
           "(Ntot, SOM, Clay, Sand, CN). The Cremonesi field ships with",
           "the package as a 12-ha demo."),
@@ -30,8 +30,8 @@ spatialUI <- function(id) {
                     accept = c(".tif", ".tiff"))
         ),
         selectInput(ns("crop"), "Crop",
-                    choices = .nfert_crop_choices(),
-                    selected = .nfert_default_crop()),
+                    choices = .agrinutri_crop_choices(),
+                    selected = .agrinutri_default_crop()),
         numericInput(ns("yield"), "Expected yield (t ha\u207B\u00B9)",
                       value = 60, min = 0.1, step = 1),
         selectInput(ns("source"),
@@ -50,7 +50,7 @@ spatialUI <- function(id) {
       )
     ),
     column(8,
-      .nfert_card(
+      .agrinutri_card(
         h3("Field-level N to apply"),
         plotOutput(ns("nmap_plot"), height = "360px"),
         h4("Within-field distribution"),
@@ -71,7 +71,7 @@ spatialServer <- function(id, research_mode, app_state) {
     soil_stack <- reactive({
       if (!requireNamespace("terra", quietly = TRUE)) return(NULL)
       if (identical(input$source_sel, "cremonesi")) {
-        dir <- system.file("extdata", package = "NFert")
+        dir <- system.file("extdata", package = "agrinutri")
         paths <- file.path(dir, c("Cremonesi_TN.tif",
                                   "Cremonesi_SOM.tif",
                                   "Cremonesi_Clay.tif",
@@ -100,7 +100,7 @@ spatialServer <- function(id, research_mode, app_state) {
         showNotification("No soil stack available.", type = "error"); return(NULL)
       }
       withProgress(message = "Running spatial balance...", value = 0.3, {
-        tryCatch(NFert::spatial_N_balance(
+        tryCatch(agrinutri::spatial_N_balance(
           soil_stack = st,
           expected_yield_tons_ha = input$yield,
           crop   = input$crop,
@@ -131,7 +131,7 @@ spatialServer <- function(id, research_mode, app_state) {
       lyr <- tryCatch(r[["N_to_apply"]], error = function(e) r)
       mean_val <- tryCatch(terra::global(lyr, "mean", na.rm = TRUE)[1,1],
                             error = function(e) NA)
-      .nfert_raster_hist(lyr, breaks = mean_val,
+      .agrinutri_raster_hist(lyr, breaks = mean_val,
                           xlab = "N rate (kg N/ha)")
     })
     output$spat_summary <- renderUI({
@@ -140,16 +140,16 @@ spatialServer <- function(id, research_mode, app_state) {
       mn <- terra::global(lyr, "mean", na.rm = TRUE)[1,1]
       mi <- terra::global(lyr, "min",  na.rm = TRUE)[1,1]
       ma <- terra::global(lyr, "max",  na.rm = TRUE)[1,1]
-      div(class = "nfert-kpi-row",
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mn, 1)),
-              span(class = "nfert-kpi-label", "mean")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(mi, 1)),
-              span(class = "nfert-kpi-label", "min")),
-          div(class = "nfert-kpi",
-              span(class = "nfert-kpi-value", .nfert_fmt(ma, 1)),
-              span(class = "nfert-kpi-label", "max")))
+      div(class = "agrinutri-kpi-row",
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mn, 1)),
+              span(class = "agrinutri-kpi-label", "mean")),
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(mi, 1)),
+              span(class = "agrinutri-kpi-label", "min")),
+          div(class = "agrinutri-kpi",
+              span(class = "agrinutri-kpi-value", .agrinutri_fmt(ma, 1)),
+              span(class = "agrinutri-kpi-label", "max")))
     })
     output$dl_tif <- downloadHandler(
       filename = function()

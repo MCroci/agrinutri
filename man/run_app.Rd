@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_app.R
 \name{run_app}
 \alias{run_app}
-\title{Launch the NFert Shiny web interface}
+\title{Launch the agrinutri Shiny web interface}
 \usage{
 run_app(launch.browser = TRUE, port = NULL, host = "127.0.0.1", ...)
 }
@@ -23,7 +23,7 @@ Invisibly, the value returned by \code{\link[shiny]{runApp}}.
 }
 \description{
 Opens the bundled Shiny application in the user's default browser,
-exposing the core of the NFert package (N, P, K balance, distribution
+exposing the core of the agrinutri package (N, P, K balance, distribution
 plan, variable-rate prescription, Sentinel-2 NNI pipeline and spatial
 balance) through interactive forms and maps. Two working modes are
 available: \emph{agronomist view} (default, focused on the outputs
@@ -33,7 +33,7 @@ balance terms and coefficient overrides).
 }
 \examples{
 \dontrun{
-NFert::run_app()                              # local, open in browser
-NFert::run_app(host = "0.0.0.0", port = 3838) # serve on the LAN
+agrinutri::run_app()                              # local, open in browser
+agrinutri::run_app(host = "0.0.0.0", port = 3838) # serve on the LAN
 }
 }

@@ -3,18 +3,23 @@
 #' Calculates the final nitrogen fertilization requirement (N_fert) from a nitrogen balance result.
 #'
 #' @param n_balance A data frame returned by `N_balance()` containing nitrogen balance components.
-#' @param method The calculation method to use. Default is "standard" which uses the DPI formula:
-#'   N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+#' @param method The calculation method to use. Only "standard" (DPI balance)
+#'   is available.
 #'
 #' @return A numeric value representing the nitrogen fertilization requirement in kg/ha.
 #'
 #' @details
-#' This function calculates the final nitrogen fertilization requirement based on the nitrogen
-#' balance components. If the result is negative, it returns 0 (no fertilization needed).
-#'
-#' The standard (DPI) formula is:
+#' This function calculates the mineral nitrogen to apply from the nitrogen
+#' balance components, as Fert_Office v1.26 does: the balance
 #' ```
-#' N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+#' N = A - B + C1 + C2 + D - E - F - G
+#' ```
+#' is multiplied by the share admitted for the crop phase (`N_pct`; 0 before
+#' planting, 1 for most phases), bounded to 0 and to the crop's ceiling
+#' (`N_limit`, usually 340 kg N/ha), and the current-year organic N `Forg` is
+#' then subtracted (the result is never negative):
+#' ```
+#' N_fert = max(0, min(max(0, N * N_pct), N_limit) - Forg)
 #' ```
 #'
 #' Where:
@@ -32,7 +37,7 @@
 #' @examples
 #' # Calculate nitrogen balance
 #' balance <- N_balance(
-#'   expected_yield_tons_ha = 15,
+#'   expected_yield_tons_ha = 60,
 #'   crop = "Mais trinciato (classe 700)",
 #'   ccp = "Spring-summer crop 100-130 days",
 #'   sand = 50, clay = 35,
@@ -99,15 +104,20 @@ calculate_N_fertilization <- function(n_balance, method = "standard") {
     stop("Crop nitrogen demand (A) is NA. Cannot calculate fertilization requirement.")
   }
   
-  # Calculate nitrogen fertilization requirement (DPI: N = A - B + C + D - E - F - Forg - G)
-  if (method == "standard") {
-    N_fert <- A - B + C1 + C2 + D - E - F_prev - Forg - G
-  } else {
-    stop("Unknown method. Use 'standard'.")
-  }
-  
-  # Return 0 if negative (no fertilization needed)
-  N_fert <- max(0, N_fert)
-  
-  return(N_fert)
+  if (method != "standard") stop("Unknown method. Use 'standard'.")
+
+  # DPI balance (Fert_Office Bilancio!H31): N = A - B + C + D - E - F - G
+  N_need <- A - B + C1 + C2 + D - E - F_prev - G
+
+  # Reported dose (Fert_Office "Valori da riportare"): share admitted for the
+  # crop phase, non-negative, capped at the crop's ceiling. Older balance
+  # objects without these columns use 1 and no cap.
+  N_pct <- if ("N_pct" %in% names(n_balance)) n_balance$N_pct[1] else 1
+  N_limit <- if ("N_limit" %in% names(n_balance)) n_balance$N_limit[1] else Inf
+  if (is.na(N_pct)) N_pct <- 1
+  if (is.na(N_limit)) N_limit <- Inf
+  N_dose <- min(max(0, N_need * N_pct), N_limit)
+
+  # Mineral N to apply: the current-year organic contribution is subtracted
+  max(0, N_dose - Forg)
 }
