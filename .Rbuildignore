@@ -27,3 +27,4 @@
 ^[^/]*\.pdf$
 ^LICENSE\.md$
 ^CITATION\.cff$
+^NFert_.*\.tar\.gz$
