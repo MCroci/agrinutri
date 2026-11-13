@@ -173,7 +173,7 @@ cat("Mean applied N:  ", round(terra::global(rx_raster, "mean", na.rm = TRUE)[1,
 #> Mean applied N:   220 kg N/ha
 cat("Range:           ", round(terra::global(rx_raster, "min", na.rm = TRUE)[1, 1], 1),
     "-", round(terra::global(rx_raster, "max", na.rm = TRUE)[1, 1], 1), "kg N/ha\n")
-#> Range:            101.5 - 439.8 kg N/ha
+#> Range:            103.9 - 260 kg N/ha
 ```
 
 `%||%` is just defensive code (some versions of

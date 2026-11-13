@@ -56,7 +56,9 @@ variable_rate_N(
 
 - minN, maxN:
 
-  Optional explicit override of the envelope (in kg/ha).
+  Optional explicit override of the envelope (in kg/ha). When given,
+  they also bound the per-pixel rates of the Holland-Schepers method
+  after the mass-balance rescaling.
 
 - mas_cap:
 

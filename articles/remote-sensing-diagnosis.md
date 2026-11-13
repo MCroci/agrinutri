@@ -256,14 +256,14 @@ cat("Full prescription  mean :",
 #> Full prescription  mean : 160 kg/ha
 cat("NNI-guided        mean  :",
     round(terra::global(rate_guided, "mean", na.rm = TRUE)[1, 1], 1), "kg/ha\n")
-#> NNI-guided        mean  : 103.9 kg/ha
+#> NNI-guided        mean  : 104.5 kg/ha
 cat("N saved by NNI mask     :",
     round(terra::global(vr$rate_raster - rate_guided, "mean", na.rm = TRUE)[1, 1], 1),
     "kg/ha avg, or",
     round(terra::global(vr$rate_raster - rate_guided, "sum", na.rm = TRUE)[1, 1] *
           prod(terra::res(rate_guided)) / 10000, 1),
     "kg total over the field\n")
-#> N saved by NNI mask     : 56.1 kg/ha avg, or 56.1 kg total over the field
+#> N saved by NNI mask     : 55.5 kg/ha avg, or 55.5 kg total over the field
 ```
 
 ## 7. Empirical NNI from a single VI raster (no GPR models)

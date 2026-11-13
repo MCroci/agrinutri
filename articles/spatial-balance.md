@@ -181,6 +181,8 @@ vr <- variable_rate_N(
   minN        = 40,
   maxN        = 180
 )
+#> Warning: The field mean (40.0 kg/ha) cannot reach the target (27.2 kg/ha)
+#> within the dose bounds [40, 180].
 
 rx <- vr$rate_raster
 ```
@@ -204,11 +206,11 @@ The field-mean VRT rate should match the balance-based N target:
 cat("Balance N target:", round(N_target, 1), "kg N/ha\n")
 #> Balance N target: 27.2 kg N/ha
 cat("VRT field mean:  ", round(vr$mean_kg_ha, 1), "kg N/ha\n")
-#> VRT field mean:   27.2 kg N/ha
+#> VRT field mean:   40 kg N/ha
 cat("VRT range:       ",
     round(vr$min_kg_ha, 1), "–",
     round(vr$max_kg_ha, 1), "kg N/ha\n")
-#> VRT range:        0 – 52.7 kg N/ha
+#> VRT range:        40 – 40 kg N/ha
 ```
 
 ## 6. Export the prescription
