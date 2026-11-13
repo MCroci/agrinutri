@@ -95,7 +95,7 @@ test_that("export_prescription picks the dose field automatically or explicitly"
 
 test_that("export_prescription infers the format from the extension and rejects bad input", {
   skip_if_not_installed("sf")
-  g <- NFert:::.guess_format
+  g <- agrinutri:::.guess_format
   expect_equal(g("a.shp"), "shp")
   expect_equal(g("a.JSON"), "geojson")
   expect_equal(g("a.geojson"), "geojson")
@@ -151,7 +151,7 @@ test_that("ISOXML export writes one treatment zone per unique dose", {
   doc <- xml2::read_xml(f)
   root <- xml2::xml_root(doc)
   expect_equal(xml2::xml_name(root), "ISO11783_TaskData")
-  expect_equal(xml2::xml_attr(root, "ManagementSoftwareManufacturer"), "NFert")
+  expect_equal(xml2::xml_attr(root, "ManagementSoftwareManufacturer"), "agrinutri")
   expect_equal(xml2::xml_attr(xml2::xml_find_first(doc, "//TSK"), "B"), "N top-dress")
   expect_equal(xml2::xml_attr(xml2::xml_find_first(doc, "//PDT"), "B"), "Urea 46")
   expect_equal(xml2::xml_attr(xml2::xml_find_first(doc, "//CTP"), "B"), "Cereal")
@@ -168,7 +168,7 @@ test_that("ISOXML export writes one treatment zone per unique dose", {
   # field area (PFD@D) = sum of retained polygons, 3 x 1 ha
   expect_equal(as.numeric(xml2::xml_attr(xml2::xml_find_first(doc, "//PFD"), "D")),
                3e4, tolerance = 1)
-  expect_error(NFert:::.write_prep_for_isoxml(x, "nope", 1), "Dose field 'nope'")
+  expect_error(agrinutri:::.write_prep_for_isoxml(x, "nope", 1), "Dose field 'nope'")
 })
 
 test_that("export_prescription_all writes every requested format", {

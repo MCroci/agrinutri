@@ -50,8 +50,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' farm <- NFert::farm_balance(
-#'   system.file("extdata/example_farm.geojson", package = "NFert"))
+#' farm <- agrinutri::farm_balance(
+#'   system.file("extdata/example_farm.geojson", package = "agrinutri"))
 #'
 #' # Universal Shapefile
 #' export_prescription(farm, "field_rx.shp")
@@ -135,8 +135,8 @@ export_prescription <- function(x, path,
 #' @seealso \code{\link{export_prescription}}
 #' @examples
 #' \dontrun{
-#' farm <- NFert::farm_balance(
-#'   system.file("extdata/example_farm.geojson", package = "NFert"))
+#' farm <- agrinutri::farm_balance(
+#'   system.file("extdata/example_farm.geojson", package = "agrinutri"))
 #' export_prescription_all(farm, "rx_maps", "farm_2026",
 #'   formats = c("shp", "geojson", "isoxml", "johndeere"))
 #' }
@@ -310,9 +310,9 @@ export_prescription_all <- function(x,
   root <- xml2::xml_new_root(
     "ISO11783_TaskData",
     VersionMajor = "4", VersionMinor = "2",
-    ManagementSoftwareManufacturer = "NFert",
+    ManagementSoftwareManufacturer = "agrinutri",
     ManagementSoftwareVersion = as.character(
-      utils::packageVersion("NFert")),
+      utils::packageVersion("agrinutri")),
     DataTransferOrigin = "1")
 
   xml2::xml_add_child(root, "PFD",

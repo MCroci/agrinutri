@@ -6,13 +6,13 @@
 \usage{
 max_SO_input(
   so_class = c("Poor", "Normal", "Rich"),
-  so_max_input = nfert_data_get("so_max_input")
+  so_max_input = agrinutri_data_get("so_max_input")
 )
 }
 \arguments{
 \item{so_class}{One of \code{"Poor"}, \code{"Normal"}, \code{"Rich"} (case-insensitive).}
 
-\item{so_max_input}{Lookup table (default \code{NFert::so_max_input}).}
+\item{so_max_input}{Lookup table (default \code{agrinutri::so_max_input}).}
 }
 \value{
 Numeric t dry matter / ha.

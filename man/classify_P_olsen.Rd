@@ -7,8 +7,8 @@
 classify_P_olsen(
   value,
   unit = c("P", "P2O5"),
-  p_availability.table = nfert_data_get("p_availability.table"),
-  p_availability_meta = nfert_data_get("p_availability_meta")
+  p_availability.table = agrinutri_data_get("p_availability.table"),
+  p_availability_meta = agrinutri_data_get("p_availability_meta")
 )
 }
 \arguments{
@@ -16,9 +16,9 @@ classify_P_olsen(
 
 \item{unit}{Either \code{"P"} or \code{"P2O5"} (default \code{"P"}).}
 
-\item{p_availability.table}{Lookup table, default \code{NFert::p_availability.table}.}
+\item{p_availability.table}{Lookup table, default \code{agrinutri::p_availability.table}.}
 
-\item{p_availability_meta}{Conversion metadata, default \code{NFert::p_availability_meta}.}
+\item{p_availability_meta}{Conversion metadata, default \code{agrinutri::p_availability_meta}.}
 }
 \value{
 A list with:

@@ -45,11 +45,11 @@ plan_distribution <- function(soil_group,
                               organic_rows = list(),
                               mineral_rows = list(),
                               zvn = FALSE,
-                              organic_fertilizers.table      = nfert_data_get("organic_fertilizers.table"),
-                              mineral_fertilizers.table       = nfert_data_get("mineral_fertilizers.table"),
-                              efficiency.table    = nfert_data_get("efficiency.table"),
-                              distribution_modalities.table = nfert_data_get("distribution_modalities.table"),
-                              texture_groups.table      = nfert_data_get("texture_groups.table")) {
+                              organic_fertilizers.table      = agrinutri_data_get("organic_fertilizers.table"),
+                              mineral_fertilizers.table       = agrinutri_data_get("mineral_fertilizers.table"),
+                              efficiency.table    = agrinutri_data_get("efficiency.table"),
+                              distribution_modalities.table = agrinutri_data_get("distribution_modalities.table"),
+                              texture_groups.table      = agrinutri_data_get("texture_groups.table")) {
 
   ID_Rag <- normalise_soil_group(soil_group)$id_rag
 

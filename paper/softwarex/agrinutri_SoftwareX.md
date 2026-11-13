@@ -1,5 +1,5 @@
 ---
-title: "NFert: an R package for regulatory nutrient balances and variable-rate nitrogen prescriptions"
+title: "agrinutri: an R package for regulatory nutrient balances and variable-rate nitrogen prescriptions"
 bibliography: references.bib
 link-citations: true
 ---
@@ -12,7 +12,7 @@ link-citations: true
 
 # Abstract
 
-Regional nitrogen balances set legal fertiliser doses but are distributed as closed spreadsheets that compute one field at a time. NFert is an open-source R package that implements the nitrogen, phosphorus and potassium balance of the Emilia-Romagna Integrated Production Guidelines (DPI 2026), returns every balance term so that a dose can be audited, and keeps all coefficients as editable data. The balance runs per plot or per soil-map pixel, and a Sentinel-2 module turns the Nitrogen Nutrition Index into variable-rate prescriptions whose field mean equals the balance dose. In a Monte Carlo analysis on a real farm, soil-map error made the farm nitrogen total uncertain by less than 1 percent.
+Regional nitrogen balances set legal fertiliser doses but are distributed as closed spreadsheets that compute one field at a time. agrinutri is an open-source R package that implements the nitrogen, phosphorus and potassium balance of the Emilia-Romagna Integrated Production Guidelines (DPI 2026), returns every balance term so that a dose can be audited, and keeps all coefficients as editable data. The balance runs per plot or per soil-map pixel, and a Sentinel-2 module turns the Nitrogen Nutrition Index into variable-rate prescriptions whose field mean equals the balance dose. In a Monte Carlo analysis on a real farm, soil-map error made the farm nitrogen total uncertain by less than 1 percent.
 
 # Keywords
 
@@ -23,13 +23,13 @@ R package; Nutrient balance; Fertilisation planning; Regulatory compliance; Prec
 | Nr | Code metadata description | Metadata |
 |----|-----------------------|--------------------------------------|
 | C1 | Current code version | v1.0.0 |
-| C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/NFert |
+| C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/agrinutri |
 | C3 | Permanent link to reproducible capsule | [Zenodo DOI of the v1.0.0 release, to be added] |
 | C4 | Legal code license | MIT License |
 | C5 | Code versioning system used | git |
 | C6 | Software code languages, tools and services used | R |
 | C7 | Compilation requirements, operating environments and dependencies | R ≥ 4.0; imports terra; optional (Suggests): sf, jsonlite, xml2, Rquefts, geodata, shiny, shinyjs, DT, ggplot2, patchwork, leaflet; tested on Windows, macOS and Linux |
-| C8 | If available, link to developer documentation/manual | https://mcroci.github.io/NFert/ |
+| C8 | If available, link to developer documentation/manual | https://mcroci.github.io/agrinutri/ |
 | C9 | Support email for questions | michele.croci@unicatt.it |
 
 # 1. Motivation and significance
@@ -40,15 +40,15 @@ A spreadsheet of this kind serves its purpose for one advisor and one field. It 
 
 Open tools exist around this gap, but none of them fills it. Soil-test databases such as FRST make calibration data public but do not compute plans [@lyons2020]. Process-based crop models such as DSSAT, APSIM and STICS simulate nitrogen dynamics in detail [@jones2003; @keating2003; @brisson2003], but they need calibration and are not the method that a regulation prescribes. Nutrient-balance software for other regulations, such as webBESyD for the German rules, is offered as a web service rather than as a library [@donauer2025]. Sentinel-2 tools for variable-rate nitrogen, such as AgroSat and the simplified prescriptions tested on Italian wheat, set rates from canopy reflectance but do not compute the regulatory balance [@hamie2026; @vizzari2019; @santaga2021]. The evidence that sensor-based rates improve management also varies with context [@holland2010; @diacono2013; @colaco2018; @basso2016]. What is missing is an open implementation of the regulatory balance itself that remote-sensing and variable-rate methods can build on. Compatibility with compliance demands is one of the factors that decide whether farmers and advisors adopt a decision-support tool [@rose2016], and the Common Agricultural Policy now requires Member States to offer farmers a digital Farm Sustainability Tool for Nutrients [@eu2021_2115], which such an engine could serve.
 
-NFert provides that implementation in R [@rcore2025]. It computes the Emilia-Romagna balance for nitrogen, phosphorus and potassium as Fert_Office does, keeps every coefficient table as an editable R dataset, and adds the spatial and remote-sensing steps that Fert_Office lacks. The intended users are farm advisors producing plans in batch, researchers who need the regulatory dose as a model component, and teachers of nutrient management.
+agrinutri provides that implementation in R [@rcore2025]. It computes the Emilia-Romagna balance for nitrogen, phosphorus and potassium as Fert_Office does, keeps every coefficient table as an editable R dataset, and adds the spatial and remote-sensing steps that Fert_Office lacks. The intended users are farm advisors producing plans in batch, researchers who need the regulatory dose as a model component, and teachers of nutrient management.
 
 # 2. Software description
 
 ## 2.1. Software architecture
 
-NFert is a pure-R package whose only hard dependency is terra [@terra2024]; spatial vectors (sf), the Gaussian-process models (which need jsonlite), the QUEFTS economic optimum (Rquefts) and the Shiny interface are optional. It exports 76 functions and 38 lazy-loaded datasets. The design follows the structure of the regulation (Fig. 1).
+agrinutri is a pure-R package whose only hard dependency is terra [@terra2024]; spatial vectors (sf), the Gaussian-process models (which need jsonlite), the QUEFTS economic optimum (Rquefts) and the Shiny interface are optional. It exports 76 functions and 38 lazy-loaded datasets. The design follows the structure of the regulation (Fig. 1).
 
-![Fig. 1. NFert architecture. Inputs (top) feed the DPI 2026 balance, built from one function per balance term and checked against the regulatory limits; the same balance is applied per plot or per pixel. The remote-sensing module derives canopy traits and the Nitrogen Nutrition Index from Sentinel-2 or UAV imagery. The variable-rate functions redistribute the balance dose N* in space under a mass-balance constraint and export machine files. All coefficients are editable R datasets (dashed).](figures/fig1_architecture.pdf){width=100%}
+![Fig. 1. agrinutri architecture. Inputs (top) feed the DPI 2026 balance, built from one function per balance term and checked against the regulatory limits; the same balance is applied per plot or per pixel. The remote-sensing module derives canopy traits and the Nitrogen Nutrition Index from Sentinel-2 or UAV imagery. The variable-rate functions redistribute the balance dose N* in space under a mass-balance constraint and export machine files. All coefficients are editable R datasets (dashed).](figures/fig1_architecture.pdf){width=100%}
 
 The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop demand (unit uptake × expected yield), B the soil supply from organic-matter mineralisation and readily available N, C the leaching losses in autumn–winter and at the end of winter, D immobilisation and dispersion, E the residues of the previous crop, F the residual effect of organic fertilisation in previous years and G atmospheric deposition plus biological fixation. Each term has its own exported function (`calc_crop_N_demand()`, `soil_fertility()`, `leaching_loss()`, `calc_N_immobilization_loss()`, `nitrogen_from_previous_crop_residues()`, `organic_previous_years_N()`, `natural_contribution()`). `N_balance()` composes them and returns every term, so a dose can be audited line by line. `calculate_N_fertilization()` then applies the share of the balance admitted for the crop phase and the crop ceiling, and subtracts the current-year organic N. The coefficients sit in datasets such as `uptake_table` (unit uptake, 235 crop entries), `coef_time` (time coefficients by crop phase), `mas.table` (maximum allowed doses), `cb.table` (immobilisation factors) and `e.table` (previous-crop effects). Replacing a table re-parameterises the balance for another guideline without touching the code.
 
@@ -56,7 +56,7 @@ The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop d
 
 The main functionalities are grouped in Table 1.
 
-Table: Table 1. Main functionalities of NFert 1.0.0.
+Table: Table 1. Main functionalities of agrinutri 1.0.0.
 
 | Area | Functions |
 |------------|------------------------------------|
@@ -78,7 +78,7 @@ The variable-rate functions turn a vegetation index or NNI map into rates with a
 
 ## 2.3. Quality assurance
 
-Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edition) and Fert_Office differ, for example in the mineralisation rates of sandy soils and the immobilisation factors of poorly drained soils, NFert follows Fert_Office, the tool that inspections use, and its documentation lists the differences. The test suite (169 tests, 773 expectations, about 87 percent line coverage) covers every balance term, the regulatory checks, the exact mass balance of the prescriptions and the export formats, and runs on Windows, macOS and Linux through continuous integration.
+Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edition) and Fert_Office differ, for example in the mineralisation rates of sandy soils and the immobilisation factors of poorly drained soils, agrinutri follows Fert_Office, the tool that inspections use, and its documentation lists the differences. The test suite (169 tests, 773 expectations, about 87 percent line coverage) covers every balance term, the regulatory checks, the exact mass balance of the prescriptions and the export formats, and runs on Windows, macOS and Linux through continuous integration.
 
 # 3. Illustrative examples
 
@@ -87,7 +87,7 @@ Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edi
 The sample field of Fert_Office is durum wheat at 6 t ha^−1^ on a silt-loam soil with imperfect drainage, after maize with stalks removed:
 
 ```r
-library(NFert)
+library(agrinutri)
 bal <- N_balance(expected_yield_tons_ha = 6, crop = "Grano duro (pianta intera)",
   ccp = "Spring-summer crop 100-130 days", sand = 15.5, clay = 18.5,
   Ntot = 1.5, SOM = 2, CN = 7.73, oxygen_availability = "Slow",
@@ -112,12 +112,12 @@ The returned object lists A = 186.6, B = 73.8, C = 0, D = 39.5 (including the �
 The package also ships a Sentinel-2 Level-2A scene of a 3.2 ha silage maize field at the CERZOO experimental farm near Piacenza (13 August 2024). A few calls go from the image to an ISOXML task file; here the target dose is set to 200 kg N ha^−1^, whereas in practice it is the balance dose of the field (`calculate_N_fertilization()`):
 
 ```r
-s2   <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "NFert")
+s2   <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "agrinutri")
 bio  <- estimate_biophysical(s2, output_dir = tempdir(),
                              variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
 nni  <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
                             crop = "maize", fvc = bio$FVC)
-farm <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"))
+farm <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"))
 rx   <- build_strip_prescription(farm[farm$id == 3, ], machine_width = 24,
                                  cell_length = 30, variability = "nni",
                                  nni_raster = nni$NNI, n_target = 200,
@@ -139,7 +139,7 @@ The nitrogen requirement of the mapped fields, before any credit for current-yea
 
 # 4. Impact
 
-NFert makes the Emilia-Romagna balance a reusable component instead of an end product.
+agrinutri makes the Emilia-Romagna balance a reusable component instead of an end product.
 
 **New research questions.** Because the balance is a function rather than a set of spreadsheet cells, it can be called hundreds of thousands of times inside other analyses, which opens questions that cannot be asked of Fert_Office. One is how reliable a regulatory dose is when its soil inputs come from digital soil maps. On the CERZOO experimental farm, a different farm (eight maize and wheat fields, 32 ha), we propagated the errors of the clay, sand, organic carbon and total nitrogen maps through `N_balance()` by correlated Monte Carlo (100 draws on 866 pixels of 20 m). The per-pixel dose uncertainty was 3.3 percent, 95 percent (maize) and 96 percent (wheat) of it from soil texture. Because the map residuals showed no detectable spatial structure, the standard deviation of the farm nitrogen total was at most about 0.6 percent. Under the rainfall measured in 2024 to 2025, instead, the farm dose rose by 26 percent. The scripts of this analysis are in the repository (`paper/sat/`). Other questions of the same kind are how prescription methods compare when the field total is held constant, or how much variable-rate application can redistribute nitrogen without exceeding the plan.
 
@@ -149,13 +149,13 @@ NFert makes the Emilia-Romagna balance a reusable component instead of an end pr
 
 **Quality of the reference itself.** Writing the balance as code brought to light differences between the printed tables of the guidelines and Fert_Office (Section 2.3), now documented, and the Monte Carlo stress test above found a cell of the texture triangle coded with a non-existent class, which is fixed in version 1.0.0 and covered by a test. An open, tested implementation thus also serves as a check on the regulatory scheme.
 
-**Use.** NFert is public on GitHub with a documentation website and continuous integration on three operating systems, and passes the CRAN checks [author to add download or user figures, other publications or projects that use the package, and any commercial use, if available].
+**Use.** agrinutri is public on GitHub with a documentation website and continuous integration on three operating systems, and passes the CRAN checks [author to add download or user figures, other publications or projects that use the package, and any commercial use, if available].
 
-**Limitations.** NFert is an R package rather than a web service, and its default parameterisation is that of one region. The balance terms of other guidelines differ in detail, and adapting them means editing the tables and, where the rules differ, the term functions. Users outside Emilia-Romagna should treat the bundled values as an example.
+**Limitations.** agrinutri is an R package rather than a web service, and its default parameterisation is that of one region. The balance terms of other guidelines differ in detail, and adapting them means editing the tables and, where the rules differ, the term functions. Users outside Emilia-Romagna should treat the bundled values as an example.
 
 # 5. Conclusions
 
-NFert is an open R implementation of the Emilia-Romagna DPI 2026 nutrient balance for nitrogen, phosphorus and potassium. It extends the balance to farms, soil maps, satellite diagnosis and variable-rate prescriptions whose field mean equals the compliant dose. Planned work covers a CRAN release, other regional parameterisations and the coupling of P and K balances with sensor data.
+agrinutri is an open R implementation of the Emilia-Romagna DPI 2026 nutrient balance for nitrogen, phosphorus and potassium. It extends the balance to farms, soil maps, satellite diagnosis and variable-rate prescriptions whose field mean equals the compliant dose. Planned work covers a CRAN release, other regional parameterisations and the coupling of P and K balances with sensor data.
 
 # Declaration of competing interest
 
@@ -171,7 +171,7 @@ NFert is an open R implementation of the Emilia-Romagna DPI 2026 nutrient balanc
 
 # Data availability
 
-The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`) and the uncertainty analysis of Section 4 (`paper/sat/`) and the provincial application of Section 3.4 (`paper/softwarex/piacenza/`) are available at https://github.com/mcroci/NFert under the MIT License [@nfert2026]. The CERZOO soil maps used in Section 4 come from a separate, proprietary mapping pipeline [author to state access conditions and credit]. The field boundaries and crop classes of Section 3.4 are distributed as aggregated results only; the regional soil maps, ERA5 and ISTAT data are public.
+The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`) and the uncertainty analysis of Section 4 (`paper/sat/`) and the provincial application of Section 3.4 (`paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The CERZOO soil maps used in Section 4 come from a separate, proprietary mapping pipeline [author to state access conditions and credit]. The field boundaries and crop classes of Section 3.4 are distributed as aggregated results only; the regional soil maps, ERA5 and ISTAT data are public.
 
 # Acknowledgements
 

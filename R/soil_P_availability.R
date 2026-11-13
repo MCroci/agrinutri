@@ -7,8 +7,8 @@
 #'
 #' @param value Numeric. Olsen phosphorus value in ppm.
 #' @param unit Either `"P"` or `"P2O5"` (default `"P"`).
-#' @param p_availability.table Lookup table, default `NFert::p_availability.table`.
-#' @param p_availability_meta Conversion metadata, default `NFert::p_availability_meta`.
+#' @param p_availability.table Lookup table, default `agrinutri::p_availability.table`.
+#' @param p_availability_meta Conversion metadata, default `agrinutri::p_availability_meta`.
 #'
 #' @return A list with:
 #'   - `value_ppm_P`, `value_ppm_P2O5`: input converted to both units.
@@ -23,8 +23,8 @@
 #' @export
 classify_P_olsen <- function(value,
                              unit = c("P", "P2O5"),
-                             p_availability.table = nfert_data_get("p_availability.table"),
-                             p_availability_meta  = nfert_data_get("p_availability_meta")) {
+                             p_availability.table = agrinutri_data_get("p_availability.table"),
+                             p_availability_meta  = agrinutri_data_get("p_availability_meta")) {
   unit <- match.arg(unit)
   if (!is.numeric(value) || length(value) != 1 || is.na(value) || value < 0) {
     stop("`value` must be a single non-negative numeric.")
@@ -109,9 +109,9 @@ soil_P_availability <- function(olsen_value,
                                 A_demand_P2O5,
                                 depth_cm = 30,
                                 total_carbonate = NULL,
-                                p_availability.table = nfert_data_get("p_availability.table"),
-                                p_availability_meta  = nfert_data_get("p_availability_meta"),
-                                texture_groups.table = nfert_data_get("texture_groups.table")) {
+                                p_availability.table = agrinutri_data_get("p_availability.table"),
+                                p_availability_meta  = agrinutri_data_get("p_availability_meta"),
+                                texture_groups.table = agrinutri_data_get("texture_groups.table")) {
   unit <- match.arg(unit)
   cls <- classify_P_olsen(olsen_value, unit = unit,
                           p_availability.table = p_availability.table, p_availability_meta = p_availability_meta)

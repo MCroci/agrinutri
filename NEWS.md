@@ -1,4 +1,12 @@
-# NFert News
+# agrinutri News
+
+## Version 1.0.0: package renamed
+
+* The package formerly called NFert is now **agrinutri** (repository
+  https://github.com/mcroci/agrinutri). Exported helpers renamed accordingly:
+  `nfert_it2en()` -> `agrinutri_it2en()`, `nfert_en2it()` -> `agrinutri_en2it()`,
+  `nfert_to_quefts_*()` -> `agrinutri_to_quefts_*()`, `nfert_crop_pars_quefts()` ->
+  `agrinutri_crop_pars_quefts()`. Entries below keep the old name.
 
 ## Version 1.0.0 (2026-10-14) — validated against Fert_Office v1.26
 

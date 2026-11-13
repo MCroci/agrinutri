@@ -74,7 +74,7 @@ test_that("check_MAS treats a crop with no MAS_N as compliant", {
 # ---------------------------------------------------------------------------
 test_that("farm_balance enriches the bundled example farm", {
   skip_if_not_installed("sf")
-  ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+  ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
   skip_if(!nzchar(ex), "no bundled example_farm.geojson")
 
   farm <- farm_balance(ex)

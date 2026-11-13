@@ -1,5 +1,5 @@
 test_that("leaching_loss matches Fert_Office v1.26 rainfall logic (id_rag = 2, Slow, b1 = 39)", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
 
   r <- leaching_loss(
     winter_rain = 100, start_spring_rain = 0,
@@ -33,7 +33,7 @@ test_that("leaching_loss matches Fert_Office v1.26 rainfall logic (id_rag = 2, S
 })
 
 test_that("late rain loses the residual N pronto plus 1 kg per 10 mm (C&D!C24, C32)", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   b <- 29.16
   r <- leaching_loss(220, 80, "Normal", 3, b)
   expect_equal(r$C1, b * 0.70)
@@ -45,7 +45,7 @@ test_that("late rain loses the residual N pronto plus 1 kg per 10 mm (C&D!C24, C
 })
 
 test_that("perennial crops lose a fixed 30 kg pool and phase rules apply", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   r <- leaching_loss(200, 0, b1 = 0, perennial = TRUE)
   expect_equal(r$C1, 15)
   r <- leaching_loss(200, 0, b1 = 40, autumn_loss = FALSE)
@@ -53,7 +53,7 @@ test_that("perennial crops lose a fixed 30 kg pool and phase rules apply", {
 })
 
 test_that("N_balance reproduces Fert_Office Bilancio dose for Cerzoo-style durum scenario", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
 
   out <- N_balance(
     expected_yield_tons_ha = 6,
@@ -75,7 +75,7 @@ test_that("N_balance reproduces Fert_Office Bilancio dose for Cerzoo-style durum
 })
 
 test_that("invalid oxygen_availability errors", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   expect_error(
     leaching_loss(160, 0, oxygen_availability = "not_a_real_class", id_rag = 2, b1 = 30),
     "oxygen_availability"

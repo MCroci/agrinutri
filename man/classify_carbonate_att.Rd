@@ -6,7 +6,7 @@
 \usage{
 classify_carbonate_att(
   caco3_att,
-  active_carbonate.table = nfert_data_get("active_carbonate.table")
+  active_carbonate.table = agrinutri_data_get("active_carbonate.table")
 )
 }
 \arguments{

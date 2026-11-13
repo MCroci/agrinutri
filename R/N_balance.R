@@ -2,8 +2,8 @@
 #'
 #' Calculates the nitrogen balance of a crop with the DPI Emilia-Romagna 2026
 #' balance method (Allegato 2), reproducing the regional tool Fert_Office v1.26
-#' term by term. Where the printed DPI tables and Fert_Office differ, NFert
-#' follows Fert_Office (see `vignette("NFert-PK-and-distribution")`).
+#' term by term. Where the printed DPI tables and Fert_Office differ, agrinutri
+#' follows Fert_Office (see `vignette("agrinutri-PK-and-distribution")`).
 #'
 #' @param expected_yield_tons_ha Expected crop yield in tons per hectare.
 #' @param crop Name of the crop.
@@ -143,7 +143,7 @@ N_balance <- function(expected_yield_tons_ha = 15, crop = "Grano tenero FF (gran
   soil.group <- soil_props$soil.group
 
   # Crop phase: time coefficient, precession rule and admitted share of N
-  coef_time <- nfert_data_get("coef_time")
+  coef_time <- agrinutri_data_get("coef_time")
   ccp <- resolve_ccp(ccp, table = coef_time)
   ph <- coef_time[match(ccp, coef_time$ccp), , drop = FALSE]
   C_tempo <- as.numeric(ph$C_tempo)
@@ -265,7 +265,7 @@ N_balance <- function(expected_yield_tons_ha = 15, crop = "Grano tenero FF (gran
   pieces <- lapply(pieces, function(p) p[1])
 
   # Build result data frame (DPI: N = A - B + C + D - E - F - Forg - G)
-  Nfert <- as.data.frame(pieces, stringsAsFactors = FALSE)
+  agrinutri <- as.data.frame(pieces, stringsAsFactors = FALSE)
 
-  return(Nfert)
+  return(agrinutri)
 }

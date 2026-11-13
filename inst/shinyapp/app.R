@@ -1,21 +1,21 @@
-# NFert Shiny app -- entry point.
+# agrinutri Shiny app -- entry point.
 #
 # Run locally with:
 #   shiny::runApp("inst/shinyapp")
 # or via the package helper:
-#   NFert::run_app()
+#   agrinutri::run_app()
 
 source("global.R", local = TRUE)
 
 # ---------- UI -------------------------------------------------------
 ui <- navbarPage(
-  id = "nfert_nav",
+  id = "agrinutri_nav",
   title = div(
-    tags$span("NFert", style = "font-weight: 700; letter-spacing: 0.5px;"),
+    tags$span("agrinutri", style = "font-weight: 700; letter-spacing: 0.5px;"),
     tags$span(sprintf(" v%s", APP_VERSION),
               style = "font-weight: 300; opacity: 0.7; font-size: 13px; margin-left: 4px;")
   ),
-  windowTitle = "NFert -- Balance-based & sensor-based N management",
+  windowTitle = "agrinutri -- Balance-based & sensor-based N management",
   theme = NULL,
   collapsible = TRUE,
 
@@ -27,7 +27,7 @@ ui <- navbarPage(
     ),
     # Mode toggle - visible on every tab, top-right of the navbar
     absolutePanel(
-      class = "nfert-mode-toggle",
+      class = "agrinutri-mode-toggle",
       top = "10px", right = "14px", width = "auto",
       checkboxInput("research_mode",
                     label = "Research mode", value = FALSE, width = "auto")
@@ -44,17 +44,17 @@ ui <- navbarPage(
 
   tabPanel("About", icon = icon("circle-info"),
            fluidRow(column(10, offset = 1,
-             div(class = "nfert-card",
-               h3("About NFert"),
-               p("NFert is an open-source R package that implements balance-based",
+             div(class = "agrinutri-card",
+               h3("About agrinutri"),
+               p("agrinutri is an open-source R package that implements balance-based",
                  "and sensor-based nitrogen fertilisation planning. This web",
                  "interface exposes the core functionality of the package through",
                  "interactive forms and visualisations."),
                p(tags$strong("Reference parameterisation: "),
                  "Emilia-Romagna Integrated Production Guidelines (DPI 2026)."),
                p(tags$strong("Source code and documentation: "),
-                 tags$a(href = "https://github.com/mcroci/NFert",
-                        "https://github.com/mcroci/NFert")),
+                 tags$a(href = "https://github.com/mcroci/agrinutri",
+                        "https://github.com/mcroci/agrinutri")),
                p(tags$strong("Licence: "), "MIT."),
                tags$hr(),
                h4("Two working modes"),
@@ -70,11 +70,11 @@ ui <- navbarPage(
                          "\"Research mode\" switch at the top-right.")
                ),
                tags$hr(),
-               div(class = "nfert-footer",
-                   sprintf("NFert v%s -- build %s. ", APP_VERSION, APP_BUILD),
-                   tags$a(href = "https://github.com/mcroci/NFert/issues",
+               div(class = "agrinutri-footer",
+                   sprintf("agrinutri v%s -- build %s. ", APP_VERSION, APP_BUILD),
+                   tags$a(href = "https://github.com/mcroci/agrinutri/issues",
                           "Report an issue"), " ",
-                   tags$a(href = "https://github.com/mcroci/NFert",
+                   tags$a(href = "https://github.com/mcroci/agrinutri",
                           "Source on GitHub"))
              )
            ))

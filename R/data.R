@@ -1,12 +1,12 @@
-#' NFert Package Data
+#' agrinutri Package Data
 #'
-#' Internal datasets used by the NFert package for nitrogen (and, from v0.2.0,
+#' Internal datasets used by the agrinutri package for nitrogen (and, from v0.2.0,
 #' phosphorus and potassium) balance calculations following the Disciplinari di
 #' Produzione Integrata (DPI) Emilia-Romagna (Allegato 2 - metodo del bilancio,
 #' Allegati 3, 4, 6, 7, 9) and the FertDPI / Fert_Office reference tool
 #' (v1.26, Febbraio 2026).
 #'
-#' @name NFert-data
+#' @name agrinutri-data
 #' @aliases uptake_table e.table f.table g.table soil.table tri2.table tri3.table
 #'          ca.table cb.table coefN_readily coefN_mineralised coef_time s2.rast
 #'          mas.table crops.table crop_groups.table texture_groups.table so.table
@@ -25,7 +25,7 @@
 #' (L, F, FL, FSA, FA), (3) Tendenzialmente argilloso (FLA, AS, AL, A).
 #' Tables with character keys retain the original Italian naming used in
 #' Fert_Office; English aliases (`*_it` columns, or English primary values)
-#' are provided where backward compatibility with earlier NFert versions is
+#' are provided where backward compatibility with earlier agrinutri versions is
 #' required.
 #'
 #' @section Core N datasets:
@@ -104,7 +104,7 @@
 #' }
 #'
 #' @examples
-#' library(NFert)
+#' library(agrinutri)
 #' head(uptake_table)
 #' head(mas.table)
 #' head(p_availability.table)

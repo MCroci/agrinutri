@@ -1,6 +1,6 @@
 """Reference DOCX for the SoftwareX manuscript.
 
-Starts from the house style (../reference-nfert.docx: Times New Roman, black
+Starts from the house style (../reference-agrinutri.docx: Times New Roman, black
 headings, justified body) and sets the code styles back to a monospaced font,
 so R snippets are readable. Run from paper/softwarex/:
     python make_refdoc_swx.py
@@ -9,7 +9,7 @@ from docx import Document
 from docx.oxml.ns import qn
 from docx.shared import Pt
 
-doc = Document("../reference-nfert.docx")
+doc = Document("../reference-agrinutri.docx")
 for name in ("Source Code", "Verbatim Char"):
     try:
         st = doc.styles[name]

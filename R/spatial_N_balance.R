@@ -51,7 +51,7 @@
 #' @examples
 #' \dontrun{
 #' library(terra)
-#' ext <- system.file("extdata", package = "NFert")
+#' ext <- system.file("extdata", package = "agrinutri")
 #' soil <- terra::rast(c(
 #'   file.path(ext, "Cremonesi_TN.tif"),
 #'   file.path(ext, "Cremonesi_SOM.tif"),

@@ -1,11 +1,11 @@
-test_that("nfert_to_quefts_crop reads bundled IT table", {
-  cp <- nfert_to_quefts_crop("Grano duro (granella)")
+test_that("agrinutri_to_quefts_crop reads bundled IT table", {
+  cp <- agrinutri_to_quefts_crop("Grano duro (granella)")
   expect_true(is.list(cp))
   expect_true(all(c("Yzero", "SeasonLength") %in% names(cp)))
 })
 
-test_that("nfert_to_quefts_soil returns QUEFTS soil list", {
-  s <- nfert_to_quefts_soil(45)
+test_that("agrinutri_to_quefts_soil returns QUEFTS soil list", {
+  s <- agrinutri_to_quefts_soil(45)
   expect_identical(names(s)[1], "N_base_supply")
   expect_true(is.matrix(s$UptakeAdjust))
 })

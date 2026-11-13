@@ -147,7 +147,7 @@ defines the driving direction.
 
 \examples{
 \dontshow{if (requireNamespace("sf", quietly = TRUE)) withAutoprint(\{ # examplesIf}
-ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 field <- farm[1, ]  # 5.2 ha silage-maize plot
 

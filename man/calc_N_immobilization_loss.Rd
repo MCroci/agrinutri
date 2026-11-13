@@ -35,7 +35,7 @@ Calculates the amount of nitrogen immobilized by soil microorganisms based on so
 oxygen availability, and drainage.
 }
 \details{
-This function uses lookup tables (\code{ca.table} and \code{cb.table}) from the \code{NFert} package
+This function uses lookup tables (\code{ca.table} and \code{cb.table}) from the \code{agrinutri} package
 to determine the immobilization correction factor (\code{fc_D}) based on soil drainage and oxygen
 availability. The nitrogen immobilization loss is then calculated as:
 

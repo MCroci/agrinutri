@@ -2,7 +2,7 @@
 #'
 #' Generic engine that computes the main vegetation indices used in nitrogen
 #' diagnosis from a multi-band `terra::SpatRaster`.
-#' NFert supports six indices with configurable band mapping, so the function
+#' agrinutri supports six indices with configurable band mapping, so the function
 #' works with Sentinel-2 L2A, UAV multispectral sensors (MicaSense, Parrot
 #' Sequoia, Pix4D) or any other multispectral product.
 #'
@@ -25,7 +25,7 @@
 #' NDVI saturates at LAI > 3--4 in closed canopies; in mid- to late-vegetative
 #' stages (GS30+ for cereals, V8+ for maize) the red-edge indices (NDRE,
 #' CIred) are considerably more sensitive to canopy nitrogen status (Clarke
-#' 2001; Li 2014; Cao 2015). NFert variable-rate functions
+#' 2001; Li 2014; Cao 2015). agrinutri variable-rate functions
 #' (`variable_rate_N()`, `estimate_N_rate_from_calibration_curve()`,
 #' `estimate_N_rate_from_holland_schepers()`) all accept any normalised VI on
 #' a 0--1 scale, so the user can substitute NDVI with NDRE or GNDVI
@@ -83,7 +83,7 @@
 #' @examples
 #' \dontrun{
 #' library(terra)
-#' library(NFert)
+#' library(agrinutri)
 #'
 #' # Sentinel-2 L2A stack (integer DN, 0-10000)
 #' s2 <- terra::rast("S2_Cremonesi_20260415.tif")

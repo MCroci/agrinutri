@@ -4,14 +4,14 @@
 \alias{classify_SOM}
 \title{Classify SO (soil organic matter) initial content by texture group}
 \usage{
-classify_SOM(SOM, soil_group, so.table = nfert_data_get("so.table"))
+classify_SOM(SOM, soil_group, so.table = agrinutri_data_get("so.table"))
 }
 \arguments{
 \item{SOM}{Soil organic matter (\% mass).}
 
 \item{soil_group}{Texture group (Italian).}
 
-\item{so.table}{Lookup (default \code{NFert::so.table}).}
+\item{so.table}{Lookup (default \code{agrinutri::so.table}).}
 }
 \value{
 List with \code{rating} (4 classes) and \code{class} (3-class for SO input).

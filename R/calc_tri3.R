@@ -29,7 +29,7 @@
 #' tri3(clay = 25, sand = 20)  # "Loamy"
 #' tri3(clay = 55, sand = 15)  # "Clayey"
 
-tri3 <- function(clay = 10, sand = 35, tri3.table = nfert_data_get("tri3.table")) {
+tri3 <- function(clay = 10, sand = 35, tri3.table = agrinutri_data_get("tri3.table")) {
 
   # Input Validation
   if (!is.numeric(clay) || clay < 0 || clay > 100) {

@@ -10,7 +10,7 @@ organic_fertilization(
   quantity = 100,
   soil_group = NULL,
   distribution_efficiency = NULL,
-  f.table = nfert_data_get("f.table")
+  f.table = agrinutri_data_get("f.table")
 )
 }
 \arguments{
@@ -29,7 +29,7 @@ efficiency is taken from \code{f.table} (no texture/distribution).}
 (DPI: Alta/Media/Bassa). Required together with \code{soil_group} for the DPI efficiency path.}
 
 \item{f.table}{A data frame with columns \code{source}, \code{frequency}, \code{value}.
-Used when \code{soil_group} is \code{NULL}. Default is \code{NFert::f.table}.}
+Used when \code{soil_group} is \code{NULL}. Default is \code{agrinutri::f.table}.}
 }
 \value{
 The estimated amount of nitrogen (N) in kg/ha available to the crop

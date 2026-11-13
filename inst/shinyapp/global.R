@@ -6,42 +6,42 @@ suppressPackageStartupMessages({
   library(shinyjs)
   library(DT)
   library(ggplot2)
-  if (!requireNamespace("NFert", quietly = TRUE))
-    stop("Package 'NFert' must be installed to run the Shiny app.")
-  library(NFert)
+  if (!requireNamespace("agrinutri", quietly = TRUE))
+    stop("Package 'agrinutri' must be installed to run the Shiny app.")
+  library(agrinutri)
 })
 
 # Runtime constants
 APP_VERSION <- tryCatch(
-  as.character(utils::packageVersion("NFert")),
+  as.character(utils::packageVersion("agrinutri")),
   error = function(e) "0.9.0"
 )
 APP_BUILD   <- format(Sys.Date(), "%Y-%m-%d")
 
 # --- Helpers shared by several modules -------------------------------
 
-# Crop choice list. Starting with NFert 0.12.0 the reference tables are
+# Crop choice list. Starting with agrinutri 0.12.0 the reference tables are
 # English-canonical, so list_crops() already returns English names; we
 # use them both as label and as value (identity named vector).
-.nfert_crop_choices <- function() {
+.agrinutri_crop_choices <- function() {
   en_names <- tryCatch({
-    ct <- NFert::list_crops()
+    ct <- agrinutri::list_crops()
     if (is.data.frame(ct) && "crop" %in% names(ct))
       sort(unique(as.character(ct$crop)))
     else sort(as.character(ct))
   },
-  error = function(e) names(NFert::crop_en2it))
+  error = function(e) names(agrinutri::crop_en2it))
   setNames(en_names, en_names)
 }
 
-.nfert_default_crop <- function() {
-  d <- .nfert_crop_choices()
+.agrinutri_default_crop <- function() {
+  d <- .agrinutri_crop_choices()
   want <- "Silage maize (class 700)"
   if (want %in% d) want else d[[1]]
 }
 
 # English-only labels for the domain-specific dropdowns. Values are the
-# canonical keys expected by the NFert reference tables (Italian where
+# canonical keys expected by the agrinutri reference tables (Italian where
 # required). Visible labels on the left, canonical values on the right.
 .CCP_CHOICES <- c(
   "Spring-summer crop <70 days"     = "Spring-summer crop <70 days",
@@ -115,12 +115,12 @@ APP_BUILD   <- format(Sys.Date(), "%Y-%m-%d")
   "Sunflower" = "sunflower",
   "Soybean"   = "soybean")
 
-.nfert_fmt <- function(x, digits = 1) {
+.agrinutri_fmt <- function(x, digits = 1) {
   if (is.null(x) || length(x) == 0 || !is.finite(x)) "--"
   else format(round(x, digits), big.mark = " ", scientific = FALSE)
 }
 
-.nfert_download_csv <- function(outputId, df_reactive, filename_prefix) {
+.agrinutri_download_csv <- function(outputId, df_reactive, filename_prefix) {
   downloadHandler(
     filename = function()
       sprintf("%s_%s.csv", filename_prefix, format(Sys.time(), "%Y%m%d_%H%M")),
@@ -132,8 +132,8 @@ APP_BUILD   <- format(Sys.Date(), "%Y-%m-%d")
   )
 }
 
-.nfert_card <- function(...) div(class = "nfert-card", ...)
-.nfert_research_box <- function(...) div(class = "nfert-research-box", ...)
+.agrinutri_card <- function(...) div(class = "agrinutri-card", ...)
+.agrinutri_research_box <- function(...) div(class = "agrinutri-research-box", ...)
 
 # --- Shared plot helpers ---------------------------------------------
 source("helpers_plots.R", local = TRUE)

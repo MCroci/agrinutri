@@ -1,4 +1,4 @@
-"""Drive the Fert_Office v1.26 spreadsheet to build a validation set for NFert.
+"""Drive the Fert_Office v1.26 spreadsheet to build a validation set for agrinutri.
 
 Generates random field scenarios, writes each one into the input cells of a
 copy of Fert_Office_v1._26.xlsm through Excel automation (Windows + Excel
@@ -20,7 +20,7 @@ import tempfile
 
 import win32com.client
 
-# (Fert_Office "ordinato" id = NFert uptake_table$id, crop group, target
+# (Fert_Office "ordinato" id = agrinutri uptake_table$id, crop group, target
 #  ID_Fa_D phase, yield range in t/ha)
 CROPS = [
     (50, 2, 13, (4.0, 8.0)),     # Durum wheat (whole plant)
@@ -131,7 +131,7 @@ def main():
                               ("Q32", "org_prev_N")]:
                 ins.Range(cell).Value = s[key]
             # N fixation "considerata" = the value Fert_Office proposes for
-            # the crop (Inserimento!H15), which is NFert's default.
+            # the crop (Inserimento!H15), which is agrinutri's default.
             ins.Range("J15").Value = ins.Range("H15").Value
             cod.Range("AZ2").Value = bool(s["no_till"])
             for cell, key in [("AM2", "id_dre"), ("AO2", "id_pre"),

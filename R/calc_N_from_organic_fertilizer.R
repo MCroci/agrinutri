@@ -19,7 +19,7 @@
 #' @param distribution_efficiency Optional. \code{"efficient"}, \code{"medium"}, or \code{"low"}
 #'   (DPI: Alta/Media/Bassa). Required together with \code{soil_group} for the DPI efficiency path.
 #' @param f.table A data frame with columns \code{source}, \code{frequency}, \code{value}.
-#'   Used when \code{soil_group} is \code{NULL}. Default is \code{NFert::f.table}.
+#'   Used when \code{soil_group} is \code{NULL}. Default is \code{agrinutri::f.table}.
 #'
 #' @return The estimated amount of nitrogen (N) in kg/ha available to the crop
 #'   (efficient N when \code{soil_group} and \code{distribution_efficiency} are set).
@@ -36,7 +36,7 @@
 organic_fertilization <- function(source = "Cattle slurry", frequency = "every year",
                                   quantity = 100, soil_group = NULL,
                                   distribution_efficiency = NULL,
-                                  f.table = nfert_data_get("f.table")) {
+                                  f.table = agrinutri_data_get("f.table")) {
 
   if (quantity < 0) {
     stop("Quantity of organic fertilizer cannot be negative.")

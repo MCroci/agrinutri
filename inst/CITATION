@@ -1,14 +1,14 @@
-citHeader("To cite NFert in publications use:")
+citHeader("To cite agrinutri in publications use:")
 
 # `meta` is the package DESCRIPTION when read during R CMD check / build;
 # fall back to the installed description otherwise. Avoids packageVersion(),
 # which errors when the package is not yet installed.
-if (!exists("meta") || is.null(meta)) meta <- utils::packageDescription("NFert")
+if (!exists("meta") || is.null(meta)) meta <- utils::packageDescription("agrinutri")
 ver <- meta[["Version"]]
 
 bibentry(
   bibtype = "Manual",
-  title = "NFert: N, P and K Fertilization Following Emilia-Romagna DPI 2026",
+  title = "agrinutri: N, P and K Fertilization Following Emilia-Romagna DPI 2026",
   author = c(
     person("Michele", "Croci", role = c("aut", "cre"),
            email = "michele.croci@unicatt.it"),
@@ -22,12 +22,12 @@ bibentry(
   ),
   year = 2026,
   note = paste("R package version", ver),
-  url = "https://github.com/mcroci/NFert",
+  url = "https://github.com/mcroci/agrinutri",
   textVersion = paste0(
     "Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N, Tabaglio V, ",
     "Amaducci S (2026). ",
-    "NFert: N, P and K Fertilization Following Emilia-Romagna DPI 2026. ",
+    "agrinutri: N, P and K Fertilization Following Emilia-Romagna DPI 2026. ",
     "R package version ", ver, ". ",
-    "https://github.com/mcroci/NFert"
+    "https://github.com/mcroci/agrinutri"
   )
 )

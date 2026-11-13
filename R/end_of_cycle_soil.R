@@ -26,8 +26,8 @@ estimate_soil_P_end_of_cycle <- function(P2O5_start_ppm,
                                          P2O5_removed,
                                          soil_group,
                                          depth_cm = 30,
-                                         texture_groups.table = nfert_data_get("texture_groups.table"),
-                                         p_availability_meta     = nfert_data_get("p_availability_meta")) {
+                                         texture_groups.table = agrinutri_data_get("texture_groups.table"),
+                                         p_availability_meta     = agrinutri_data_get("p_availability_meta")) {
   unit <- match.arg(unit)
   if (unit == "P") P2O5_start_ppm <- P2O5_start_ppm / as.numeric(p_availability_meta$P2O5_to_P[1])
 
@@ -68,7 +68,7 @@ estimate_soil_K_end_of_cycle <- function(K2O_start_ppm,
                                          clay_pct,
                                          soil_group,
                                          depth_cm = 30,
-                                         texture_groups.table = nfert_data_get("texture_groups.table")) {
+                                         texture_groups.table = agrinutri_data_get("texture_groups.table")) {
   id_rag <- normalise_soil_group(soil_group)$id_rag
   rt_idx <- match(id_rag, texture_groups.table$ID_Rag)
   if (is.na(rt_idx)) stop(sprintf("ID_Rag %d not found in texture_groups.table.", id_rag))

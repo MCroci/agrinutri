@@ -20,7 +20,7 @@
 
 tri2 <- function(clay = 10, sand = 35) {
 
-  tri2.table <- nfert_data_get("tri2.table")
+  tri2.table <- agrinutri_data_get("tri2.table")
 
   # Input Validation
   if (!is.numeric(clay) || clay < 0 || clay > 100) {

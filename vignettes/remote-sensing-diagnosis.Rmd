@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ## Overview
 
 This vignette demonstrates the **remote-sensing diagnosis** pipeline added
-in NFert 0.7.0:
+in agrinutri 0.7.0:
 
 1. Compute multiple vegetation indices (VIs) from a multi-band raster
    with `compute_vi()`.
@@ -44,7 +44,7 @@ scene or a UAV multispectral flight. Here we synthesise a small stack
 so the vignette is reproducible offline.
 
 ```{r synthetic-stack}
-library(NFert)
+library(agrinutri)
 library(terra)
 
 set.seed(1)
@@ -224,7 +224,7 @@ An NNI map (from either pipeline) can drive
 machine-width strips directly exportable to any tractor monitor:
 
 ```{r strip-from-nni, eval = FALSE}
-ex    <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex    <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 field <- sf::st_read(ex, quiet = TRUE)[1, ]
 
 rx <- build_strip_prescription(
@@ -240,7 +240,7 @@ export_prescription(rx, "rx_nni.shp", format = "shp")
 ## 9. Notes and limitations
 
 * The VIs and NNI require a **closed canopy** (W >= W_min of the
-  species-specific curve). NFert clamps W at W_min internally, but
+  species-specific curve). agrinutri clamps W at W_min internally, but
   interpret outputs with care for early-vegetative imagery.
 * `compute_vi()` does *not* perform cloud masking; clean the input
   stack beforehand (Sentinel-2 L2A ships a SCL layer that can be used

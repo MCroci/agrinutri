@@ -1,5 +1,5 @@
 test_that(".preserve_mean hits the weighted target within the bounds", {
-  pm <- NFert:::.preserve_mean
+  pm <- agrinutri:::.preserve_mean
   d <- c(150, 230, 240, 240, 180); w <- c(1, 2, 1, 3, 1)
   out <- pm(d, w, target = 200, lo = 160, hi = 240)
   expect_equal(sum(out * w) / sum(w), 200, tolerance = 1e-8)
@@ -9,7 +9,7 @@ test_that(".preserve_mean hits the weighted target within the bounds", {
 })
 
 test_that(".preserve_mean warns when the target is infeasible", {
-  pm <- NFert:::.preserve_mean
+  pm <- agrinutri:::.preserve_mean
   expect_warning(out <- pm(c(100, 120), c(1, 1), target = 300, lo = 0, hi = 250),
                  "cannot reach")
   expect_equal(out, c(250, 250))

@@ -1,9 +1,9 @@
-# NFert
+# agrinutri
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/mcroci/NFert/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mcroci/NFert/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://github.com/mcroci/NFert/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/mcroci/NFert/actions/workflows/pkgdown.yaml)
-[![Coverage](https://github.com/mcroci/NFert/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/mcroci/NFert/actions/workflows/test-coverage.yaml)
+[![R-CMD-check](https://github.com/mcroci/agrinutri/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mcroci/agrinutri/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/mcroci/agrinutri/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/mcroci/agrinutri/actions/workflows/pkgdown.yaml)
+[![Coverage](https://github.com/mcroci/agrinutri/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/mcroci/agrinutri/actions/workflows/test-coverage.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
@@ -11,7 +11,7 @@
 
 ## Overview
 
-`NFert` is an R package for nitrogen, phosphorus and potassium fertilization
+`agrinutri` is an R package for nitrogen, phosphorus and potassium fertilization
 planning of field and tree crops. It implements the balance method (Allegato 2)
 and the standard-dose method of the Emilia-Romagna Integrated Production
 Guidelines (*Disciplinari di Produzione Integrata*, DPI 2026) and reproduces the
@@ -29,7 +29,7 @@ re-parameterized for other guidelines.
 
 ```r
 # install.packages("remotes")
-remotes::install_github("mcroci/NFert")
+remotes::install_github("mcroci/agrinutri")
 ```
 
 R >= 4.0. The only hard dependency is `terra`; spatial, remote-sensing, QUEFTS
@@ -41,7 +41,7 @@ and Shiny features use optional packages (`sf`, `jsonlite`, `Rquefts`,
 Durum wheat, 6 t/ha, on a silt-loam soil (the sample field of Fert_Office v1.26):
 
 ```r
-library(NFert)
+library(agrinutri)
 
 bal <- N_balance(
   expected_yield_tons_ha = 6, crop = "Grano duro (pianta intera)",
@@ -67,19 +67,19 @@ Crop names are accepted in Italian (Fert_Office labels) or English
 A whole farm, from a vector layer with one row per plot:
 
 ```r
-farm <- sf::st_read(system.file("extdata/example_farm.geojson", package = "NFert"))
+farm <- sf::st_read(system.file("extdata/example_farm.geojson", package = "agrinutri"))
 farm_balance(farm)[, c("plot_id", "crop", "N_target", "MAS_ok", "N_total_kg")]
 ```
 
 From a Sentinel-2 Level-2A scene to a variable-rate map:
 
 ```r
-s2   <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "NFert")
+s2   <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "agrinutri")
 bio  <- estimate_biophysical(s2, output_dir = tempdir(),
                              variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
 nni  <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
                             crop = "maize", fvc = bio$FVC)
-field <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"))
+field <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"))
 rx   <- build_strip_prescription(field[field$id == 3, ], machine_width = 24,
                                  variability = "nni", nni_raster = nni$NNI,
                                  n_target = 200, min_dose = 160, max_dose = 240)
@@ -121,20 +121,20 @@ current-year organic N (`Forg`) is then subtracted to give the mineral N.
 
 ## Validation
 
-The test suite checks NFert against Fert_Office v1.26 on random field
+The test suite checks agrinutri against Fert_Office v1.26 on random field
 scenarios computed by the spreadsheet itself
 (`tests/testthat/fixtures/`, generated with `data-raw/fertoffice_validation.py`):
 every balance term and the reported N, P2O5 and K2O doses are compared.
 Where the printed tables of the DPI Norme Generali and Fert_Office disagree,
-NFert follows Fert_Office; the differences are listed in
-`vignette("NFert-PK-and-distribution")`.
+agrinutri follows Fert_Office; the differences are listed in
+`vignette("agrinutri-PK-and-distribution")`.
 
 ## Course lab workflow (companion teaching repo)
 
 If you use the **lab-agricoltura-di-precisione** exercise scripts together with
 this package, the mapping is:
 
-| Exercise script | Main NFert entry points |
+| Exercise script | Main agrinutri entry points |
 |---|---|
 | `01_bilancio_N.R` | `farm_balance()`, `N_balance()` |
 | `02_suolo_IDW.R` | interpolation outputs feed `spatial_N_balance()` via rasters |
@@ -144,7 +144,7 @@ this package, the mapping is:
 | `06_NNI_serie_temporale.R` | `estimate_biophysical()`, `crop_params_NNI()`, NNI helpers |
 | `07_prescrizione_VRT.R` | `build_strip_prescription()` |
 | `08_export_macchine.R` | `export_prescription_all()` |
-| `09_figure_prescrizioni_metodi.R` | reads grids from step 07 (no new NFert calls) |
+| `09_figure_prescrizioni_metodi.R` | reads grids from step 07 (no new agrinutri calls) |
 | `10_biophysical_mean_vs_pixel.R` | `estimate_biophysical()` |
 
 Install course dependencies once with
@@ -152,13 +152,13 @@ Install course dependencies once with
 
 ## Documentation
 
-- Reference and articles: <https://mcroci.github.io/NFert/>
-- Vignettes: `browseVignettes("NFert")`
+- Reference and articles: <https://mcroci.github.io/agrinutri/>
+- Vignettes: `browseVignettes("agrinutri")`
 
 ## Citation
 
 ```r
-citation("NFert")
+citation("agrinutri")
 ```
 
 ## Authors

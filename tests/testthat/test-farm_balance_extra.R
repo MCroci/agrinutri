@@ -3,7 +3,7 @@
 
 .farm <- function() {
   skip_if_not_installed("sf")
-  ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+  ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
   skip_if(!nzchar(ex), "no bundled example_farm.geojson")
   sf::st_read(ex, quiet = TRUE)
 }
@@ -18,7 +18,7 @@ test_that("farm_balance accepts an sf object and matches a direct N_balance()", 
   bal <- N_balance(
     expected_yield_tons_ha = r$expected_yield_tons_ha, crop = r$crop, ccp = r$ccp,
     sand = r$sand, clay = r$clay, Ntot = r$Ntot, SOM = r$SOM, CN = r$CN,
-    oxygen_availability = nfert_normalize_oxygen(r$oxygen_availability),
+    oxygen_availability = agrinutri_normalize_oxygen(r$oxygen_availability),
     winter_rain = r$winter_rain, start_spring_rain = r$start_spring_rain,
     prev_crop = r$prev_crop, source = NA, fertorg_frequency = r$fertorg_frequency,
     location = r$location, forg_quantity = r$forg_quantity,
@@ -79,12 +79,12 @@ test_that("farm_balance validates its input", {
 })
 
 test_that("%||% returns the fallback for NULL", {
-  `%||%` <- NFert:::`%||%`
+  `%||%` <- agrinutri:::`%||%`
   expect_equal(NULL %||% 1, 1)
   expect_equal(NA %||% 1, NA)
   expect_equal(0 %||% 1, 0)
 })
 
 test_that("%||% also treats zero-length values as missing (as farm_balance.R intends)", {
-  expect_equal(NFert:::`%||%`(character(0), "a"), "a")
+  expect_equal(agrinutri:::`%||%`(character(0), "a"), "a")
 })

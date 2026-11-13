@@ -8,7 +8,7 @@
 #' @param value Numeric K or K2O value in ppm.
 #' @param unit `"K"` (default) or `"K2O"`. Conversion K2O = K / 0.83333.
 #' @param soil_group Texture grouping (must match `k_availability.table$group`).
-#' @param k_availability.table Lookup table, default `NFert::k_availability.table`.
+#' @param k_availability.table Lookup table, default `agrinutri::k_availability.table`.
 #'
 #' @return A list with `value_ppm_K`, `value_ppm_K2O`, `ID_Gri_K`, `rating`,
 #'   `strategy` (`Arricchimento` / `Mantenimento` / `Riduzione`).
@@ -18,7 +18,7 @@
 classify_K <- function(value,
                        unit = c("K", "K2O"),
                        soil_group,
-                       k_availability.table = nfert_data_get("k_availability.table")) {
+                       k_availability.table = agrinutri_data_get("k_availability.table")) {
   unit <- match.arg(unit)
   if (!is.numeric(value) || length(value) != 1 || is.na(value) || value < 0) {
     stop("`value` must be a single non-negative numeric.")
@@ -110,8 +110,8 @@ soil_K_availability <- function(k_value, unit = c("K","K2O"),
                                 soil_group, A_demand_K2O,
                                 clay_pct,
                                 include_leaching = TRUE,
-                                k_availability.table = nfert_data_get("k_availability.table"),
-                                texture_groups.table = nfert_data_get("texture_groups.table")) {
+                                k_availability.table = agrinutri_data_get("k_availability.table"),
+                                texture_groups.table = agrinutri_data_get("texture_groups.table")) {
   unit <- match.arg(unit)
   cls <- classify_K(k_value, unit = unit, soil_group = soil_group,
                     k_availability.table = k_availability.table)

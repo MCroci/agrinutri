@@ -1,5 +1,5 @@
 ---
-title: "N, P and K fertilization with NFert — DPI Emilia-Romagna 2026"
+title: "N, P and K fertilization with agrinutri — DPI Emilia-Romagna 2026"
 author: "Michele Croci, Manuele Ragazzi, Giorgio Impollonia, Stefano Amaducci"
 date: "`r format(Sys.Date(), '%B %Y')`"
 output:
@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{N, P and K fertilization with NFert — DPI Emilia-Romagna 2026}
+  %\VignetteIndexEntry{N, P and K fertilization with agrinutri — DPI Emilia-Romagna 2026}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This vignette shows how to use **NFert 0.6.0** to compute a full nitrogen,
+This vignette shows how to use **agrinutri 0.6.0** to compute a full nitrogen,
 phosphorus and potassium fertilisation plan following the
 *Disciplinari di Produzione Integrata* (DPI) Emilia-Romagna 2026. The
 package reproduces the logic of the official regional tool
@@ -60,7 +60,7 @@ planning and recording.
 
 # Naming conventions
 
-NFert mixes English and Italian terminology by design:
+agrinutri mixes English and Italian terminology by design:
 
 - **Function names**: English snake_case (e.g. `N_balance`, `P_balance`,
   `plan_distribution`, `classify_pH`). Three exceptions retain the Italian
@@ -75,7 +75,7 @@ NFert mixes English and Italian terminology by design:
   `normalise_soil_group()` helper canonicalises any of them.
 
 ```{r naming}
-library(NFert)
+library(agrinutri)
 normalise_soil_group("Loamy textures")
 normalise_soil_group("Franco")
 resolve_id_rag(clay = 18.5, sand = 15.5)
@@ -117,7 +117,7 @@ Inserimento` and is used as the end-to-end benchmark of the package.
 
 # Soil characterisation
 
-NFert classifies the soil along the DPI 2026 dimensions. The 3-class texture
+agrinutri classifies the soil along the DPI 2026 dimensions. The 3-class texture
 grouping (Sabbiosi / Medio impasto / Argillosi e limosi) drives every
 subsequent coefficient choice (B, C, D, efficiency, soil weight, etc.).
 
@@ -375,7 +375,7 @@ This matches cell `Gri_K!F30` of Fert_Office (A + H).
 # Scheda a dose Standard
 
 For contexts with limited soil analyses, DPI 2026 provides a standard-dose
-method. NFert mirrors the flag catalogue of `Fert_Office` `Scheda_N` and
+method. agrinutri mirrors the flag catalogue of `Fert_Office` `Scheda_N` and
 `Scheda_PK`.
 
 ## Scheda N
@@ -510,7 +510,7 @@ efficiency.table[
 
 # End-of-cycle soil dotation
 
-After the plan is executed, NFert estimates the residual soil P and K in
+After the plan is executed, agrinutri estimates the residual soil P and K in
 ppm, usable as input for the following year's calculation:
 
 ```{r end}
@@ -590,14 +590,14 @@ apple_k
 
 # Precision agriculture: variable-rate from balance + NDVI
 
-NFert bridges the **agronomic balance** (constant-rate dose, kg/ha) with
+agrinutri bridges the **agronomic balance** (constant-rate dose, kg/ha) with
 **NDVI-based variable-rate application**. The integration logic is:
 
 1. Compute the **field-average dose** with `N_balance()` +
    `calculate_N_fertilization()` or `scheda_N()`.
 2. Use NDVI as a proxy of crop vigour: low NDVI → more N (rescue),
    high NDVI → less N (already vigorous).
-3. Apply one of the two NFert variable-rate algorithms:
+3. Apply one of the two agrinutri variable-rate algorithms:
 
    - **Calibration curve** (`estimate_N_rate_from_calibration_curve()`):
      two-point or three-point linear interpolation between observed NDVI
@@ -615,7 +615,7 @@ pixel at the MAS limit.
 ```{r prec-ag-setup, eval = requireNamespace("terra", quietly = TRUE)}
 library(terra)
 
-# NDVI raster: example from NFert (SpatRaster or multi-band stack; functions use the NDVI layer if named)
+# NDVI raster: example from agrinutri (SpatRaster or multi-band stack; functions use the NDVI layer if named)
 data(s2.rast)
 ndvi <- terra::rast(s2.rast)
 ndvi
@@ -716,7 +716,7 @@ summary(terra::values(n_rate_3pt, mat = FALSE))
 
 # Reference tables
 
-NFert exposes 33 internal tables; the most useful in day-to-day work:
+agrinutri exposes 33 internal tables; the most useful in day-to-day work:
 
 ```{r tables}
 # Crop master list
@@ -759,7 +759,7 @@ texture_groups.table
 
 # Agreement with Fert_Office and differences with the DPI text
 
-NFert reproduces Fert_Office v1.26 term by term. The test suite
+agrinutri reproduces Fert_Office v1.26 term by term. The test suite
 (`tests/testthat/test-fertoffice-validation.R`) compares every balance term
 and the reported N, P2O5 and K2O doses with the values computed by the
 spreadsheet itself on 400 random field scenarios (13 crops, all texture
@@ -767,10 +767,10 @@ groups, drainage classes, precessions, previous organic fertilisation and
 no-till); all agree to within 1e-6 kg/ha.
 
 In a few places the printed tables of the DPI Norme Generali (Allegato 2,
-2024/25 edition) and Fert_Office give different numbers. NFert follows
+2024/25 edition) and Fert_Office give different numbers. agrinutri follows
 Fert_Office, which is the tool used to check DPI plans:
 
-| Item | Norme Generali text | Fert_Office v1.26 (used by NFert) |
+| Item | Norme Generali text | Fert_Office v1.26 (used by agrinutri) |
 |---|---|---|
 | Mineralised N, sandy soil, C/N 9-12 and > 12 | 36 and 24 x SOM | 35 and 28 x SOM (the decomposition rates of the table footnote) |
 | Mineralised N, loamy soil, C/N > 12 | 20 x SOM | 22.1 x SOM |
@@ -779,7 +779,7 @@ Fert_Office, which is the tool used to check DPI plans:
 | Residual N of a soybean precession | 0 | 10 kg/ha |
 | End-of-winter loss (Cb) | 1 kg N per 10 mm once winter + February rain exceeds 250 mm | the same, plus the loss of the N pronto not yet leached |
 
-Where the text and the tool agree, NFert follows both: organic matter
+Where the text and the tool agree, agrinutri follows both: organic matter
 above 3 % adds no mineralised N, perennial crops in production count only
 mineralised N and lose a fixed 30 kg N/ha pool to leaching, no-till seeding
 reduces the soil supply by 10 kg N/ha, and the previous-years' organic term

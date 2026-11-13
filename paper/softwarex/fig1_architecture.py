@@ -1,4 +1,4 @@
-"""Fig. 1 - NFert software architecture (modules, data and outputs).
+"""Fig. 1 - agrinutri software architecture (modules, data and outputs).
 
 Run from paper/softwarex/:  python fig1_architecture.py
 """

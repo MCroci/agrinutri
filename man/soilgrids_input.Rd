@@ -2,7 +2,7 @@
 % Please edit documentation in R/soilgrids_input.R
 \name{soilgrids_input}
 \alias{soilgrids_input}
-\title{Build an NFert soil input stack from SoilGrids (open global default)}
+\title{Build an agrinutri soil input stack from SoilGrids (open global default)}
 \usage{
 soilgrids_input(
   aoi,
@@ -48,11 +48,11 @@ A \code{terra::SpatRaster} with layers \code{TN} (g/kg), \code{SOM}
 pass as the \code{soil_stack} argument of \code{\link{spatial_N_balance}()}.
 }
 \description{
-Downloads the soil properties that the NFert nitrogen balance consumes from
+Downloads the soil properties that the agrinutri nitrogen balance consumes from
 the ISRIC SoilGrids 2.0 service and returns them as a \code{terra::SpatRaster}
 with the layer names, units and shape that \code{\link{spatial_N_balance}()}
 and \code{\link{farm_balance}()} expect. It is the open, global fallback soil
-layer: with it the whole NFert pipeline (balance, prescription mean and
+layer: with it the whole agrinutri pipeline (balance, prescription mean and
 uncertainty) runs end to end on freely licensed data (CC-BY 4.0) anywhere on
 Earth, without a proprietary local soil map.
 }
@@ -78,7 +78,7 @@ SoilGrids 2.0, SOIL 7, 217-240, \doi{10.5194/soil-7-217-2021}.
 
 \examples{
 \dontshow{if (requireNamespace("geodata", quietly = TRUE) && interactive()) withAutoprint(\{ # examplesIf}
-aoi <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"))
+aoi <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"))
 soil <- soilgrids_input(aoi, crs_out = 32632)
 n <- spatial_N_balance(soil, expected_yield_tons_ha = 9,
                        crop = "Grano tenero FF (granella)",

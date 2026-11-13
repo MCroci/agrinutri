@@ -12,9 +12,9 @@ soil_fertility(
   ccp = "Autumn-winter crop <150 days",
   soil_seeding = c("traditional", "no-till"),
   crop = NULL,
-  coefN_readily = nfert_data_get("coefN_readily"),
-  coefN_mineralised = nfert_data_get("coefN_mineralised"),
-  coef_time = nfert_data_get("coef_time")
+  coefN_readily = agrinutri_data_get("coefN_readily"),
+  coefN_mineralised = agrinutri_data_get("coefN_mineralised"),
+  coef_time = agrinutri_data_get("coef_time")
 )
 }
 \arguments{

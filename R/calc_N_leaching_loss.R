@@ -60,8 +60,8 @@ leaching_loss <- function(winter_rain = 160, start_spring_rain = 40,
     stop("`b1` must be a non-negative finite numeric value.", call. = FALSE)
   }
 
-  oxygen_availability <- nfert_normalize_oxygen(oxygen_availability)
-  ca.table <- nfert_data_get("ca.table")
+  oxygen_availability <- agrinutri_normalize_oxygen(oxygen_availability)
+  ca.table <- agrinutri_data_get("ca.table")
   avail <- unique(trimws(as.character(ca.table[["availability"]])))
 
   if (!oxygen_availability %in% avail) {

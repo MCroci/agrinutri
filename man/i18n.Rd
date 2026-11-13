@@ -8,7 +8,7 @@
 \alias{source_en2it}
 \alias{modality_epoch_en2it}
 \alias{level_en2it}
-\title{English alias dictionaries for the NFert reference tables}
+\title{English alias dictionaries for the agrinutri reference tables}
 \format{
 An object of class \code{character} of length 53.
 
@@ -32,7 +32,7 @@ modality_epoch_en2it
 level_en2it
 }
 \description{
-Starting with NFert 0.12.0 every bundled reference table
+Starting with agrinutri 0.12.0 every bundled reference table
 (\code{uptake_table}, \code{mas.table}, \code{e.table},
 \code{organic_fertilizers.table}, \code{cycle_modality.table},
 \code{distribution_modalities.table}, ...) uses the English name as
@@ -43,21 +43,21 @@ re-used with a single translation step.
 \details{
 The dictionaries below survive from the transitional 0.11 release and
 are now a convenience for users who still want to pass Italian
-strings: \code{\link{nfert_en2it}()} and \code{\link{nfert_it2en}()}
+strings: \code{\link{agrinutri_en2it}()} and \code{\link{agrinutri_it2en}()}
 translate either direction. Most code bases do not need to call them
 any longer - the tables accept English strings natively.
 
 Five dictionaries are exported:
 \code{crop_en2it}, \code{prev_crop_en2it}, \code{source_en2it},
 \code{modality_epoch_en2it} and \code{level_en2it}. The helpers
-\code{nfert_translate()} and \code{nfert_en2it()} take an English
+\code{agrinutri_translate()} and \code{agrinutri_en2it()} take an English
 string (or a vector) and return the corresponding Italian canonical
 string, falling back to the input unchanged when no match is found.
 }
 \section{Adding new aliases}{
 
 The dictionaries are plain named character vectors. Extending them in
-user code is a matter of \code{c(NFert::crop_en2it, "My Crop" = "Mia
+user code is a matter of \code{c(agrinutri::crop_en2it, "My Crop" = "Mia
 coltura")}. The helpers match case-insensitively so users don't need
 to worry about capitalisation.
 }

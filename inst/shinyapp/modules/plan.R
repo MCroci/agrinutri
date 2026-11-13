@@ -5,7 +5,7 @@ planUI <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(4,
-      .nfert_card(
+      .agrinutri_card(
         h3(icon("truck"), " Plan inputs"),
         uiOutput(ns("targets_box")),
         tags$hr(),
@@ -79,7 +79,7 @@ planUI <- function(id) {
       )
     ),
     column(8,
-      .nfert_card(
+      .agrinutri_card(
         h3("Fertilisation plan"),
         uiOutput(ns("alerts_box")),
         h4("Split vs. target and regulatory limits"),
@@ -99,21 +99,21 @@ planServer <- function(id, research_mode, app_state) {
   moduleServer(id, function(input, output, session) {
 
     output$targets_box <- renderUI({
-      tags$div(class = "nfert-kpi-row",
-        tags$div(class = "nfert-kpi",
-          tags$span(class = "nfert-kpi-value",
-                    .nfert_fmt(app_state$n_target, 0)),
-          tags$span(class = "nfert-kpi-label",
+      tags$div(class = "agrinutri-kpi-row",
+        tags$div(class = "agrinutri-kpi",
+          tags$span(class = "agrinutri-kpi-value",
+                    .agrinutri_fmt(app_state$n_target, 0)),
+          tags$span(class = "agrinutri-kpi-label",
                     "N* (kg N ha\u207B\u00B9)")),
-        tags$div(class = "nfert-kpi",
-          tags$span(class = "nfert-kpi-value",
-                    .nfert_fmt(app_state$p_target, 0)),
-          tags$span(class = "nfert-kpi-label",
+        tags$div(class = "agrinutri-kpi",
+          tags$span(class = "agrinutri-kpi-value",
+                    .agrinutri_fmt(app_state$p_target, 0)),
+          tags$span(class = "agrinutri-kpi-label",
                     "P2O5* (kg ha\u207B\u00B9)")),
-        tags$div(class = "nfert-kpi",
-          tags$span(class = "nfert-kpi-value",
-                    .nfert_fmt(app_state$k_target, 0)),
-          tags$span(class = "nfert-kpi-label",
+        tags$div(class = "agrinutri-kpi",
+          tags$span(class = "agrinutri-kpi-value",
+                    .agrinutri_fmt(app_state$k_target, 0)),
+          tags$span(class = "agrinutri-kpi-label",
                     "K2O* (kg ha\u207B\u00B9)"))
       )
     })
@@ -141,7 +141,7 @@ planServer <- function(id, research_mode, app_state) {
           modality_epoch = as.integer(input$min_epoch)))
 
       withProgress(message = "Building plan...", value = 0.5, {
-        tryCatch(NFert::plan_distribution(
+        tryCatch(agrinutri::plan_distribution(
           soil_group   = "Loamy textures",
           n_balance    = as.numeric(app_state$n_target),
           p_balance    = as.numeric(app_state$p_target %||% 0),
@@ -162,7 +162,7 @@ planServer <- function(id, research_mode, app_state) {
       alerts <- p$alerts %||% character()
       zvn    <- p$zvn_alert %||% ""
       cls <- if (length(alerts) == 0 && !nzchar(zvn))
-        "nfert-alert nfert-alert-ok" else "nfert-alert nfert-alert-warn"
+        "agrinutri-alert agrinutri-alert-ok" else "agrinutri-alert agrinutri-alert-warn"
       tags$div(class = cls,
         tags$strong(if (length(alerts) == 0 && !nzchar(zvn))
                       "Plan compliant." else "Plan alerts:"),
@@ -193,7 +193,7 @@ planServer <- function(id, research_mode, app_state) {
           applied_min <- sum(df[[n_col]][!is_org], na.rm = TRUE)
         }
       }
-      .nfert_plan_stack(
+      .agrinutri_plan_stack(
         applied_organic = applied_org,
         applied_mineral = applied_min,
         n_target = as.numeric(app_state$n_target),
@@ -211,7 +211,7 @@ planServer <- function(id, research_mode, app_state) {
 
     output$dl_csv <- downloadHandler(
       filename = function()
-        sprintf("NFert_plan_%s.csv",
+        sprintf("agrinutri_plan_%s.csv",
                 format(Sys.time(), "%Y%m%d_%H%M")),
       content  = function(file) {
         p <- plan_obj()

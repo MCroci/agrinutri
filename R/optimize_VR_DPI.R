@@ -11,7 +11,7 @@
 #'   elements are ignored.
 #' @param NNI_raster A `terra::SpatRaster` of NNI values for the field. Cells
 #'   with `NA` are excluded from the prescription.
-#' @param crop_params Either `NULL` (use [nfert_to_quefts_crop()] on
+#' @param crop_params Either `NULL` (use [agrinutri_to_quefts_crop()] on
 #'   `field_inputs$crop`), a character string (same lookup), or a named list of
 #'   QUEFTS crop parameters passed straight to [Rquefts::quefts()].
 #' @param fertilizers `data.frame` with columns `name`, `N`, `P`, `K`, and
@@ -137,7 +137,7 @@ optimize_VR_DPI <- function(field_inputs,
 
   # --- Fertilizer table ----------------------------------------------------
   if (is.null(fertilizers)) {
-    f_path <- system.file("extdata", "fertilizers_IT.csv", package = "NFert")
+    f_path <- system.file("extdata", "fertilizers_IT.csv", package = "agrinutri")
     if (nzchar(f_path) && file.exists(f_path)) {
       fertilizers <- utils::read.csv(f_path, stringsAsFactors = FALSE)
     } else {
@@ -162,14 +162,14 @@ optimize_VR_DPI <- function(field_inputs,
 
   # --- QUEFTS crop & soil --------------------------------------------------
   if (is.null(crop_params)) {
-    crop_pars <- nfert_to_quefts_crop(field_inputs$crop)
+    crop_pars <- agrinutri_to_quefts_crop(field_inputs$crop)
   } else if (is.list(crop_params) && "Yzero" %in% names(crop_params)) {
     crop_pars <- crop_params
   } else {
-    crop_pars <- nfert_to_quefts_crop(as.character(crop_params)[1L])
+    crop_pars <- agrinutri_to_quefts_crop(as.character(crop_params)[1L])
   }
 
-  soil_pars <- nfert_to_quefts_soil(as.numeric(bal$B))
+  soil_pars <- agrinutri_to_quefts_soil(as.numeric(bal$B))
 
   p_y <- if (!is.null(prices$p_y)) as.numeric(prices$p_y)[1L] else 280
   dm_crop_value <- p_y / 1000
@@ -186,7 +186,7 @@ optimize_VR_DPI <- function(field_inputs,
   # fertApp()). optApp() returns the applied N, P and K already in kg/ha.
   for (i in seq_len(n_cells)) {
     cell <- tryCatch({
-      biom_i <- nfert_to_quefts_biom(
+      biom_i <- agrinutri_to_quefts_biom(
         field_inputs$expected_yield_tons_ha,
         nni_v[i],
         crop_pars

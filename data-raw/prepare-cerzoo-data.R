@@ -2,7 +2,7 @@
 # data-raw/prepare-cerzoo-data.R
 #
 # Build the bundled CERZOO example datasets shipped in inst/extdata so that
-# package users can run the NFert functions on a real field out of the box.
+# package users can run the agrinutri functions on a real field out of the box.
 #
 # Source data live in the companion teaching repository (not part of the
 # package). Only the maintainer needs them; running this script regenerates

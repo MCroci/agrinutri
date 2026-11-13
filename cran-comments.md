@@ -1,4 +1,4 @@
-# CRAN submission comments — NFert 1.0.0
+# CRAN submission comments — agrinutri 1.0.0
 
 This is a new submission.
 

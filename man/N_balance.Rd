@@ -126,8 +126,8 @@ used by \code{\link[=calculate_N_fertilization]{calculate_N_fertilization()}}.
 \description{
 Calculates the nitrogen balance of a crop with the DPI Emilia-Romagna 2026
 balance method (Allegato 2), reproducing the regional tool Fert_Office v1.26
-term by term. Where the printed DPI tables and Fert_Office differ, NFert
-follows Fert_Office (see \code{vignette("NFert-PK-and-distribution")}).
+term by term. Where the printed DPI tables and Fert_Office differ, agrinutri
+follows Fert_Office (see \code{vignette("agrinutri-PK-and-distribution")}).
 }
 \details{
 The nitrogen fertilization requirement (DPI formula) is:

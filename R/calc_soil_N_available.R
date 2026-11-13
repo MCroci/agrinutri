@@ -45,9 +45,9 @@ soil_fertility <- function(Ntot = 1.2, SOM = 2, soil.group = "Sandy textures",
                            CN = 8, ccp = "Autumn-winter crop <150 days",
                            soil_seeding = c("traditional", "no-till"),
                            crop = NULL,
-                           coefN_readily = nfert_data_get("coefN_readily"),
-                           coefN_mineralised = nfert_data_get("coefN_mineralised"),
-                           coef_time = nfert_data_get("coef_time")) {
+                           coefN_readily = agrinutri_data_get("coefN_readily"),
+                           coefN_mineralised = agrinutri_data_get("coefN_mineralised"),
+                           coef_time = agrinutri_data_get("coef_time")) {
   soil_seeding <- match.arg(soil_seeding)
   ccp <- resolve_ccp(ccp, table = coef_time)
   CN_class <- ifelse(CN < 9, "<9", ifelse(CN >= 9 & CN < 12, "9-12", ">12"))
@@ -79,12 +79,12 @@ soil_fertility <- function(Ntot = 1.2, SOM = 2, soil.group = "Sandy textures",
 # TRUE when the DPI no-till reduction applies to `crop` (crops.table flag).
 .no_till_applies <- function(crop) {
   if (is.null(crop)) return(TRUE)
-  ct <- tryCatch(nfert_data_get("crops.table"), error = function(e) NULL)
+  ct <- tryCatch(agrinutri_data_get("crops.table"), error = function(e) NULL)
   if (is.null(ct) || !"no_till_reduction" %in% names(ct)) return(TRUE)
-  key <- .nfert_ascii_fold(tolower(trimws(crop)))
-  i <- match(key, .nfert_ascii_fold(tolower(trimws(ct$crop))))
+  key <- .agrinutri_ascii_fold(tolower(trimws(crop)))
+  i <- match(key, .agrinutri_ascii_fold(tolower(trimws(ct$crop))))
   if (is.na(i) && "crop_it" %in% names(ct))
-    i <- match(key, .nfert_ascii_fold(tolower(trimws(ct$crop_it))))
+    i <- match(key, .agrinutri_ascii_fold(tolower(trimws(ct$crop_it))))
   if (is.na(i)) return(TRUE)
   isTRUE(as.logical(ct$no_till_reduction[i]))
 }

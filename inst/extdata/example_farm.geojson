@@ -1,6 +1,6 @@
 {
   "type": "FeatureCollection",
-  "name": "NFert_example_farm",
+  "name": "agrinutri_example_farm",
   "crs": {
     "type": "name",
     "properties": {
@@ -10,7 +10,7 @@
   "metadata": {
     "description": "Fictitious 35.5 ha demo farm in the Po Valley (Piacenza area). Each feature carries the columns expected by N_balance() using the canonical English names of the DPI 2026 reference tables rebuilt by data-raw/build-rda.R.",
     "reference_parameterisation": "Emilia-Romagna DPI 2026",
-    "generated_by": "NFert v0.12.0",
+    "generated_by": "agrinutri v0.12.0",
     "language": "en"
   },
   "features": [

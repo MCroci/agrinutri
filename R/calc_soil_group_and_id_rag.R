@@ -23,7 +23,7 @@
 #' calc_soil_group_and_id_rag(clay = 10, sand = 35)
 #' calc_soil_group_and_id_rag(clay = 25, sand = 20)  # Clay loam
 
-calc_soil_group_and_id_rag <- function(clay = 10, sand = 35, tri3.table = nfert_data_get("tri3.table"), soil.table = nfert_data_get("soil.table")) {
+calc_soil_group_and_id_rag <- function(clay = 10, sand = 35, tri3.table = agrinutri_data_get("tri3.table"), soil.table = agrinutri_data_get("soil.table")) {
 
   # Input Validation
   if (!is.numeric(clay) || clay < 0 || clay > 100) {

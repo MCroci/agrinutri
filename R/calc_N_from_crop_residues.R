@@ -6,7 +6,7 @@
 #'   in the `previous_crop` column of the `e.table`.
 #' @param e.table A data frame containing the nitrogen values (in kg/ha) for different
 #'   previous crops. It should have at least two columns: `previous_crop` (character)
-#'   and `N` (numeric). The default is `NFert::e.table`.
+#'   and `N` (numeric). The default is `agrinutri::e.table`.
 #'
 #' @return The estimated amount of nitrogen (N) in kg/ha available from the previous crop residues.
 #'
@@ -23,7 +23,7 @@
 #' print(E)
 #'
 nitrogen_from_previous_crop_residues <- function(previous_crop = "Winter cereals straw removal",
-                                                 e.table = nfert_data_get("e.table")){
+                                                 e.table = agrinutri_data_get("e.table")){
 
 
   # Input Validation

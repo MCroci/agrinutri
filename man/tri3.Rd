@@ -4,7 +4,7 @@
 \alias{tri3}
 \title{Soil Texture Class Determination (Simplified)}
 \usage{
-tri3(clay = 10, sand = 35, tri3.table = nfert_data_get("tri3.table"))
+tri3(clay = 10, sand = 35, tri3.table = agrinutri_data_get("tri3.table"))
 }
 \arguments{
 \item{clay}{Percentage of clay in the soil (0-100).}

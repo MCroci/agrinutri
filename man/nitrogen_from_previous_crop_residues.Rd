@@ -6,7 +6,7 @@
 \usage{
 nitrogen_from_previous_crop_residues(
   previous_crop = "Winter cereals straw removal",
-  e.table = nfert_data_get("e.table")
+  e.table = agrinutri_data_get("e.table")
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ in the \code{previous_crop} column of the \code{e.table}.}
 
 \item{e.table}{A data frame containing the nitrogen values (in kg/ha) for different
 previous crops. It should have at least two columns: \code{previous_crop} (character)
-and \code{N} (numeric). The default is \code{NFert::e.table}.}
+and \code{N} (numeric). The default is \code{agrinutri::e.table}.}
 }
 \value{
 The estimated amount of nitrogen (N) in kg/ha available from the previous crop residues.

@@ -1,7 +1,7 @@
 #' Variable-rate nitrogen from balance + NDVI
 #'
 #' Bridges the constant-rate output of `N_balance()` / `calculate_N_fertilization()`
-#' or `scheda_N()` with the spatial NDVI-based variable-rate estimators of NFert
+#' or `scheda_N()` with the spatial NDVI-based variable-rate estimators of agrinutri
 #' (`estimate_N_rate_from_calibration_curve()` and
 #' `estimate_N_rate_from_holland_schepers()`).
 #'
@@ -46,7 +46,7 @@
 #' @examples
 #' \dontrun{
 #' library(terra)
-#' library(NFert)
+#' library(agrinutri)
 #' # NDVI raster
 #' data(s2.rast)
 #' ndvi <- terra::rast(s2.rast)   # s2.rast is a PackedSpatRaster; unwrap it

@@ -1,12 +1,12 @@
 # Data for Fig. 3 (bundled Sentinel-2 demo scene of CERZOO Field 3, 13 Aug 2024):
 # run from paper/softwarex/:  Rscript fig3_data.R
 suppressMessages(pkgload::load_all("../..", quiet = TRUE))
-s2  <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "NFert")
+s2  <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif", package = "agrinutri")
 bio <- estimate_biophysical(s2, output_dir = tempdir(),
                             variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
 nni <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
                            crop = "maize", fvc = bio$FVC)
-farm  <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"), quiet = TRUE)
+farm  <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"), quiet = TRUE)
 field <- farm[farm$id == 3, ]
 rx <- build_strip_prescription(field, machine_width = 24, cell_length = 30,
                                variability = "nni", nni_raster = nni$NNI,

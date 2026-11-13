@@ -4,21 +4,21 @@
 \alias{resolve_crop}
 \title{Resolve a crop name (Italian or English) to its canonical entry}
 \usage{
-resolve_crop(x, table = nfert_data_get("uptake_table"))
+resolve_crop(x, table = agrinutri_data_get("uptake_table"))
 }
 \arguments{
 \item{x}{Character. Crop name in Italian or English.}
 
-\item{table}{Lookup table; default \code{NFert::uptake_table}.}
+\item{table}{Lookup table; default \code{agrinutri::uptake_table}.}
 }
 \value{
 Character. The canonical crop name (English, as in the
 \code{crop} column).
 }
 \description{
-NFert reference tables (\code{uptake_table}, \code{mas.table}, \code{crops.table},
+agrinutri reference tables (\code{uptake_table}, \code{mas.table}, \code{crops.table},
 \code{standard_pk_doses.table}) carry the canonical English crop names in
-the column \code{crop} (since NFert 0.12.0), with the Italian translation
+the column \code{crop} (since agrinutri 0.12.0), with the Italian translation
 in \code{crop_it} and a duplicate of the English name in \code{crop_en} for
 backward compatibility. This helper accepts any of the three forms
 (case-insensitive, whitespace-normalised, exact match) and returns

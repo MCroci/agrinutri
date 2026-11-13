@@ -1,11 +1,11 @@
 # SoftwareX manuscript
 
-Source of the SoftwareX Original Software Publication on NFert 1.0.0.
+Source of the SoftwareX Original Software Publication on agrinutri 1.0.0.
 
 | File | Content |
 |---|---|
-| `NFert_SoftwareX.md` | manuscript (Markdown, pandoc citations) |
-| `NFert_SoftwareX.docx` | rendered manuscript (`sh render.sh`) |
+| `agrinutri_SoftwareX.md` | manuscript (Markdown, pandoc citations) |
+| `agrinutri_SoftwareX.docx` | rendered manuscript (`sh render.sh`) |
 | `references.bib` | references cited in the manuscript, collected by `make_bib.py` |
 | `fig1_architecture.py` | Fig. 1, architecture diagram |
 | `fig2_data.R`, `fig2_farm.py` | Fig. 2, demonstration farm |

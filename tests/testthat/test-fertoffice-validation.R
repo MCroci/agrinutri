@@ -6,14 +6,14 @@
 
 fixture <- test_path("fixtures", "fertoffice_v1.26_scenarios.csv")
 
-# nfert_vs_fertoffice() is defined in helper-fertoffice.R
-nfert_vs_fertoffice_rows <- function() {
-  nfert_vs_fertoffice(utils::read.csv(fixture, stringsAsFactors = FALSE))
+# agrinutri_vs_fertoffice() is defined in helper-fertoffice.R
+agrinutri_vs_fertoffice_rows <- function() {
+  agrinutri_vs_fertoffice(utils::read.csv(fixture, stringsAsFactors = FALSE))
 }
 
-test_that("NFert reproduces Fert_Office v1.26 on random scenarios", {
+test_that("agrinutri reproduces Fert_Office v1.26 on random scenarios", {
   skip_if_not(file.exists(fixture), "validation fixture not found")
-  r <- nfert_vs_fertoffice_rows()
+  r <- agrinutri_vs_fertoffice_rows()
   expect_gte(nrow(r), 100L)
   tol <- 1e-6
   terms <- c(A = "fo_A", B = "fo_B", C = "fo_C", D = "fo_D", E = "fo_E",

@@ -106,7 +106,7 @@ test_that("resolve_id_rag uses the label first, then clay/sand", {
 })
 
 test_that(".texture_group_weight_col finds English or Italian weight columns", {
-  f <- NFert:::.texture_group_weight_col
+  f <- agrinutri:::.texture_group_weight_col
   expect_equal(f(30, data.frame(soil_weight_30cm = 1)), "soil_weight_30cm")
   expect_equal(f(40, data.frame(peso_40cm = 1)), "peso_40cm")
   expect_error(f(50, data.frame(peso_40cm = 1)), "No soil weight column for depth 50")
@@ -176,15 +176,15 @@ test_that("nitrogen_from_previous_crop_residues looks up e.table", {
   expect_true(is.na(v))
 })
 
-test_that("nfert_data_get returns namespace objects and errors for unknown names", {
-  expect_identical(nfert_data_get("ph.table"), ph.table)
-  expect_s3_class(nfert_data_get("e.table"), "data.frame")
-  expect_error(suppressWarnings(nfert_data_get("no_such_dataset_xyz")),
+test_that("agrinutri_data_get returns namespace objects and errors for unknown names", {
+  expect_identical(agrinutri_data_get("ph.table"), ph.table)
+  expect_s3_class(agrinutri_data_get("e.table"), "data.frame")
+  expect_error(suppressWarnings(agrinutri_data_get("no_such_dataset_xyz")),
                "not found")
 })
 
-test_that("nfert_normalize_oxygen maps legacy labels", {
-  f <- nfert_normalize_oxygen
+test_that("agrinutri_normalize_oxygen maps legacy labels", {
+  f <- agrinutri_normalize_oxygen
   expect_equal(f("Low"), "Slow")
   expect_equal(f("Reduced"), "Slow")
   expect_equal(f("Poor"), "Slow")

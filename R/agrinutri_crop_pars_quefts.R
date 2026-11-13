@@ -1,8 +1,8 @@
-#' Map NFert crop label to QUEFTS crop parameters (backward-compatible)
+#' Map agrinutri crop label to QUEFTS crop parameters (backward-compatible)
 #'
 #' Returns parameters for [Rquefts::quefts()]. If `crop_params` is already a
 #' full QUEFTS crop list, it is returned unchanged. Otherwise this function
-#' calls [nfert_to_quefts_crop()] using `inst/extdata/quefts_crop_pars_IT.csv`.
+#' calls [agrinutri_to_quefts_crop()] using `inst/extdata/quefts_crop_pars_IT.csv`.
 #' If the crop is missing from that table, it falls back to
 #' [Rquefts::quefts_crop()] with a coarse heuristic (requires **Rquefts**).
 #'
@@ -10,30 +10,30 @@
 #'   named list of QUEFTS crop parameters.
 #'
 #' @return List compatible with `Rquefts::quefts(..., crop = crop_pars)`.
-#' @seealso [nfert_to_quefts_crop()]
+#' @seealso [agrinutri_to_quefts_crop()]
 #' @export
-nfert_crop_pars_quefts <- function(crop_params) {
+agrinutri_crop_pars_quefts <- function(crop_params) {
   if (is.list(crop_params) && !is.null(names(crop_params)) &&
       "Yzero" %in% names(crop_params)) {
     return(crop_params)
   }
   label <- as.character(crop_params)[1]
   tryCatch(
-    nfert_to_quefts_crop(label),
+    agrinutri_to_quefts_crop(label),
     error = function(e) {
       if (!requireNamespace("Rquefts", quietly = TRUE)) stop(e)
       warning(
-        "nfert_to_quefts_crop('", label, "') failed (",
+        "agrinutri_to_quefts_crop('", label, "') failed (",
         conditionMessage(e),
         "); using Rquefts::quefts_crop() fallback.",
         call. = FALSE
       )
-      .nfert_crop_fallback_quefts(label)
+      .agrinutri_crop_fallback_quefts(label)
     }
   )
 }
 
-.nfert_crop_fallback_quefts <- function(label) {
+.agrinutri_crop_fallback_quefts <- function(label) {
   nm <- tolower(trimws(gsub("\\s*\\(.*$", "", label)))
   rquefts_name <- if (grepl("orzo|barley", nm)) {
     "Barley"

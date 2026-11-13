@@ -4,12 +4,12 @@
 test_that("no bundled dataset contains non-ASCII characters", {
   # Works both on the installed package (lazy-load database) and under
   # load_all(): list the datasets from the package metadata and fetch each one.
-  items <- utils::data(package = "NFert")$results[, "Item"]
+  items <- utils::data(package = "agrinutri")$results[, "Item"]
   items <- sub(" .*$", "", items)          # drop "(alias)" suffixes
   expect_gt(length(items), 10L)
   bad <- character()
   for (nm in items) {
-    obj <- tryCatch(nfert_data_get(nm), error = function(e) NULL)
+    obj <- tryCatch(agrinutri_data_get(nm), error = function(e) NULL)
     if (is.null(obj)) next
     cols <- if (is.data.frame(obj)) obj else list(obj)
     for (col in cols) {
@@ -22,7 +22,7 @@ test_that("no bundled dataset contains non-ASCII characters", {
 })
 
 test_that("accent-insensitive matching keeps accented input resolving", {
-  fold <- NFert:::.nfert_ascii_fold
+  fold <- agrinutri:::.agrinutri_ascii_fold
   # Build the accented inputs from code points so this test file stays ASCII.
   deg  <- intToUtf8(0xB0L)    # degree sign
   ugr  <- intToUtf8(0xF9L)    # u-grave

@@ -3,7 +3,7 @@ test_that("the Shiny app loads and its server starts", {
   skip_if_not_installed("shiny")
   for (p in c("shinyjs", "DT", "ggplot2", "leaflet", "sf"))
     skip_if_not_installed(p)
-  dir <- system.file("shinyapp", package = "NFert")
+  dir <- system.file("shinyapp", package = "agrinutri")
   skip_if(!nzchar(dir), "app directory not installed")
   app <- shiny::shinyAppDir(dir)
   expect_s3_class(app, "shiny.appobj")

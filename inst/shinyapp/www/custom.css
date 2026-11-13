@@ -1,4 +1,4 @@
-/* NFert Shiny app -- custom styling.
+/* agrinutri Shiny app -- custom styling.
    Follows the same palette as the scientific article:
      dark green  #2F7A44  (brand / balance reduces N)
      dark red    #C0392B  (balance adds to N / warnings)
@@ -6,22 +6,22 @@
 */
 
 :root {
-  --nfert-green-dark: #2F7A44;
-  --nfert-green-soft: #D5ECDB;
-  --nfert-red-dark:   #C0392B;
-  --nfert-red-soft:   #F2D7D5;
-  --nfert-blue-dark:  #1F4E79;
-  --nfert-blue-soft:  #D5E4F0;
-  --nfert-gold:       #C08A3C;
-  --nfert-grey-soft:  #F5F5F5;
-  --nfert-grey-mid:   #BFBFBF;
-  --nfert-grey-dark:  #333333;
+  --agrinutri-green-dark: #2F7A44;
+  --agrinutri-green-soft: #D5ECDB;
+  --agrinutri-red-dark:   #C0392B;
+  --agrinutri-red-soft:   #F2D7D5;
+  --agrinutri-blue-dark:  #1F4E79;
+  --agrinutri-blue-soft:  #D5E4F0;
+  --agrinutri-gold:       #C08A3C;
+  --agrinutri-grey-soft:  #F5F5F5;
+  --agrinutri-grey-mid:   #BFBFBF;
+  --agrinutri-grey-dark:  #333333;
 }
 
 /* --- Global layout --- */
 body {
-  background: var(--nfert-grey-soft);
-  color: var(--nfert-grey-dark);
+  background: var(--agrinutri-grey-soft);
+  color: var(--agrinutri-grey-dark);
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   font-size: 14px;
 }
@@ -32,7 +32,7 @@ body {
 
 /* --- Navbar --- */
 .navbar-default {
-  background-color: var(--nfert-green-dark);
+  background-color: var(--agrinutri-green-dark);
   border-color: #1F5B30;
 }
 .navbar-default .navbar-brand,
@@ -46,17 +46,17 @@ body {
 }
 
 /* Mode toggle in the navbar */
-.nfert-mode-toggle {
+.agrinutri-mode-toggle {
   background: rgba(255,255,255,0.15);
   padding: 4px 10px;
   border-radius: 4px;
   z-index: 1030;
   color: #fff !important;
 }
-.nfert-mode-toggle .checkbox label { color: #fff !important; }
+.agrinutri-mode-toggle .checkbox label { color: #fff !important; }
 
 /* --- Cards --- */
-.nfert-card {
+.agrinutri-card {
   background: #fff;
   border: 1px solid #E2E2E2;
   border-radius: 8px;
@@ -65,72 +65,72 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
-.nfert-card h3 { margin-top: 0; color: var(--nfert-green-dark); }
-.nfert-card h4 { margin-top: 18px; color: var(--nfert-grey-dark); }
+.agrinutri-card h3 { margin-top: 0; color: var(--agrinutri-green-dark); }
+.agrinutri-card h4 { margin-top: 18px; color: var(--agrinutri-grey-dark); }
 
 /* --- Research overrides box --- */
-.nfert-research-box {
-  border: 2px dashed var(--nfert-gold);
+.agrinutri-research-box {
+  border: 2px dashed var(--agrinutri-gold);
   background: #FDF7E7;
   padding: 12px 16px;
   border-radius: 6px;
   margin: 12px 0 6px 0;
 }
-.nfert-research-box h4 { color: var(--nfert-gold); margin-top: 0; }
+.agrinutri-research-box h4 { color: var(--agrinutri-gold); margin-top: 0; }
 
 /* --- KPI boxes --- */
-.nfert-kpi-row {
+.agrinutri-kpi-row {
   display: flex; gap: 10px; flex-wrap: wrap;
   margin-bottom: 12px;
 }
-.nfert-kpi {
+.agrinutri-kpi {
   flex: 1 1 0;
   min-width: 100px;
-  background: var(--nfert-blue-soft);
-  border-left: 4px solid var(--nfert-blue-dark);
+  background: var(--agrinutri-blue-soft);
+  border-left: 4px solid var(--agrinutri-blue-dark);
   padding: 10px 14px;
   border-radius: 4px;
   display: flex; flex-direction: column;
 }
-.nfert-kpi-value {
-  font-size: 22px; font-weight: 700; color: var(--nfert-blue-dark);
+.agrinutri-kpi-value {
+  font-size: 22px; font-weight: 700; color: var(--agrinutri-blue-dark);
 }
-.nfert-kpi-label {
-  font-size: 12px; color: var(--nfert-grey-dark); opacity: 0.8;
+.agrinutri-kpi-label {
+  font-size: 12px; color: var(--agrinutri-grey-dark); opacity: 0.8;
   margin-top: 2px;
 }
 
 /* --- Alerts --- */
-.nfert-alert {
+.agrinutri-alert {
   border-radius: 6px;
   padding: 10px 14px;
   margin: 8px 0;
   border-left: 4px solid;
 }
-.nfert-alert-ok   { background: var(--nfert-green-soft);
-                    border-left-color: var(--nfert-green-dark); }
-.nfert-alert-warn { background: var(--nfert-red-soft);
-                    border-left-color: var(--nfert-red-dark); }
-.nfert-alert-info { background: var(--nfert-blue-soft);
-                    border-left-color: var(--nfert-blue-dark); }
+.agrinutri-alert-ok   { background: var(--agrinutri-green-soft);
+                    border-left-color: var(--agrinutri-green-dark); }
+.agrinutri-alert-warn { background: var(--agrinutri-red-soft);
+                    border-left-color: var(--agrinutri-red-dark); }
+.agrinutri-alert-info { background: var(--agrinutri-blue-soft);
+                    border-left-color: var(--agrinutri-blue-dark); }
 
 /* --- Landing tab --- */
-.nfert-lead { font-size: 16px; line-height: 1.55; color: #222; }
-.nfert-btn-cta {
+.agrinutri-lead { font-size: 16px; line-height: 1.55; color: #222; }
+.agrinutri-btn-cta {
   border-radius: 6px; padding: 14px 12px; white-space: normal;
   line-height: 1.2; font-size: 15px;
 }
-.btn.btn-primary       { background: var(--nfert-green-dark);
+.btn.btn-primary       { background: var(--agrinutri-green-dark);
                          border-color: #1F5B30; }
 .btn.btn-primary:hover { background: #256335; border-color: #184524; }
-.btn.btn-success       { background: var(--nfert-blue-dark);
+.btn.btn-success       { background: var(--agrinutri-blue-dark);
                          border-color: #163D5F; }
 
 /* --- Footer --- */
-.nfert-footer {
-  color: var(--nfert-grey-mid); font-size: 12px; margin-top: 12px;
+.agrinutri-footer {
+  color: var(--agrinutri-grey-mid); font-size: 12px; margin-top: 12px;
 }
-.nfert-muted { color: var(--nfert-grey-mid); font-size: 13px; }
+.agrinutri-muted { color: var(--agrinutri-grey-mid); font-size: 13px; }
 
 /* --- Plot containers: neutral frame + caption space --- */
 .shiny-plot-output {
@@ -141,22 +141,22 @@ body {
 }
 
 /* --- Workflow breadcrumb (optional, for the top of a card) --- */
-.nfert-stepbar {
+.agrinutri-stepbar {
   display: flex; gap: 6px; flex-wrap: wrap;
   margin: 0 0 14px 0; padding: 0;
 }
-.nfert-stepbar li {
+.agrinutri-stepbar li {
   list-style: none;
   padding: 5px 12px;
   border-radius: 14px;
   font-size: 12px;
-  background: #E9ECEF; color: var(--nfert-grey-mid);
+  background: #E9ECEF; color: var(--agrinutri-grey-mid);
 }
-.nfert-stepbar li.active {
-  background: var(--nfert-green-dark); color: #fff; font-weight: 600;
+.agrinutri-stepbar li.active {
+  background: var(--agrinutri-green-dark); color: #fff; font-weight: 600;
 }
-.nfert-stepbar li.done {
-  background: var(--nfert-green-soft); color: var(--nfert-green-dark);
+.agrinutri-stepbar li.done {
+  background: var(--agrinutri-green-soft); color: var(--agrinutri-green-dark);
 }
 
 /* --- Polished DataTable look --- */
@@ -164,22 +164,22 @@ table.dataTable {
   font-size: 13px !important;
 }
 table.dataTable thead th {
-  background: var(--nfert-grey-soft);
-  border-bottom: 2px solid var(--nfert-green-dark) !important;
+  background: var(--agrinutri-grey-soft);
+  border-bottom: 2px solid var(--agrinutri-green-dark) !important;
 }
 
 /* --- KPI variants for zones --- */
-.nfert-kpi.kpi-deficient {
-  background: var(--nfert-red-soft);
-  border-left-color: var(--nfert-red-dark);
+.agrinutri-kpi.kpi-deficient {
+  background: var(--agrinutri-red-soft);
+  border-left-color: var(--agrinutri-red-dark);
 }
-.nfert-kpi.kpi-deficient .nfert-kpi-value { color: var(--nfert-red-dark); }
-.nfert-kpi.kpi-optimal {
-  background: var(--nfert-green-soft);
-  border-left-color: var(--nfert-green-dark);
+.agrinutri-kpi.kpi-deficient .agrinutri-kpi-value { color: var(--agrinutri-red-dark); }
+.agrinutri-kpi.kpi-optimal {
+  background: var(--agrinutri-green-soft);
+  border-left-color: var(--agrinutri-green-dark);
 }
-.nfert-kpi.kpi-optimal .nfert-kpi-value { color: var(--nfert-green-dark); }
-.nfert-kpi.kpi-excessive {
-  background: var(--nfert-blue-soft);
-  border-left-color: var(--nfert-blue-dark);
+.agrinutri-kpi.kpi-optimal .agrinutri-kpi-value { color: var(--agrinutri-green-dark); }
+.agrinutri-kpi.kpi-excessive {
+  background: var(--agrinutri-blue-soft);
+  border-left-color: var(--agrinutri-blue-dark);
 }

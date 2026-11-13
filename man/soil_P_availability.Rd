@@ -11,9 +11,9 @@ soil_P_availability(
   A_demand_P2O5,
   depth_cm = 30,
   total_carbonate = NULL,
-  p_availability.table = nfert_data_get("p_availability.table"),
-  p_availability_meta = nfert_data_get("p_availability_meta"),
-  texture_groups.table = nfert_data_get("texture_groups.table")
+  p_availability.table = agrinutri_data_get("p_availability.table"),
+  p_availability_meta = agrinutri_data_get("p_availability_meta"),
+  texture_groups.table = agrinutri_data_get("texture_groups.table")
 )
 }
 \arguments{

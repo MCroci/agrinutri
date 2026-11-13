@@ -6,7 +6,7 @@
 #   Pioggia 1/10-31/1 = 150 mm, febbraio = 0 mm
 #   Precessione: Maize stalks removed (E = -10)
 #   Grano duro (pianta intera), resa 6 t/ha, fase primaverile-estiva 100-130 gg
-#   Disponibilita ossigeno: Imperfetta (NFert "Slow") -> fc_D = 0.40
+#   Disponibilita ossigeno: Imperfetta (agrinutri "Slow") -> fc_D = 0.40
 #   Apporti naturali: pianura isolata -> G = 15 kg/ha * C_tempo 0.67 = 10.05
 #
 # Expected (from foglio Bilancio):
@@ -22,7 +22,7 @@ library(testthat)
 context("DPI 2026 Fert_Office v1.26 benchmark")
 
 test_that("N_balance (grano duro) reproduces Fert_Office Bilancio", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
 
   # Inputs exactly as in the Fert_Office v1.26 "Inserimento" sample:
   # oxygen availability "Imperfetta" (ID_Dre 1 = "Slow") and location
@@ -58,7 +58,7 @@ test_that("N_balance (grano duro) reproduces Fert_Office Bilancio", {
 })
 
 test_that("scheda_N reproduces Scheda_N grano duro (200 kg/ha)", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
 
   res <- scheda_N(
     crop = "Grano duro (pianta intera)",
@@ -73,7 +73,7 @@ test_that("scheda_N reproduces Scheda_N grano duro (200 kg/ha)", {
 })
 
 test_that("scheda_N cap at MAS when decrements < increments overshoot dose_max", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   res <- scheda_N(
     crop = "Grano duro (pianta intera)",
     increments = c(straw_burial = 100, compacted_no_till = 100)
@@ -83,7 +83,7 @@ test_that("scheda_N cap at MAS when decrements < increments overshoot dose_max",
 })
 
 test_that("no-till soil_seeding reduces B by 10 kg/ha (DPI Allegato 2)", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   b_trad <- soil_fertility(Ntot = 1.5, SOM = 2, soil.group = "Loamy textures",
                            CN = 8, ccp = "Spring-summer crop 100-130 days",
                            soil_seeding = "traditional")
@@ -100,7 +100,7 @@ test_that("no-till soil_seeding reduces B by 10 kg/ha (DPI Allegato 2)", {
 })
 
 test_that("soil_fertility follows Fert_Office caps and the perennial rule", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   ccp <- "Spring-summer crop 100-130 days"          # C_tempo 0.67
   hi <- soil_fertility(Ntot = 3, SOM = 5, soil.group = "Loamy textures",
                        CN = 10, ccp = ccp)
@@ -116,7 +116,7 @@ test_that("soil_fertility follows Fert_Office caps and the perennial rule", {
 })
 
 test_that("greenhouse adds 2 kg/ha to D", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   D1 <- calc_N_immobilization_loss(B = 50, oxygen_availability = "Normal",
                                    id_rag = 2, greenhouse = FALSE)
   D2 <- calc_N_immobilization_loss(B = 50, oxygen_availability = "Normal",
@@ -125,7 +125,7 @@ test_that("greenhouse adds 2 kg/ha to D", {
 })
 
 test_that("negative E is folded into D", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   D_no_e <- calc_N_immobilization_loss(B = 60, oxygen_availability = "Normal",
                                        id_rag = 2, E_residual = 0)
   D_e    <- calc_N_immobilization_loss(B = 60, oxygen_availability = "Normal",
@@ -134,7 +134,7 @@ test_that("negative E is folded into D", {
 })
 
 test_that("surplus_pluviometrico flag is TRUE when winter + feb >= 300 mm", {
-  skip_if_not_installed("NFert")
+  skip_if_not_installed("agrinutri")
   r1 <- leaching_loss(winter_rain = 250, start_spring_rain = 60,
                       oxygen_availability = "Normal", id_rag = 2, b1 = 30)
   r2 <- leaching_loss(winter_rain = 150, start_spring_rain = 30,

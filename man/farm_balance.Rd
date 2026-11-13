@@ -2,7 +2,7 @@
 % Please edit documentation in R/farm_balance.R
 \name{farm_balance}
 \alias{farm_balance}
-\title{Apply the NFert balance to every plot of a farm}
+\title{Apply the agrinutri balance to every plot of a farm}
 \usage{
 farm_balance(
   x,
@@ -66,7 +66,7 @@ Every feature must carry at least:
 \code{area_ha} \tab 5.2 \tab used to derive \code{N_total_kg}
 }
 Italian aliases (Frumento tenero, Liquame bovino, Cereali vernini -
-paglia asportata, ...) are accepted because the underlying NFert
+paglia asportata, ...) are accepted because the underlying agrinutri
 functions carry the translation layer.
 }
 
@@ -84,7 +84,7 @@ otherwise (rows that fail are not dropped).}
 
 \examples{
 \dontrun{
-ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- farm_balance(ex)
 print(farm[, c("plot_id", "crop", "area_ha",
                 "N_target", "MAS_cap", "N_total_kg")])

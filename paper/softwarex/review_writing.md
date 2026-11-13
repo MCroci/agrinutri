@@ -1,8 +1,8 @@
-# Writing Quality Review: NFert_SoftwareX.md (SoftwareX, OSP template v4)
+# Writing Quality Review: agrinutri_SoftwareX.md (SoftwareX, OSP template v4)
 
 Reviewed against the SoftwareX template (abstract about 100 words, body up to 3000 words,
 Impact as the main section) and general conventions. Line numbers refer to
-`paper/softwarex/NFert_SoftwareX.md` as of 2026-11-13. Numbers checked against the code
+`paper/softwarex/agrinutri_SoftwareX.md` as of 2026-11-13. Numbers checked against the code
 (76 exports, 38 datasets, 235 `uptake_table` entries, six indices in `compute_vi()`, 169 tests,
 773 expectations) and against the outputs of `fig2_data.R`, `fig3_data.R` and `paper/sat/data/`.
 
@@ -78,7 +78,7 @@ No problems worth reporting; passives are confined to settled background (line 3
 Parameters: SoftwareX, about 100 words, no citations. Word count 89.
 
 ```
-[1 Field / tool]   NFert is an open-source R package for N, P and K fertilization planning.
+[1 Field / tool]   agrinutri is an open-source R package for N, P and K fertilization planning.
 [2 Background]     It implements the crop nutrient balance and the standard-dose method of the DPI 2026 ...
 [2 Background]     The same balance runs per plot ... and a Sentinel-2 module turns ... into prescriptions ...
 [3 Problem ✗]      missing: why an open implementation is needed (closed regional spreadsheet)
@@ -89,7 +89,7 @@ Parameters: SoftwareX, about 100 words, no citations. Word count 89.
 why they are needed or what the package made possible. Suggested abstract (about 110 words):
 
 "Regional nitrogen balances set the legal fertilizer dose in many European regions, but they are
-distributed as closed spreadsheets that compute one field at a time. NFert is an open-source R
+distributed as closed spreadsheets that compute one field at a time. agrinutri is an open-source R
 package that implements the nitrogen, phosphorus and potassium balance of the Emilia-Romagna
 Integrated Production Guidelines (DPI 2026), returns every balance term so that a dose can be
 audited, and keeps all coefficients as editable data. The same balance runs per plot of a farm

@@ -26,7 +26,7 @@
 # ---------------------------------------------------------------------
 
 suppressPackageStartupMessages({
-  library(NFert)
+  library(agrinutri)
   library(terra)
 })
 
@@ -77,7 +77,7 @@ nni_timeseries <- function(field_dir,
   if (!length(scenes))
     stop("No scenes match pattern '", pattern, "' in ", field_dir)
 
-  message(sprintf("[NFert] Found %d scenes in %s", length(scenes),
+  message(sprintf("[agrinutri] Found %d scenes in %s", length(scenes),
                   field_dir))
 
   log <- vector("list", length(scenes))
@@ -198,13 +198,13 @@ nni_timeseries <- function(field_dir,
 
   csv_path <- file.path(out_root, "summary.csv")
   utils::write.csv(out, csv_path, row.names = FALSE)
-  message(sprintf("[NFert] Summary written to %s", csv_path))
+  message(sprintf("[agrinutri] Summary written to %s", csv_path))
 
   # 5. Optional NNI time-series stack
   if (isTRUE(stack_out)) {
     ok <- out$status == "ok" | out$status == "cached"
     if (sum(ok) >= 2) {
-      message("[NFert] Stacking NNI rasters into a single .tif...")
+      message("[agrinutri] Stacking NNI rasters into a single .tif...")
       stk <- tryCatch({
         rs <- lapply(out$nni_path[ok], terra::rast)
         # Align to first scene's grid, in case of small differences
@@ -219,10 +219,10 @@ nni_timeseries <- function(field_dir,
       if (!is.null(stk)) {
         stack_path <- file.path(out_root, "NNI_timeseries.tif")
         terra::writeRaster(stk, stack_path, overwrite = TRUE)
-        message(sprintf("[NFert] Time-series stack -> %s", stack_path))
+        message(sprintf("[agrinutri] Time-series stack -> %s", stack_path))
       }
     } else {
-      message("[NFert] Need >= 2 successful scenes to stack -- skipped.")
+      message("[agrinutri] Need >= 2 successful scenes to stack -- skipped.")
     }
   }
 

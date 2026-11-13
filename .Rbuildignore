@@ -14,7 +14,7 @@
 ^INSTALL_RTOOLS\.md$
 ^Guida_Fertilizzazione_DPI.*\.md$
 ^references$
-^NFert_SoftwareX_article_.*\.docx$
+^agrinutri_SoftwareX_article_.*\.docx$
 ^output_.*$
 ^_pkgdown\.yml$
 ^pkgdown$
@@ -22,7 +22,7 @@
 ^tmp$
 ^out$
 ^output$
-^NFert_.*\.tar\.gz$
+^agrinutri_.*\.tar\.gz$
 ^.*\.Rcheck$
 ^[^/]*\.pdf$
 ^LICENSE\.md$

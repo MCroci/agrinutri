@@ -43,7 +43,7 @@ test_that("organic_previous_years_N returns 0 for missing or non-positive N", {
 })
 
 test_that(".organic_recovery_table is a complete 4 x 4 grid in [0, 1]", {
-  tab <- NFert:::.organic_recovery_table()
+  tab <- agrinutri:::.organic_recovery_table()
   expect_equal(nrow(tab), 16L)
   expect_equal(nrow(unique(tab[, c("organic_type", "frequency")])), 16L)
   expect_true(all(tab$recovery >= 0 & tab$recovery <= 1))

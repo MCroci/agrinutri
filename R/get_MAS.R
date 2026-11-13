@@ -47,10 +47,10 @@ get_MAS <- function(crop = NULL, mas_table = NULL, edition = c("2026", "2025")) 
   crop <- as.character(crop)
   # Legacy generic DPI names (e.g. "Mais da insilato") map to a table row
   amap <- c(.mas_crop_alias(), .crop_alias_to_canonical())
-  ia <- match(tolower(.nfert_ascii_fold(trimws(crop))), tolower(names(amap)))
+  ia <- match(tolower(.agrinutri_ascii_fold(trimws(crop))), tolower(names(amap)))
   if (!is.na(ia) && !(crop %in% mas_table$crop)) crop <- unname(amap[ia])
   # Accent-insensitive match on crop, then on the Italian / English aliases
-  norm <- function(s) tolower(.nfert_ascii_fold(gsub("\\s+", " ", trimws(as.character(s)))))
+  norm <- function(s) tolower(.agrinutri_ascii_fold(gsub("\\s+", " ", trimws(as.character(s)))))
   key <- norm(crop)
   i <- NA_integer_
   for (col in intersect(c("crop", "crop_it", "crop_en"), names(mas_table))) {
@@ -137,7 +137,7 @@ check_MAS <- function(crop, N_planned, mas_table = NULL, edition = c("2026", "20
   # DPI 2026 MAS (Allegato 9, Reg. reg. 2/2024) as shipped in the bundled
   # `mas.table` dataset, which mirrors the "MAS" sheet of Fert_Office v1.26
   # (column "MAS", not the "teorico massimo" column).
-  m <- nfert_data_get("mas.table")
+  m <- agrinutri_data_get("mas.table")
   ref <- m$reference_yield_t_ha
   ref[!is.na(ref) & ref <= 0] <- NA_real_
   out <- data.frame(
@@ -156,7 +156,7 @@ check_MAS <- function(crop, N_planned, mas_table = NULL, edition = c("2026", "20
   out[!duplicated(out$crop), , drop = FALSE]
 }
 
-# Generic DPI crop names used by earlier NFert releases and in the DPI text,
+# Generic DPI crop names used by earlier agrinutri releases and in the DPI text,
 # mapped to the corresponding row of the DPI 2026 MAS table.
 .mas_crop_alias <- function() {
   stats::setNames(

@@ -4,12 +4,12 @@
 \alias{classify_pH}
 \title{Classify soil pH}
 \usage{
-classify_pH(pH, ph.table = nfert_data_get("ph.table"))
+classify_pH(pH, ph.table = agrinutri_data_get("ph.table"))
 }
 \arguments{
 \item{pH}{Numeric.}
 
-\item{ph.table}{Lookup (default \code{NFert::ph.table}).}
+\item{ph.table}{Lookup (default \code{agrinutri::ph.table}).}
 }
 \value{
 List with \code{ID_pH} and \code{class}.

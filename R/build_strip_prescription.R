@@ -101,7 +101,7 @@
 #'   \code{\link{compute_NNI_from_S2}}
 #'
 #' @examplesIf requireNamespace("sf", quietly = TRUE)
-#' ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+#' ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 #' farm <- sf::st_read(ex, quiet = TRUE)
 #' field <- farm[1, ]  # 5.2 ha silage-maize plot
 #'

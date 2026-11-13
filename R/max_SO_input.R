@@ -5,12 +5,12 @@
 #' "Poor" = 13, "Normal" = 11, "Rich" = 9 (Fert_Office v1.26 foglio SO).
 #'
 #' @param so_class One of `"Poor"`, `"Normal"`, `"Rich"` (case-insensitive).
-#' @param so_max_input Lookup table (default `NFert::so_max_input`).
+#' @param so_max_input Lookup table (default `agrinutri::so_max_input`).
 #' @return Numeric t dry matter / ha.
 #' @examples max_SO_input("Normal")
 #' @export
 max_SO_input <- function(so_class = c("Poor", "Normal", "Rich"),
-                         so_max_input = nfert_data_get("so_max_input")) {
+                         so_max_input = agrinutri_data_get("so_max_input")) {
   choices <- c("Poor", "Normal", "Rich")
   if (length(so_class) == 1L && !is.na(so_class) && !so_class %in% choices) {
     i <- match(tolower(so_class), tolower(choices))
@@ -30,15 +30,15 @@ max_SO_input <- function(so_class = c("Poor", "Normal", "Rich"),
 #'
 #' @param SOM Soil organic matter (% mass).
 #' @param soil_group Texture group (Italian).
-#' @param so.table Lookup (default `NFert::so.table`).
+#' @param so.table Lookup (default `agrinutri::so.table`).
 #' @return List with `rating` (4 classes) and `class` (3-class for SO input).
 #' @examples classify_SOM(SOM = 2, soil_group = "Medio impasto")
 #' @export
-classify_SOM <- function(SOM, soil_group, so.table = nfert_data_get("so.table")) {
+classify_SOM <- function(SOM, soil_group, so.table = agrinutri_data_get("so.table")) {
   if (!is.numeric(SOM) || length(SOM) != 1 || is.na(SOM) || SOM < 0) {
     stop("`SOM` must be a non-negative numeric.")
   }
-  # Thresholds from foglio B (NFert 0.1.0 already handles fertility; here we
+  # Thresholds from foglio B (agrinutri 0.1.0 already handles fertility; here we
   # just classify SO for the organic-input limit)
   th <- list(
     "Sandy textures" = c(0.8, 1.4, 2.0),

@@ -41,8 +41,8 @@ writes several formats side-by-side into the same output directory.
 }
 \examples{
 \dontrun{
-farm <- NFert::farm_balance(
-  system.file("extdata/example_farm.geojson", package = "NFert"))
+farm <- agrinutri::farm_balance(
+  system.file("extdata/example_farm.geojson", package = "agrinutri"))
 export_prescription_all(farm, "rx_maps", "farm_2026",
   formats = c("shp", "geojson", "isoxml", "johndeere"))
 }

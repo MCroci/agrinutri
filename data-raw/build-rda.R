@@ -1,8 +1,8 @@
 # ----------------------------------------------------------------------------
 # data-raw/build-rda.R
 #
-# Rebuild all NFert datasets from the canonical CSVs in data-raw/csv/.
-# Since NFert 0.12.0 the rebuilt .rda files expose the English names as
+# Rebuild all agrinutri datasets from the canonical CSVs in data-raw/csv/.
+# Since agrinutri 0.12.0 the rebuilt .rda files expose the English names as
 # the canonical lookup columns (`crop`, `previous_crop`, `fertilizer`,
 # `modality_epoch`, `level`, `cycle`, `type`, `phase_duration`) and the
 # Italian translations as the secondary `*_it` columns.
@@ -64,7 +64,7 @@ promote_english_primary <- function(df, name) {
 # Fold the few non-ASCII characters of the Italian reference labels
 # (degree sign, en/em dash, accented vowels) to ASCII, so the bundled data
 # passes R CMD check. Matching in the package is accent-insensitive
-# (.nfert_ascii_fold in R/crop_lookup.R), so this does not change lookups.
+# (.agrinutri_ascii_fold in R/crop_lookup.R), so this does not change lookups.
 fold_nonascii <- function(df) {
   fold1 <- function(s) {
     s <- gsub(paste0("[", intToUtf8(c(0x2013L, 0x2014L)), "]"), "-", s)

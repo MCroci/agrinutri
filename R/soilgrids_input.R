@@ -1,10 +1,10 @@
-#' Build an NFert soil input stack from SoilGrids (open global default)
+#' Build an agrinutri soil input stack from SoilGrids (open global default)
 #'
-#' Downloads the soil properties that the NFert nitrogen balance consumes from
+#' Downloads the soil properties that the agrinutri nitrogen balance consumes from
 #' the ISRIC SoilGrids 2.0 service and returns them as a \code{terra::SpatRaster}
 #' with the layer names, units and shape that \code{\link{spatial_N_balance}()}
 #' and \code{\link{farm_balance}()} expect. It is the open, global fallback soil
-#' layer: with it the whole NFert pipeline (balance, prescription mean and
+#' layer: with it the whole agrinutri pipeline (balance, prescription mean and
 #' uncertainty) runs end to end on freely licensed data (CC-BY 4.0) anywhere on
 #' Earth, without a proprietary local soil map.
 #'
@@ -55,7 +55,7 @@
 #' @seealso \code{\link{spatial_N_balance}}, \code{\link{farm_balance}}
 #'
 #' @examplesIf requireNamespace("geodata", quietly = TRUE) && interactive()
-#' aoi <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"))
+#' aoi <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"))
 #' soil <- soilgrids_input(aoi, crs_out = 32632)
 #' n <- spatial_N_balance(soil, expected_yield_tons_ha = 9,
 #'                        crop = "Grano tenero FF (granella)",
@@ -118,7 +118,7 @@ soilgrids_input <- function(aoi,
   raw <- list()
   for (v in vars) for (st in stats) raw[[paste0(v, "_", st)]] <- grab(v, st)
 
-  # --- convert raw SoilGrids units to NFert balance units --------------------
+  # --- convert raw SoilGrids units to agrinutri balance units --------------------
   # clay/sand g/kg -> %, nitrogen cg/kg -> g/kg, soc dg/kg -> g/kg
   conv <- function(tag) {
     clay <- raw[[paste0("clay_", tag)]] / 10

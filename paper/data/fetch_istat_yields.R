@@ -6,7 +6,7 @@
 # SOFT WHEAT (frumento tenero) in the PIACENZA province (NUTS3 ITD51) and the
 # EMILIA-ROMAGNA region (NUTS2 ITD5) from Istat's SDMX web service, and write a
 # tidy CSV (istat_yields.csv) used to justify the expected-yield inputs of the
-# NFert nitrogen-balance paper (CERZOO case-study farm, Po Valley near Piacenza).
+# agrinutri nitrogen-balance paper (CERZOO case-study farm, Po Valley near Piacenza).
 #
 # DATA SOURCE
 #   Istat, "Coltivazioni" (DataSetCode DCSP_COLTIVAZIONI), dataflow IT1:101_1015.

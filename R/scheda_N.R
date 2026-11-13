@@ -21,7 +21,7 @@
 #' | Incremento  | Lisciviazione x surplus pluviometrico            | user-defined  |
 #' | Incremento  | Terreno compattato o semina su sodo              | 10            |
 #'
-#' @param crop Crop name exactly as in `NFert::mas.table$crop`.
+#' @param crop Crop name exactly as in `agrinutri::mas.table$crop`.
 #' @param phase Optional phase string (e.g. "Primaverile-estiva 100-130 gg") for crops
 #'   with multiple fases. If `NULL` (default) and the crop has multiple rows, the
 #'   first match is used and a note is emitted.
@@ -31,7 +31,7 @@
 #' @param increments Named numeric vector (kg/ha) with one or more of:
 #'   `yield_high`, `low_SOM`, `straw_burial`, `rain_surplus`, `compacted_no_till`.
 #'   Missing names default to 0.
-#' @param mas.table Reference MAS lookup (default `NFert::mas.table`).
+#' @param mas.table Reference MAS lookup (default `agrinutri::mas.table`).
 #' @param apply_mas_cap Logical, default `TRUE`. Cap the final dose at
 #'   `max_N_dose = standard_N + max_increment` from MAS.
 #'
@@ -54,7 +54,7 @@ dose_standard_N <- function(crop,
                      phase = NULL,
                      decrements = numeric(),
                      increments = numeric(),
-                     mas.table = nfert_data_get("mas.table"),
+                     mas.table = agrinutri_data_get("mas.table"),
                      apply_mas_cap = TRUE) {
 
   if (missing(crop) || !is.character(crop) || length(crop) != 1) {
@@ -70,8 +70,8 @@ dose_standard_N <- function(crop,
     stop(sprintf("Crop '%s' not found in mas.table.", crop))
   }
   if (!is.null(phase)) {
-    idx_p <- which(.nfert_ascii_fold(mas.table$crop) == .nfert_ascii_fold(crop) &
-                     .nfert_ascii_fold(mas.table$phase) == .nfert_ascii_fold(phase))
+    idx_p <- which(.agrinutri_ascii_fold(mas.table$crop) == .agrinutri_ascii_fold(crop) &
+                     .agrinutri_ascii_fold(mas.table$phase) == .agrinutri_ascii_fold(phase))
     if (length(idx_p) == 0) {
       warning(sprintf("Phase '%s' not found for crop '%s'. Using first available row.", phase, crop))
     } else {

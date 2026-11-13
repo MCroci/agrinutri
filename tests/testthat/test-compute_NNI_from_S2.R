@@ -12,7 +12,7 @@
 # packages `terra` or `jsonlite` are not installed.
 
 scene_path <- system.file("extdata/sentinel-2/S2_field001_20240711.tif",
-                          package = "NFert")
+                          package = "agrinutri")
 
 test_that("Sentinel-2 demo scene is bundled", {
   expect_true(nzchar(scene_path))
@@ -24,7 +24,7 @@ test_that("estimate_biophysical -> compute_NNI_from_S2 runs end-to-end", {
   skip_if_not_installed("jsonlite")
 
   # 1. GPR retrieval (LAI / Cm / CNC_Cprot / FVC) -- output to tempdir
-  out_dir <- file.path(tempdir(), "NFert-NNI-test")
+  out_dir <- file.path(tempdir(), "agrinutri-NNI-test")
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
   maps <- estimate_biophysical(
@@ -87,11 +87,11 @@ test_that("default scaling yields a plausible, non-empty NNI on the CERZOO scene
   # regression where an extra -1000 offset drove every pixel out of range and
   # returned an all-NA LAI / empty NNI (issue: empty operational NNI maps).
   cerzoo <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
-                        package = "NFert")
+                        package = "agrinutri")
   skip_if(!nzchar(cerzoo) || !file.exists(cerzoo),
           "CERZOO demo scene not bundled")
 
-  out_dir <- file.path(tempdir(), "NFert-NNI-cerzoo")
+  out_dir <- file.path(tempdir(), "agrinutri-NNI-cerzoo")
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
   maps <- estimate_biophysical(
@@ -129,11 +129,11 @@ test_that("estimate_biophysical warns on a DN scaling mismatch", {
   skip_if_not_installed("jsonlite")
 
   cerzoo <- system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
-                        package = "NFert")
+                        package = "agrinutri")
   skip_if(!nzchar(cerzoo) || !file.exists(cerzoo),
           "CERZOO demo scene not bundled")
 
-  out_dir <- file.path(tempdir(), "NFert-NNI-cerzoo-badscale")
+  out_dir <- file.path(tempdir(), "agrinutri-NNI-cerzoo-badscale")
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
   # Applying the baseline-04 offset to already-offset-applied reflectance
@@ -152,7 +152,7 @@ test_that("compute_NNI_from_S2 errors on unknown crop", {
   skip_if_not_installed("terra")
   skip_if_not_installed("jsonlite")
 
-  out_dir <- file.path(tempdir(), "NFert-NNI-test-bad-crop")
+  out_dir <- file.path(tempdir(), "agrinutri-NNI-test-bad-crop")
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
   maps <- estimate_biophysical(

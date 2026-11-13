@@ -1,7 +1,7 @@
 # Data for Fig. 2 (farm example): run from paper/softwarex/ with the package
 # source one level up:  Rscript fig2_data.R
 suppressMessages(pkgload::load_all("../..", quiet = TRUE))
-farm <- sf::st_read(system.file("extdata/example_farm.geojson", package = "NFert"),
+farm <- sf::st_read(system.file("extdata/example_farm.geojson", package = "agrinutri"),
                     quiet = TRUE)
 out <- farm_balance(farm)
 args <- c("expected_yield_tons_ha", "crop", "ccp", "sand", "clay", "Ntot", "SOM",

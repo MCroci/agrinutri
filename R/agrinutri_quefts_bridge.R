@@ -1,4 +1,4 @@
-#' Translate NFert inputs into QUEFTS soil parameters
+#' Translate agrinutri inputs into QUEFTS soil parameters
 #'
 #' Builds the soil parameter list expected by [Rquefts::quefts()] from the
 #' soil logic already reflected in [N_balance()]. The conversion is
@@ -32,7 +32,7 @@
 #' Sattari, S.Z. et al. (2014). Eur. J. Agron. 60, 79-90.
 #'
 #' @export
-nfert_to_quefts_soil <- function(N_supply, P_supply = 10, K_supply = 60,
+agrinutri_to_quefts_soil <- function(N_supply, P_supply = 10, K_supply = 60,
                                  N_recovery = 0.55, P_recovery = 0.10,
                                  K_recovery = 0.50) {
   list(
@@ -54,10 +54,10 @@ nfert_to_quefts_soil <- function(N_supply, P_supply = 10, K_supply = 60,
   )
 }
 
-#' Translate NFert crop name into QUEFTS crop parameters
+#' Translate agrinutri crop name into QUEFTS crop parameters
 #'
 #' Looks up QUEFTS crop parameters in the bundled `quefts_crop_pars_IT.csv`
-#' table. Crop names follow NFert / English DPI-style labels
+#' table. Crop names follow agrinutri / English DPI-style labels
 #' (e.g. `"Durum wheat (whole plant)"`, `"Grano duro (granella)"`).
 #'
 #' @param crop Character. Crop name as accepted by [N_balance()].
@@ -68,11 +68,11 @@ nfert_to_quefts_soil <- function(N_supply, P_supply = 10, K_supply = 60,
 #'   `crop` argument (`NminVeg`, `NmaxVeg`, `NminStore`, \dots, `SeasonLength`).
 #'
 #' @export
-nfert_to_quefts_crop <- function(crop, crop_pars_path = NULL) {
+agrinutri_to_quefts_crop <- function(crop, crop_pars_path = NULL) {
   if (is.null(crop_pars_path)) {
     crop_pars_path <- system.file(
       "extdata", "quefts_crop_pars_IT.csv",
-      package = "NFert"
+      package = "agrinutri"
     )
   }
   if (!nzchar(crop_pars_path) || !file.exists(crop_pars_path)) {
@@ -122,7 +122,7 @@ nfert_to_quefts_crop <- function(crop, crop_pars_path = NULL) {
   )
 }
 
-#' Build QUEFTS biomass list from NFert state and Sentinel-2 NNI
+#' Build QUEFTS biomass list from agrinutri state and Sentinel-2 NNI
 #'
 #' Translates expected yield and per-pixel NNI into QUEFTS attainable biomass
 #' partitioning. NNI scales attainable storage biomass between a stressed and
@@ -131,7 +131,7 @@ nfert_to_quefts_crop <- function(crop, crop_pars_path = NULL) {
 #' @param expected_yield_tons_ha Numeric. Expected attainable yield (t/ha).
 #' @param NNI Numeric vector or scalar. Nitrogen Nutrition Index (typical range
 #'   near 0.5--1.1).
-#' @param crop_pars Named list returned by [nfert_to_quefts_crop()].
+#' @param crop_pars Named list returned by [agrinutri_to_quefts_crop()].
 #' @param leaf_to_store_ratio Numeric. Leaf:store DM ratio for cereals. Default
 #'   0.42.
 #'
@@ -140,7 +140,7 @@ nfert_to_quefts_crop <- function(crop, crop_pars_path = NULL) {
 #'   (one per element).
 #'
 #' @export
-nfert_to_quefts_biom <- function(expected_yield_tons_ha, NNI, crop_pars,
+agrinutri_to_quefts_biom <- function(expected_yield_tons_ha, NNI, crop_pars,
                                  leaf_to_store_ratio = 0.42) {
   Y_pot_kg <- as.numeric(expected_yield_tons_ha) * 1000
   NNI_clamped <- pmin(pmax(NNI, 0.30), 1.10)

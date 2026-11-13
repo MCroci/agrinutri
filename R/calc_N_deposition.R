@@ -6,10 +6,10 @@
 #' @param ccp Crop category and planting period (e.g., "Autumn-winter crop <150 days"). Must match a value in the `ccp` column of the `coef_time` table.
 #' @param g.table A data frame containing annual nitrogen deposition rates for different locations.
 #'   It should have at least two columns: `location` (character) and `annual_deposition` (numeric).
-#'   Defaults to `NFert::g.table`.
+#'   Defaults to `agrinutri::g.table`.
 #' @param coef_time A data frame containing adjustment factors (C_tempo) based on crop category and planting period.
 #'   It should have at least two columns: `ccp` (character) and `C_tempo` (numeric).
-#'   Defaults to `NFert::coef_time`.
+#'   Defaults to `agrinutri::coef_time`.
 #'
 #' @return The estimated natural nitrogen contribution in kg/ha, or `NA` if input values are not found in the respective tables.
 #'
@@ -35,8 +35,8 @@
 
 natural_contribution <- function(location = "Plain adjacent to urbanized areas",
                                  ccp = "Autumn-winter crop <150 days",
-                                 g.table = nfert_data_get("g.table"),
-                                 coef_time = nfert_data_get("coef_time")) {
+                                 g.table = agrinutri_data_get("g.table"),
+                                 coef_time = agrinutri_data_get("coef_time")) {
 
   # Input Validation
   if (!location %in% g.table$location) {

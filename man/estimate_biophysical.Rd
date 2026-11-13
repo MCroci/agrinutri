@@ -95,7 +95,7 @@ the pre-computed \code{Linv_pre_calc} matrix). Output rasters inherit the
 geometry (CRS, extent, resolution) of the input.
 }
 
-\section{Use within NFert}{
+\section{Use within agrinutri}{
 
 Two of the outputs are directly usable as inputs to
 \code{\link{compute_NNI}}:
@@ -116,7 +116,7 @@ The helper \code{\link{biophysical_to_NNI_inputs}} wraps this conversion.
 \dontshow{if (requireNamespace("terra", quietly = TRUE) && requireNamespace("jsonlite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
 # Loading the Gaussian-process model takes a few seconds
-scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "NFert")
+scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "agrinutri")
 if (nzchar(scene)) {
   od <- tempfile()
   dir.create(od)

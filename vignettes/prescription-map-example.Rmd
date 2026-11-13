@@ -33,15 +33,15 @@ machine-width grid prescription map, in six steps:
      an A-B line), colour-coded by the same calibration.
   6. Export both as GeoTIFF / Shapefile / ISOXML.
 
-All of this runs on the demo data that ships with NFert.
+All of this runs on the demo data that ships with agrinutri.
 
 ## 1. Load a field polygon
 
 ```{r field}
-library(NFert)
+library(agrinutri)
 library(sf)
 
-ex   <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex   <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 
 # Pick plot P03 - "Lower Ditch", 7.8 ha grain maize, loamy soil
@@ -165,7 +165,7 @@ top of the vignette in the hidden setup chunk.
 The pixel-by-pixel raster in Option A is fine for a self-driving
 tractor with a continuous-rate spreader, but many farm monitors prefer
 a **block prescription**: rectangular cells of
-`machine_width x cell_length` with a single dose per cell. NFert's
+`machine_width x cell_length` with a single dose per cell. agrinutri's
 `build_strip_prescription()` produces exactly that, applying the same
 calibration internally:
 

@@ -1,15 +1,15 @@
 # The bundled CERZOO example data must be present and usable by the pipeline.
 
 test_that("CERZOO example files are bundled", {
-  expect_true(nzchar(system.file("extdata/cerzoo_field.geojson", package = "NFert")))
+  expect_true(nzchar(system.file("extdata/cerzoo_field.geojson", package = "agrinutri")))
   expect_true(nzchar(system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
-                                 package = "NFert")))
+                                 package = "agrinutri")))
 })
 
 test_that("compute_vi runs on the bundled CERZOO Sentinel-2 scene", {
   skip_if_not_installed("terra")
   s2 <- terra::rast(system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
-                                package = "NFert"))
+                                package = "agrinutri"))
   expect_equal(terra::nlyr(s2), 10L)
   ndvi <- compute_vi(s2, "NDVI", scale_factor = 10000)
   expect_s4_class(ndvi, "SpatRaster")
@@ -20,7 +20,7 @@ test_that("compute_vi runs on the bundled CERZOO Sentinel-2 scene", {
 
 test_that("CERZOO Field 3 carries the agronomic attributes for N_balance", {
   skip_if_not_installed("sf")
-  f  <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"),
+  f  <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"),
                     quiet = TRUE)
   f3 <- f[as.character(f$id) == "3", ]
   expect_equal(nrow(f3), 1L)

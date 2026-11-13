@@ -1,14 +1,14 @@
-# Test helper: compare NFert with Fert_Office v1.26 on the scenarios produced by
+# Test helper: compare agrinutri with Fert_Office v1.26 on the scenarios produced by
 # data-raw/fertoffice_validation.py. Used by
 # tests/testthat/test-fertoffice-validation.R.
 
-nfert_vs_fertoffice <- function(sc) {
-  ut  <- NFert:::nfert_data_get("uptake_table")
-  ct  <- NFert:::nfert_data_get("coef_time")
-  ca  <- NFert:::nfert_data_get("ca.table")
-  et  <- NFert:::nfert_data_get("e.table")
-  ft  <- NFert:::nfert_data_get("f.table")
-  gt  <- NFert:::nfert_data_get("g.table")
+agrinutri_vs_fertoffice <- function(sc) {
+  ut  <- agrinutri:::agrinutri_data_get("uptake_table")
+  ct  <- agrinutri:::agrinutri_data_get("coef_time")
+  ca  <- agrinutri:::agrinutri_data_get("ca.table")
+  et  <- agrinutri:::agrinutri_data_get("e.table")
+  ft  <- agrinutri:::agrinutri_data_get("f.table")
+  gt  <- agrinutri:::agrinutri_data_get("g.table")
   freq <- c("every year", "every 2 years", "every 3 years", "occasional")
   one <- function(s) {
     crop <- ut$crop[match(s$crop_id, ut$id)]

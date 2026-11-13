@@ -50,7 +50,7 @@ A list with:
 }
 \description{
 Bridges the constant-rate output of \code{N_balance()} / \code{calculate_N_fertilization()}
-or \code{scheda_N()} with the spatial NDVI-based variable-rate estimators of NFert
+or \code{scheda_N()} with the spatial NDVI-based variable-rate estimators of agrinutri
 (\code{estimate_N_rate_from_calibration_curve()} and
 \code{estimate_N_rate_from_holland_schepers()}).
 }
@@ -72,7 +72,7 @@ rescaling within ), so the agronomic constraint (MAS, ZVN) is kept.
 \examples{
 \dontrun{
 library(terra)
-library(NFert)
+library(agrinutri)
 # NDVI raster
 data(s2.rast)
 ndvi <- terra::rast(s2.rast)   # s2.rast is a PackedSpatRaster; unwrap it

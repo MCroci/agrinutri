@@ -1,12 +1,12 @@
-"""Collect the references cited in NFert_SoftwareX.md from the project .bib files.
+"""Collect the references cited in agrinutri_SoftwareX.md from the project .bib files.
 
 Run from paper/softwarex/:  python make_bib.py
 """
 import re
 
 # every key cited in the manuscript, except the package itself (written below)
-KEYS = sorted(set(re.findall(r"(?<![\w.])@([A-Za-z0-9_]+)", open("NFert_SoftwareX.md", encoding="utf-8").read()))
-              - {"nfert2026"})
+KEYS = sorted(set(re.findall(r"(?<![\w.])@([A-Za-z0-9_]+)", open("agrinutri_SoftwareX.md", encoding="utf-8").read()))
+              - {"agrinutri2026"})
 
 EU2115 = r"""@misc{eu2021_2115,
   author = {{European Parliament and Council of the European Union}},
@@ -16,11 +16,11 @@ EU2115 = r"""@misc{eu2021_2115,
   url = {https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R2115}
 }"""
 
-NFERT = r"""@misc{nfert2026,
+NFERT = r"""@misc{agrinutri2026,
   author = {Croci, Michele and Impollonia, Giorgio and Ferrarini, Andrea and Fiorini, Andrea and Ragazzi, Manuele and Franceschi, Nicolaj and Tabaglio, Vincenzo and Amaducci, Stefano},
-  title = {{NFert}: {N}, {P} and {K} Fertilization Following {Emilia-Romagna} {DPI} 2026. {R} package version 1.0.0},
+  title = {{agrinutri}: {N}, {P} and {K} Fertilization Following {Emilia-Romagna} {DPI} 2026. {R} package version 1.0.0},
   year = {2026},
-  howpublished = {\url{https://github.com/mcroci/NFert}},
+  howpublished = {\url{https://github.com/mcroci/agrinutri}},
   note = {[Zenodo DOI to be added at release]}
 }"""
 

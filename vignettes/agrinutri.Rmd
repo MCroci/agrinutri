@@ -1,5 +1,5 @@
 ---
-title: "Nitrogen Fertilization Management with NFert: A Comprehensive Guide"
+title: "Nitrogen Fertilization Management with agrinutri: A Comprehensive Guide"
 author: "Michele Croci, Stefano Amaducci"
 date: "`r Sys.Date()`"
 output: 
@@ -8,7 +8,7 @@ output:
     toc_depth: 3
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{Nitrogen Fertilization Management with NFert: A Comprehensive Guide}
+  %\VignetteIndexEntry{Nitrogen Fertilization Management with agrinutri: A Comprehensive Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,11 +27,11 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The **NFert** R package provides a comprehensive toolkit for calculating nitrogen fertilization requirements in field crops following the Emilia-Romagna Regional Recommendations for integrated production. This vignette demonstrates how to use NFert for nitrogen balance calculations, soil fertility assessment, and precision agriculture applications.
+The **agrinutri** R package provides a comprehensive toolkit for calculating nitrogen fertilization requirements in field crops following the Emilia-Romagna Regional Recommendations for integrated production. This vignette demonstrates how to use agrinutri for nitrogen balance calculations, soil fertility assessment, and precision agriculture applications.
 
 ## What is Nitrogen Balance?
 
-Nitrogen balance is a quantitative method that accounts for all nitrogen inputs and outputs in an agricultural system. The general equation used in NFert is:
+Nitrogen balance is a quantitative method that accounts for all nitrogen inputs and outputs in an agricultural system. The general equation used in agrinutri is:
 
 $$\text{Nitrogen Fertilization (N)} = A - B + C1 + C2 + D - E - F_{org} - G$$
 
@@ -48,7 +48,7 @@ Where:
 
 ## Normative framework: DPI 2025–2026 and FertDPI
 
-NFert implements the **method of the balance** (Allegato 2) of the Disciplinari di Produzione Integrata (DPI) Emilia-Romagna, in line with the *Guida alla Fertilizzazione Minerale e Organica* (DPI 2025) and the regional tool **FertDPI / Fert_Office**. References: DPI Norme Generali (Allegato 2, 3, 4, 6, 7, 9), Reg. reg. 2/2024 and 3/2017, Direttiva Nitrati (91/676/CEE). In **Zone Vulnerabili ai Nitrati (ZVN)** the MAS (limiti di massima applicazione standard) are binding and the 170 kg N/ha/year ceiling from livestock effluents applies at farm level.
+agrinutri implements the **method of the balance** (Allegato 2) of the Disciplinari di Produzione Integrata (DPI) Emilia-Romagna, in line with the *Guida alla Fertilizzazione Minerale e Organica* (DPI 2025) and the regional tool **FertDPI / Fert_Office**. References: DPI Norme Generali (Allegato 2, 3, 4, 6, 7, 9), Reg. reg. 2/2024 and 3/2017, Direttiva Nitrati (91/676/CEE). In **Zone Vulnerabili ai Nitrati (ZVN)** the MAS (limiti di massima applicazione standard) are binding and the 170 kg N/ha/year ceiling from livestock effluents applies at farm level.
 
 **Formula N (Guida DPI 2025):**  
 N da apportare = **A** − **B** + **C** + **D** − **E** − **F** − **G**
@@ -61,17 +61,17 @@ N da apportare = **A** − **B** + **C** + **D** − **E** − **F** − **G**
 - **F** = N da fertilizzazioni organiche anni precedenti (ammendanti 50/30/20 %; Cattle slurry 30/15/10; suino/pollina 15/10/5).  
 - **G** = Apporti naturali (precipitazioni; fissazione per leguminose).
 
-NFert computes the balance and subtracts the current-year organic N (Forg) to obtain the mineral N to apply. Fractioning rules (max 100 kg/ha N per intervention for herbaceous crops, 60 kg/ha for tree crops; min 7 days between interventions) and presemina/autumn caps (e.g. max 30 kg/ha presemina, max 40 kg/ha arboree before 15 Oct) are set by DPI and must be respected in the field plan.
+agrinutri computes the balance and subtracts the current-year organic N (Forg) to obtain the mineral N to apply. Fractioning rules (max 100 kg/ha N per intervention for herbaceous crops, 60 kg/ha for tree crops; min 7 days between interventions) and presemina/autumn caps (e.g. max 30 kg/ha presemina, max 40 kg/ha arboree before 15 Oct) are set by DPI and must be respected in the field plan.
 
-**Soil texture (DPI groupings):** The 12 USDA texture classes are grouped into three macro-categories used for efficiency and coefficients: (1) *Tendenzialmente sabbioso* (S, SF, FS), (2) *Franco / Medio impasto* (L, F, FL, FSA, FA), (3) *Tendenzialmente argilloso* (FLA, AS, AL, A). NFert's `tri3()` and `calc_soil_group_and_id_rag()` provide texture and soil group.
+**Soil texture (DPI groupings):** The 12 USDA texture classes are grouped into three macro-categories used for efficiency and coefficients: (1) *Tendenzialmente sabbioso* (S, SF, FS), (2) *Franco / Medio impasto* (L, F, FL, FSA, FA), (3) *Tendenzialmente argilloso* (FLA, AS, AL, A). agrinutri's `tri3()` and `calc_soil_group_and_id_rag()` provide texture and soil group.
 
 **Maximum allowed doses (MAS):** Each crop has a ceiling for N and P₂O₅ that must not be exceeded. Use `get_MAS(crop)` and `check_MAS(crop, N_planned)` to retrieve and check against MAS (see section below).
 
-**Organic N efficiency (DPI):** The share of organic N available to the crop in the year of application depends on fertilizer type, **distribution technique** (efficient / medium / low), and **soil texture**. Efficient = injection, fertigation, incorporation within 4 h; medium = band spreading with quick incorporation; low = surface spreading without incorporation. Ammendanti compostati use a fixed 40% efficiency. NFert's `organic_fertilization()` uses factors by source and frequency; for DPI-specific efficiency by soil and distribution, refer to the FertDPI 'Efficienza' sheet or the regional guide.
+**Organic N efficiency (DPI):** The share of organic N available to the crop in the year of application depends on fertilizer type, **distribution technique** (efficient / medium / low), and **soil texture**. Efficient = injection, fertigation, incorporation within 4 h; medium = band spreading with quick incorporation; low = surface spreading without incorporation. Ammendanti compostati use a fixed 40% efficiency. agrinutri's `organic_fertilization()` uses factors by source and frequency; for DPI-specific efficiency by soil and distribution, refer to the FertDPI 'Efficienza' sheet or the regional guide.
 
 ## Package Overview
 
-NFert provides the following categories of functions:
+agrinutri provides the following categories of functions:
 
 1. **Field-scale nitrogen balance** - `N_balance()` plus the ten
    component helpers (crop demand, soil supply, leaching, immobilisation,
@@ -101,10 +101,10 @@ NFert provides the following categories of functions:
 
 ```{r installation}
 # If not already installed
-# install.packages("NFert")
+# install.packages("agrinutri")
 
 # Load the package
-library(NFert)
+library(agrinutri)
 
 # For precision agriculture functions, also load terra
 library(terra)
@@ -424,7 +424,7 @@ cat("Scenario 3:", round(N1 - N3, 2), "kg/ha (", round((N1-N3)/N1*100, 1), "%)\n
 
 # Precision Agriculture: NDVI-Based Variable Rate Application
 
-NFert supports precision agriculture through NDVI-based nitrogen rate estimation. Below, **maps** show example rasters (synthetic field); in practice you replace `ndvi_raster` with your Sentinel‑2 or UAV NDVI layer.
+agrinutri supports precision agriculture through NDVI-based nitrogen rate estimation. Below, **maps** show example rasters (synthetic field); in practice you replace `ndvi_raster` with your Sentinel‑2 or UAV NDVI layer.
 
 ## Method 1: Calibration Curve
 
@@ -774,9 +774,9 @@ head(uptake_table, 5)
 
 ## Getting Help
 
-- **Package documentation**: `help(package = "NFert")`
+- **Package documentation**: `help(package = "agrinutri")`
 - **Function help**: `?N_balance` or `?calc_crop_N_demand`
-- **GitHub issues**: Report bugs at https://github.com/mcroci/NFert/issues
+- **GitHub issues**: Report bugs at https://github.com/mcroci/agrinutri/issues
 - **Email**: Contact michele.croci@unicatt.it
 
 # References
@@ -790,4 +790,4 @@ head(uptake_table, 5)
 
 ---
 
-**Note**: The calculations in NFert follow regional guidelines for Emilia-Romagna, Italy. For other regions, coefficients and parameters may need adjustment based on local conditions and regulations.
+**Note**: The calculations in agrinutri follow regional guidelines for Emilia-Romagna, Italy. For other regions, coefficients and parameters may need adjustment based on local conditions and regulations.
