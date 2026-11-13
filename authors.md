@@ -21,7 +21,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/mcroci/agrinutri/blob/master/inst/CITATION)
+[`inst/CITATION`](https://github.com/mcroci/agrinutri/blob/v1.0.1/inst/CITATION)
 
 Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N,
 Tabaglio V, Amaducci S (2026). agrinutri: N, P and K Fertilization
