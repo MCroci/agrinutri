@@ -5,7 +5,7 @@ polygon along a user-supplied *A-B line* (or the longest edge of the
 field, if no A-B line is given) and assigns a target N rate to every
 strip according to the chosen variability method. The output is ready to
 be passed to
-[`export_prescription`](https://mcroci.github.io/NFert/reference/export_prescription.md)
+[`export_prescription`](https://mcroci.github.io/agrinutri/reference/export_prescription.md)
 for SHP / GeoJSON / ISOXML / John Deere / Trimble export.
 
 ## Usage
@@ -30,7 +30,7 @@ build_strip_prescription(
   thr_hi = 1.1,
   n_classes = 5,
   preserve_mean = TRUE,
-  crs_metric = 3857
+  crs_metric = NULL
 )
 ```
 
@@ -119,8 +119,11 @@ build_strip_prescription(
 
 - crs_metric:
 
-  EPSG code of a metric CRS used internally (default 3857, Web
-  Mercator). Use a local UTM for higher accuracy on larger fields.
+  EPSG code of the metric CRS in which strips are drawn. `NULL`
+  (default) uses the WGS 84 / UTM zone of the field centroid, so
+  `machine_width`, `cell_length` and `area_ha` are true ground distances
+  and areas. (Web Mercator, EPSG:3857, is not suitable: at 45 degrees
+  latitude it shrinks a 24 m width to about 17 m on the ground.)
 
 ## Value
 
@@ -176,14 +179,14 @@ the driving direction.
 
 ## See also
 
-[`export_prescription`](https://mcroci.github.io/NFert/reference/export_prescription.md),
-[`variable_rate_N`](https://mcroci.github.io/NFert/reference/variable_rate_N.md),
-[`compute_NNI_from_S2`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md)
+[`export_prescription`](https://mcroci.github.io/agrinutri/reference/export_prescription.md),
+[`variable_rate_N`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md),
+[`compute_NNI_from_S2`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
 
 ## Examples
 
 ``` r
-ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 field <- farm[1, ]  # 5.2 ha silage-maize plot
 
@@ -191,7 +194,6 @@ field <- farm[1, ]  # 5.2 ha silage-maize plot
 rx <- build_strip_prescription(field, machine_width = 24,
                                 variability = "uniform",
                                 n_target = 180)
-#> Warning: st_centroid assumes attributes are constant over geometries
 
 if (FALSE) { # \dontrun{
 # VI-based 40-180 band calibration, 36 m machine (supply `vi_raster` aligned to field)

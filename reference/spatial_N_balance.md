@@ -1,7 +1,7 @@
 # Spatially-explicit Nitrogen Balance
 
 Applies
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
 pixel-by-pixel to a set of soil-property rasters, returning one or more
 raster layers with the spatially-resolved balance terms.
 
@@ -64,7 +64,7 @@ spatial_N_balance(
 - crop:
 
   Character. Crop name (Italian or English, see
-  [`resolve_crop()`](https://mcroci.github.io/NFert/reference/resolve_crop.md)).
+  [`resolve_crop()`](https://mcroci.github.io/agrinutri/reference/resolve_crop.md)).
 
 - ccp:
 
@@ -85,7 +85,7 @@ spatial_N_balance(
 - source, fertorg_frequency, location, forg_quantity:
 
   Organic-fertilization parameters (see
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)).
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)).
 
 - terms:
 
@@ -94,13 +94,13 @@ spatial_N_balance(
   Default
   `c("A", "B", "C1", "C2", "D", "E", "F", "Forg", "G", "N_to_apply")`.
   Use `"all"` to return every column of the
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
   output.
 
 - ...:
 
   Additional arguments passed to
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md).
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md).
 
 ## Value
 
@@ -122,15 +122,15 @@ on a modern laptop.
 
 ## See also
 
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md),
-[`estimate_N_rate_from_holland_schepers()`](https://mcroci.github.io/NFert/reference/estimate_N_rate_from_holland_schepers.md)
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md),
+[`estimate_N_rate_from_holland_schepers()`](https://mcroci.github.io/agrinutri/reference/estimate_N_rate_from_holland_schepers.md)
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 library(terra)
-ext <- system.file("extdata", package = "NFert")
+ext <- system.file("extdata", package = "agrinutri")
 soil <- terra::rast(c(
   file.path(ext, "Cremonesi_TN.tif"),
   file.path(ext, "Cremonesi_SOM.tif"),

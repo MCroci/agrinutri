@@ -1,6 +1,6 @@
 # Farm-level balance and strip-prescription map
 
-This vignette walks through the end-to-end workflow that NFert v0.13
+This vignette walks through the end-to-end workflow that agrinutri v0.13
 supports:
 
 1.  Load a farm layout (GeoJSON) with per-plot agronomic inputs.
@@ -14,13 +14,13 @@ supports:
 
 The package ships with a fictitious 35.5 ha farm near Piacenza with 8
 plots carrying all the columns required by
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md):
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md):
 
 ``` r
 
-library(NFert)
+library(agrinutri)
 library(sf)
-ex   <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex   <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 farm[, c("plot_id", "plot_name", "crop", "area_ha")]
 #> Simple feature collection with 8 features and 4 fields
@@ -50,9 +50,9 @@ farm[, c("plot_id", "plot_name", "crop", "area_ha")]
 
 ## 2. Per-plot N balance
 
-[`farm_balance()`](https://mcroci.github.io/NFert/reference/farm_balance.md)
+[`farm_balance()`](https://mcroci.github.io/agrinutri/reference/farm_balance.md)
 applies
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
 to every feature and appends `N_target`, `MAS_cap`, `MAS_ok` and
 `N_total_kg` to the layer. Italian legacy strings are accepted in input
 and translated on the fly.
@@ -68,14 +68,14 @@ farm_out[, c("plot_id", "crop", "N_target", "MAS_cap",
 #> Bounding box:  xmin: 9.7122 ymin: 45.048 xmax: 9.7257 ymax: 45.05645
 #> Geodetic CRS:  WGS 84
 #>   plot_id                           crop N_target MAS_cap MAS_ok N_total_kg
-#> 1     P01       Silage maize (class 700)     29.9     340   TRUE      155.5
-#> 2     P02 Soft wheat FF - strong (grain)    194.9     200   TRUE      662.7
-#> 3     P03    Grain maize 500-700 (grain)     77.5     260   TRUE      604.5
-#> 4     P04                Soybean (grain)     29.7      NA  FALSE       62.4
-#> 5     P05                        Alfalfa      0.0      NA  FALSE        0.0
-#> 6     P06       Silage maize (class 500)     40.0      NA  FALSE      240.0
-#> 7     P07            Durum wheat (grain)    141.4     200   TRUE      523.2
-#> 8     P08                 Barley (grain)     32.2     180   TRUE       90.2
+#> 1     P01       Silage maize (class 700)     26.1     280   TRUE      135.7
+#> 2     P02 Soft wheat FF - strong (grain)    190.2     190  FALSE      646.7
+#> 3     P03    Grain maize 500-700 (grain)     73.6     280   TRUE      574.1
+#> 4     P04                Soybean (grain)      0.0      30   TRUE        0.0
+#> 5     P05                        Alfalfa      0.0     170   TRUE        0.0
+#> 6     P06       Silage maize (class 500)     35.5     280   TRUE      213.0
+#> 7     P07            Durum wheat (grain)    137.6     190   TRUE      509.1
+#> 8     P08                 Barley (grain)     27.6     150   TRUE       77.3
 #>                         geometry
 #> 1 POLYGON ((9.715 45.048, 9.7...
 #> 2 POLYGON ((9.7187 45.048, 9....
@@ -89,7 +89,7 @@ farm_out[, c("plot_id", "crop", "N_target", "MAS_cap",
 
 ## 3. Strip prescription along an A-B line
 
-[`build_strip_prescription()`](https://mcroci.github.io/NFert/reference/build_strip_prescription.md)
+[`build_strip_prescription()`](https://mcroci.github.io/agrinutri/reference/build_strip_prescription.md)
 tiles one plot with parallel strips of a user-supplied working width. If
 no A-B line is given, the longest side of the field is used as driving
 direction. Dose variability can be driven by a uniform target, a VI
@@ -162,9 +162,9 @@ rx_nni <- build_strip_prescription(
 
 ## 4. Export to tractor-ready formats
 
-[`export_prescription()`](https://mcroci.github.io/NFert/reference/export_prescription.md)
+[`export_prescription()`](https://mcroci.github.io/agrinutri/reference/export_prescription.md)
 writes a single file;
-[`export_prescription_all()`](https://mcroci.github.io/NFert/reference/export_prescription_all.md)
+[`export_prescription_all()`](https://mcroci.github.io/agrinutri/reference/export_prescription_all.md)
 bundles several formats in one output folder.
 
 ``` r
@@ -181,5 +181,5 @@ export_prescription_all(rx_uni, "rx_bundle", "campo_grande",
 ```
 
 The Shiny interface
-([`NFert::run_app()`](https://mcroci.github.io/NFert/reference/run_app.md))
+([`agrinutri::run_app()`](https://mcroci.github.io/agrinutri/reference/run_app.md))
 exposes the same flow with interactive forms and a leaflet preview.

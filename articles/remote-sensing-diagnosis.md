@@ -3,19 +3,19 @@
 ## Overview
 
 This vignette demonstrates the **remote-sensing diagnosis** pipeline
-added in NFert 0.7.0:
+added in agrinutri 0.7.0:
 
 1.  Compute multiple vegetation indices (VIs) from a multi-band raster
     with
-    [`compute_vi()`](https://mcroci.github.io/NFert/reference/compute_vi.md).
+    [`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md).
 2.  Diagnose crop nitrogen status pixel-by-pixel with
-    [`compute_NNI()`](https://mcroci.github.io/NFert/reference/compute_NNI.md)
+    [`compute_NNI()`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md)
     /
-    [`diagnose_N_status()`](https://mcroci.github.io/NFert/reference/diagnose_N_status.md),
+    [`diagnose_N_status()`](https://mcroci.github.io/agrinutri/reference/diagnose_N_status.md),
     using the species-specific critical nitrogen dilution curve of
     Lemaire & Gastal (1997).
 3.  Feed the diagnosis into the variable-rate prescription pipeline
-    ([`variable_rate_N()`](https://mcroci.github.io/NFert/reference/variable_rate_N.md))
+    ([`variable_rate_N()`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md))
     so that the applied dose responds to the NNI diagnosis rather than
     to a raw vegetation index alone.
 
@@ -35,9 +35,9 @@ the vignette is reproducible offline.
 
 ``` r
 
-library(NFert)
+library(agrinutri)
 library(terra)
-#> terra 1.9.34
+#> terra 1.9.50
 
 set.seed(1)
 template <- terra::rast(nrows = 40, ncols = 40,
@@ -55,7 +55,7 @@ names(s2) <- c("B03", "B04", "B05", "B08")
 
 ## 2. Multi-index VI engine
 
-[`compute_vi()`](https://mcroci.github.io/NFert/reference/compute_vi.md)
+[`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md)
 computes any of NDVI, NDRE, GNDVI, CIred-edge, MCARI, MSAVI2 from the
 stack, with configurable band mapping. Default mapping follows
 Sentinel-2 L2A naming.
@@ -93,7 +93,7 @@ GS30+ / V8+.
 
 ## 3. Critical-N curve
 
-[`critical_N_curve()`](https://mcroci.github.io/NFert/reference/critical_N_curve.md)
+[`critical_N_curve()`](https://mcroci.github.io/agrinutri/reference/critical_N_curve.md)
 returns the (a, b, W_min) coefficients of the species-specific critical
 nitrogen dilution curve. Italian synonyms are accepted.
 
@@ -122,12 +122,12 @@ critical_N_curve("mais")   # italian
 #> [1] 1
 #> 
 #> $reference
-#> [1] "Plenet & Lemaire 2000"
+#> [1] "Plenet & Lemaire 1999"
 ```
 
 The curve is Nc = a \* W^(-b), where Nc is the critical N concentration
 (% DM) and W the aboveground dry biomass (t DM / ha). Defaults come from
-Justes 1994 (wheat), Plenet & Lemaire 2000 (maize), Sheehy 1998 (rice),
+Justes 1994 (wheat), Plenet & Lemaire 1999 (maize), Sheehy 1998 (rice),
 Colnenne 1998 (rapeseed), Duru 1997 (grass), van Oosterom 2010
 (sorghum), Debaeke 2012 (sunflower).
 
@@ -217,7 +217,7 @@ d$curve
 ## 6. Diagnosis-guided variable rate
 
 The usual
-[`variable_rate_N()`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)
+[`variable_rate_N()`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)
 accepts any normalised VI. The diagnosis-guided upgrade is: (a) use a
 red-edge index for the VRT, and (b) zero out the prescription where the
 NNI diagnosis shows excessive N status, so fertiliser is not applied
@@ -269,11 +269,11 @@ cat("N saved by NNI mask     :",
 ## 7. Empirical NNI from a single VI raster (no GPR models)
 
 The full
-[`compute_NNI_from_S2()`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md)
+[`compute_NNI_from_S2()`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
 pipeline requires the 8 pyeogpr `.json` model files plus a 10-band
 Sentinel-2 L2A scene. When only a single VI raster is available (UAV
 NDRE, satellite NDVI, etc.), the helper
-[`nni_from_vi_empirical()`](https://mcroci.github.io/NFert/reference/nni_from_vi_empirical.md)
+[`nni_from_vi_empirical()`](https://mcroci.github.io/agrinutri/reference/nni_from_vi_empirical.md)
 delivers an NNI map directly through a published linear regression:
 
 ``` r
@@ -303,7 +303,7 @@ machine-width strips directly exportable to any tractor monitor:
 
 ``` r
 
-ex    <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex    <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 field <- sf::st_read(ex, quiet = TRUE)[1, ]
 
 rx <- build_strip_prescription(
@@ -319,17 +319,17 @@ export_prescription(rx, "rx_nni.shp", format = "shp")
 ## 9. Notes and limitations
 
 - The VIs and NNI require a **closed canopy** (W \>= W_min of the
-  species-specific curve). NFert clamps W at W_min internally, but
+  species-specific curve). agrinutri clamps W at W_min internally, but
   interpret outputs with care for early-vegetative imagery.
-- [`compute_vi()`](https://mcroci.github.io/NFert/reference/compute_vi.md)
+- [`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md)
   does *not* perform cloud masking; clean the input stack beforehand
   (Sentinel-2 L2A ships a SCL layer that can be used to mask classes 3,
   8, 9, 10 and 11).
 - The diagnosis-guided VRT in section 6 is a didactic example. A
   production pipeline should combine the NNI classes with the MAS cap
-  ([`get_MAS()`](https://mcroci.github.io/NFert/reference/get_MAS.md))
+  ([`get_MAS()`](https://mcroci.github.io/agrinutri/reference/get_MAS.md))
   and the ZVN 170 kg N/ha check from
-  [`plan_distribution()`](https://mcroci.github.io/NFert/reference/plan_distribution.md).
+  [`plan_distribution()`](https://mcroci.github.io/agrinutri/reference/plan_distribution.md).
 
 ## References
 
@@ -349,7 +349,7 @@ Li, F. et al. (2014). Improving estimation of summer maize nitrogen
 status with red edge-based spectral vegetation indices. F. Crops Res.
 157.
 
-Plenet, D. & Lemaire, G. (2000). Relationships between dynamics of
+Plenet, D. & Lemaire, G. (1999). Relationships between dynamics of
 nitrogen uptake and dry matter accumulation in maize crops. Plant Soil
 216.
 
@@ -358,13 +358,13 @@ nitrogen uptake and dry matter accumulation in maize crops. Plant Soil
 ``` r
 
 sessionInfo()
-#> R version 4.6.1 (2026-06-24)
+#> R version 4.6.2 (2026-10-29)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.4 LTS
+#> Running under: Ubuntu 26.04.1 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0
 #> 
 #> locale:
 #>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
@@ -379,15 +379,15 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] terra_1.9-34 NFert_0.14.0
+#> [1] terra_1.9-50    agrinutri_1.0.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] cli_3.6.6         knitr_1.51        rlang_1.2.0       xfun_0.59        
-#>  [5] otel_0.2.0        textshaping_1.0.5 jsonlite_2.0.0    htmltools_0.5.9  
-#>  [9] ragg_1.5.2        sass_0.4.10       rmarkdown_2.31    evaluate_1.0.5   
+#>  [1] cli_3.6.6         knitr_1.52        rlang_1.3.0       xfun_0.62        
+#>  [5] otel_0.3.0        textshaping_1.0.5 jsonlite_2.0.0    htmltools_0.5.9  
+#>  [9] ragg_1.5.2        sass_0.4.10       rmarkdown_2.32    evaluate_1.0.5   
 #> [13] jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  
-#> [17] compiler_4.6.1    codetools_0.2-20  fs_2.1.0          htmlwidgets_1.6.4
-#> [21] Rcpp_1.1.1-1.1    systemfonts_1.3.2 digest_0.6.39     R6_2.6.1         
-#> [25] bslib_0.11.0      tools_4.6.1       pkgdown_2.2.0     cachem_1.1.0     
+#> [17] compiler_4.6.2    codetools_0.2-20  fs_2.1.0          htmlwidgets_1.6.4
+#> [21] Rcpp_1.1.2        systemfonts_1.3.2 digest_0.6.39     R6_2.6.1         
+#> [25] bslib_0.12.0      tools_4.6.2       pkgdown_2.2.1     cachem_1.1.0     
 #> [29] desc_1.4.3
 ```

@@ -1,13 +1,13 @@
-# Launch the NFert Shiny web interface
+# Launch the agrinutri Shiny web interface
 
 Opens the bundled Shiny application in the user's default browser,
-exposing the core of the NFert package (N, P, K balance, distribution
-plan, variable-rate prescription, Sentinel-2 NNI pipeline and spatial
-balance) through interactive forms and maps. Two working modes are
-available: *agronomist view* (default, focused on the outputs actually
-needed for on-farm recommendations) and *research view* (toggle at the
-top-right of the navigation bar, exposes intermediate balance terms and
-coefficient overrides).
+exposing the core of the agrinutri package (N, P, K balance,
+distribution plan, variable-rate prescription, Sentinel-2 NNI pipeline
+and spatial balance) through interactive forms and maps. Two working
+modes are available: *agronomist view* (default, focused on the outputs
+actually needed for on-farm recommendations) and *research view* (toggle
+at the top-right of the navigation bar, exposes intermediate balance
+terms and coefficient overrides).
 
 ## Usage
 
@@ -45,7 +45,7 @@ Invisibly, the value returned by
 
 ``` r
 if (FALSE) { # \dontrun{
-NFert::run_app()                              # local, open in browser
-NFert::run_app(host = "0.0.0.0", port = 3838) # serve on the LAN
+agrinutri::run_app()                              # local, open in browser
+agrinutri::run_app(host = "0.0.0.0", port = 3838) # serve on the LAN
 } # }
 ```

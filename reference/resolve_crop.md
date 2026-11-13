@@ -1,8 +1,8 @@
 # Resolve a crop name (Italian or English) to its canonical entry
 
-NFert reference tables (`uptake_table`, `mas.table`, `crops.table`,
+agrinutri reference tables (`uptake_table`, `mas.table`, `crops.table`,
 `standard_pk_doses.table`) carry the canonical English crop names in the
-column `crop` (since NFert 0.12.0), with the Italian translation in
+column `crop` (since agrinutri 0.12.0), with the Italian translation in
 `crop_it` and a duplicate of the English name in `crop_en` for backward
 compatibility. This helper accepts any of the three forms
 (case-insensitive, whitespace-normalised, exact match) and returns the
@@ -11,7 +11,7 @@ canonical English key used for joins downstream.
 ## Usage
 
 ``` r
-resolve_crop(x, table = nfert_data_get("uptake_table"))
+resolve_crop(x, table = agrinutri_data_get("uptake_table"))
 ```
 
 ## Arguments
@@ -23,7 +23,7 @@ resolve_crop(x, table = nfert_data_get("uptake_table"))
 - table:
 
   Lookup table; default
-  [`NFert::uptake_table`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::uptake_table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

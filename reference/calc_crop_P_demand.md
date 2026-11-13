@@ -9,7 +9,7 @@ Returns the crop P2O5 requirement (kg/ha) from `uptake_table` (column
 calc_crop_P_demand(
   expected_yield_tons_ha,
   crop,
-  uptake_table = nfert_data_get("uptake_table")
+  uptake_table = agrinutri_data_get("uptake_table")
 )
 ```
 
@@ -26,7 +26,7 @@ calc_crop_P_demand(
 - uptake_table:
 
   Lookup table (default
-  [`NFert::uptake_table`](https://mcroci.github.io/NFert/reference/NFert-data.md)).
+  [`agrinutri::uptake_table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)).
 
 ## Value
 

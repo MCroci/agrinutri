@@ -14,13 +14,13 @@ calculate_N_fertilization(n_balance, method = "standard")
 - n_balance:
 
   A data frame returned by
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
   containing nitrogen balance components.
 
 - method:
 
-  The calculation method to use. Default is "standard" which uses the
-  DPI formula: N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+  The calculation method to use. Only "standard" (DPI balance) is
+  available.
 
 ## Value
 
@@ -29,13 +29,17 @@ kg/ha.
 
 ## Details
 
-This function calculates the final nitrogen fertilization requirement
-based on the nitrogen balance components. If the result is negative, it
-returns 0 (no fertilization needed).
+This function calculates the mineral nitrogen to apply from the nitrogen
+balance components, as Fert_Office v1.26 does: the balance
 
-The standard (DPI) formula is:
+    N = A - B + C1 + C2 + D - E - F - G
 
-    N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+is multiplied by the share admitted for the crop phase (`N_pct`; 0
+before planting, 1 for most phases), bounded to 0 and to the crop's
+ceiling (`N_limit`, usually 340 kg N/ha), and the current-year organic N
+`Forg` is then subtracted (the result is never negative):
+
+    N_fert = max(0, min(max(0, N * N_pct), N_limit) - Forg)
 
 Where:
 
@@ -61,7 +65,7 @@ Where:
 ``` r
 # Calculate nitrogen balance
 balance <- N_balance(
-  expected_yield_tons_ha = 15,
+  expected_yield_tons_ha = 60,
   crop = "Mais trinciato (classe 700)",
   ccp = "Spring-summer crop 100-130 days",
   sand = 50, clay = 35,
@@ -78,5 +82,5 @@ balance <- N_balance(
 # Calculate required nitrogen fertilization
 n_fert <- calculate_N_fertilization(balance)
 print(paste("Required N fertilization:", round(n_fert, 2), "kg/ha"))
-#> [1] "Required N fertilization: 0 kg/ha"
+#> [1] "Required N fertilization: 26.12 kg/ha"
 ```

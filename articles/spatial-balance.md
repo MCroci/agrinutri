@@ -2,34 +2,34 @@
 
 ## Overview
 
-This vignette demonstrates the full NFert spatial workflow:
+This vignette demonstrates the full agrinutri spatial workflow:
 
 1.  **Load** real soil-property rasters (bundled with the package)
 2.  **Compute** a spatially-explicit nitrogen balance with
-    [`spatial_N_balance()`](https://mcroci.github.io/NFert/reference/spatial_N_balance.md)
+    [`spatial_N_balance()`](https://mcroci.github.io/agrinutri/reference/spatial_N_balance.md)
 3.  **Generate** a variable-rate (VRT) prescription with
-    [`variable_rate_N()`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)
+    [`variable_rate_N()`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)
     (Holland & Schepers method)
 
 The workflow implements the pipeline described in Section 2.2 of the
-NFert SoftwareX article: the field-scale balance provides the
+agrinutri SoftwareX article: the field-scale balance provides the
 regulatory-compliant N target, and the VRT functions redistribute it in
 space under a mass-balance constraint.
 
 ## 1. Load the Cremonesi field rasters
 
-NFert ships with six GeoTIFF rasters for a 12-ha arable field near
+agrinutri ships with six GeoTIFF rasters for a 12-ha arable field near
 Cremona (Northern Italy), at ~3.5 m resolution: total nitrogen (TN, %),
 soil organic matter (SOM, %), clay, sand and silt content (%), and the
 C/N ratio.
 
 ``` r
 
-library(NFert)
+library(agrinutri)
 library(terra)
-#> terra 1.9.34
+#> terra 1.9.50
 
-ext <- system.file("extdata", package = "NFert")
+ext <- system.file("extdata", package = "agrinutri")
 
 # Read individually: the bundled GeoTIFFs may have sub-pixel extent
 # mismatches from separate acquisitions, so we resample to a common
@@ -84,9 +84,9 @@ terra::plot(soil[["Clay"]], main = "Clay (%)", col = heat.colors(30))
 
 ## 2. Compute the spatial nitrogen balance
 
-[`spatial_N_balance()`](https://mcroci.github.io/NFert/reference/spatial_N_balance.md)
+[`spatial_N_balance()`](https://mcroci.github.io/agrinutri/reference/spatial_N_balance.md)
 iterates
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
 over every non-NA pixel in the stack. Agronomic and climatic parameters
 (crop, yield, rainfall, previous crop, organic history) are uniform; the
 spatial variability is driven by the soil rasters alone.
@@ -122,8 +122,8 @@ n_map
 #>               Cremonesi_TN
 #>               ...
 #> names       :   A,         B,       C1, C2,         D, E, ...
-#> min values  : 234, 31.910442, 0.479317,  4, 19.573133, 0, ...
-#> max values  : 234, 35.665013, 0.510853,  4, 20.699504, 0, ...
+#> min values  : 234, 31.847374, 0.473399,  0, 19.554212, 0, ...
+#> max values  : 234, 35.605838, 0.504546,  0, 20.681751, 0, ...
 ```
 
 ``` r
@@ -140,7 +140,7 @@ The field-average N to apply is:
 ``` r
 
 terra::global(n_map[["N_to_apply"]], "mean", na.rm = TRUE)[1, 1]
-#> [1] 31.13807
+#> [1] 27.17487
 ```
 
 ## 3. Generate a synthetic NDVI raster
@@ -202,13 +202,13 @@ The field-mean VRT rate should match the balance-based N target:
 ``` r
 
 cat("Balance N target:", round(N_target, 1), "kg N/ha\n")
-#> Balance N target: 31.1 kg N/ha
+#> Balance N target: 27.2 kg N/ha
 cat("VRT field mean:  ", round(vr$mean_kg_ha, 1), "kg N/ha\n")
-#> VRT field mean:   31.1 kg N/ha
+#> VRT field mean:   27.2 kg N/ha
 cat("VRT range:       ",
     round(vr$min_kg_ha, 1), "–",
     round(vr$max_kg_ha, 1), "kg N/ha\n")
-#> VRT range:        0 – 60.4 kg N/ha
+#> VRT range:        0 – 52.7 kg N/ha
 ```
 
 ## 6. Export the prescription
@@ -223,7 +223,7 @@ terra::writeRaster(rx, "VRT_prescription_Cremonesi.tif", overwrite = TRUE)
 
 ## 7. Tractor-ready formats
 
-[`export_prescription()`](https://mcroci.github.io/NFert/reference/export_prescription.md)
+[`export_prescription()`](https://mcroci.github.io/agrinutri/reference/export_prescription.md)
 polygonises a raster on the fly and writes any of the seven formats
 accepted by modern on-board monitors (Shapefile, GeoJSON, KML,
 GeoPackage, John Deere-ready, Trimble-ready, ISOXML TASKDATA):
@@ -256,7 +256,7 @@ derived from the VRT raster (or from NNI / VI directly):
 ``` r
 
 # Field polygon from the same farm GeoJSON
-ex    <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex    <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 field <- sf::st_read(ex, quiet = TRUE)[1, ]
 
 rx_strip <- build_strip_prescription(

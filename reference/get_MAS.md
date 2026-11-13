@@ -16,26 +16,37 @@ get_MAS(crop = NULL, mas_table = NULL, edition = c("2026", "2025"))
 
 - crop:
 
-  Character. Crop name (as in DPI nomenclature). Use `get_MAS(NULL)` or
-  `get_MAS()` to list all crops.
+  Character. Crop name, in English (canonical, as in
+  `uptake_table$crop`) or Italian (Fert_Office label); matching is case-
+  and accent-insensitive, and a few generic DPI names (e.g.
+  `"Mais da insilato"`, `"Frumento tenero (granella)"`) are mapped to
+  the corresponding table row. Use `get_MAS()` to list all crops.
 
 - mas_table:
 
-  Data frame with columns `crop`, `mas_N`, `reference_yield`, `type`. If
-  NULL, uses the built-in table for the chosen `edition`.
+  Optional data frame with at least columns `crop` and `mas_N` (and
+  optionally `crop_it`, `crop_en`). If NULL, uses the built-in table for
+  the chosen `edition`.
 
 - edition:
 
-  Character. `"2026"` (default) or `"2025"`. 2025 = Guida DPI 2025 (ZVN
-  table); 2026 = FertDPI / Allegato 9 style.
+  Character. `"2026"` (default; DPI 2026 / Fert_Office v1.26, Reg. reg.
+  2/2024) or `"2025"` (Guida DPI 2025, ZVN table, 17 crops).
 
 ## Value
 
-For `get_MAS(crop)`: a one-row data frame with columns `crop`, `mas_N`,
-`reference_yield` (and if present `mas_P2O5`, `yield_ref_min`,
-`yield_ref_max`), `type`, or all rows if `crop` is NULL. For
-`check_MAS`: a list with `ok` (logical), `mas_N`, `N_planned`,
+For `get_MAS(crop)`: a one-row data frame with columns `crop`,
+`crop_it`, `crop_en`, `phase`, `mas_N` (kg N/ha; `NA` when the DPI sets
+no MAS), `reference_yield` (t/ha), `max_theoretical_N`, `standard_N`,
+`max_N_dose` and `note` (edition 2026), or all rows if `crop` is NULL.
+For `check_MAS`: a list with `ok` (logical), `mas_N`, `N_planned`,
 `message`.
+
+## Details
+
+The DPI 2026 values (default) are read from the bundled
+[mas.table](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)
+dataset, which mirrors the "MAS" sheet of Fert_Office v1.26 (239 crops).
 
 ## References
 
@@ -46,75 +57,51 @@ DPI 2026, FertDPI / Fert_Office_v1_26.
 ## Examples
 
 ``` r
-get_MAS("Frumento tenero (granella)")
-#>                         crop            crop_en mas_N mas_P2O5 yield_ref_min
-#> 1 Frumento tenero (granella) Soft wheat (grain)   200      100             6
-#>   yield_ref_max    type
-#> 1             8 Erbacee
+get_MAS("Grano duro (granella)")
+#>                   crop               crop_it             crop_en phase mas_N
+#> 49 Durum wheat (grain) Grano duro (granella) Durum wheat (grain)    nd   190
+#>    reference_yield max_theoretical_N standard_N max_N_dose         note
+#> 49               6               340        160        200 RR n. 2/2024
+get_MAS("Silage maize (class 700)")$mas_N
+#> [1] 280
 get_MAS("Frumento tenero (granella)", edition = "2025")  # ZVN 2025
 #>                         crop mas_N reference_yield    type
 #> 1 Frumento tenero (granella)   180             6.5 Erbacee
-get_MAS()  # list all
-#>                               crop
-#> 1       Frumento tenero (granella)
-#> 2       Grano tenero FF (granella)
-#> 3  Frumento tenero (pianta intera)
-#> 4            Grano duro (granella)
-#> 5                 Mais da granella
-#> 6                 Mais da insilato
-#> 7          Shredded corn class 700
-#> 8                             Orzo
-#> 9                         Girasole
-#> 10                            Soia
-#> 11           Pomodoro da industria
-#> 12                            Melo
-#> 13                            Pero
-#> 14               Pesco e Nettarine
-#> 15              Vite (uva da vino)
-#> 16                       Actinidia
-#> 17                        Ciliegio
-#>                                             crop_en mas_N mas_P2O5
-#> 1                                Soft wheat (grain)   200      100
-#> 2                    Soft wheat FF - strong (grain)   200      100
-#> 3                          Soft wheat (whole plant)   200      100
-#> 4                               Durum wheat (grain)   200      100
-#> 5                       Grain maize 500-700 (grain)   260      150
-#> 6                          Silage maize (class 700)   340      150
-#> 7                          Silage maize (class 700)   340      150
-#> 8                                    Barley (grain)   180       90
-#> 9                               Sunflower (achenes)   160       90
-#> 10                                  Soybean (grain)    NA      100
-#> 11                 Processing tomato (medium yield)   200      130
-#> 12                                            Apple   340      120
-#> 13                                             Pear   340      120
-#> 14                              Peach and Nectarine   340      175
-#> 15       Vineyard (plain) - grapes, wood and leaves   120       60
-#> 16 Kiwifruit (green flesh) - fruit, wood and leaves   340      150
-#> 17                                           Cherry   340      120
-#>    yield_ref_min yield_ref_max     type
-#> 1              6             8  Erbacee
-#> 2              6             8  Erbacee
-#> 3              6             8  Erbacee
-#> 4              5             6  Erbacee
-#> 5             10            13  Erbacee
-#> 6             40            50  Erbacee
-#> 7             40            50  Erbacee
-#> 8              5             7  Erbacee
-#> 9              2             3  Erbacee
-#> 10             3             4  Erbacee
-#> 11            70           100 Orticole
-#> 12            35            35  Arboree
-#> 13            30            30  Arboree
-#> 14            25            25  Arboree
-#> 15             8            12  Arboree
-#> 16            25            25  Arboree
-#> 17             9             9  Arboree
+head(get_MAS())  # full table
+#>                                                crop
+#> 1  Kiwifruit (green flesh) - fruit, wood and leaves
+#> 2 Kiwifruit (yellow flesh) - fruit, wood and leaves
+#> 3   Apricot (medium yield) - fruit, wood and leaves
+#> 4     Apricot (high yield) - fruit, wood and leaves
+#> 5        Other fruit trees - fruit, wood and leaves
+#> 6                   Orange - fruit, wood and leaves
+#>                                             crop_it
+#> 1      Actinidia polpa verde frutti, legno e foglie
+#> 2     Actinidia polpa gialla frutti, legno e foglie
+#> 3 Albicocco media produzione frutti, legno e foglie
+#> 4 Albicocco  alta produzione frutti, legno e foglie
+#> 5           Altri fruttiferi frutti, legno e foglie
+#> 6                    Arancio frutti, legno e foglie
+#>                                             crop_en phase mas_N reference_yield
+#> 1  Kiwifruit (green flesh) - fruit, wood and leaves    nd   150              25
+#> 2 Kiwifruit (yellow flesh) - fruit, wood and leaves    nd   150              25
+#> 3   Apricot (medium yield) - fruit, wood and leaves    nd   135              13
+#> 4     Apricot (high yield) - fruit, wood and leaves    nd   135              13
+#> 5        Other fruit trees - fruit, wood and leaves    nd    NA              NA
+#> 6                   Orange - fruit, wood and leaves    nd    NA              NA
+#>   max_theoretical_N standard_N max_N_dose         note
+#> 1               340        120        160 RR n. 2/2024
+#> 2               340        150        190 RR n. 2/2024
+#> 3               340         75        125 RR n. 2/2024
+#> 4               340        100        150 RR n. 2/2024
+#> 5               340         NA         NA         <NA>
+#> 6               340        120        170 RR n. 2/2024
 check_MAS("Mais da granella", 250)
 #> $ok
 #> [1] TRUE
 #> 
 #> $mas_N
-#> [1] 260
+#> [1] 280
 #> 
 #> $N_planned
 #> [1] 250
@@ -122,17 +109,17 @@ check_MAS("Mais da granella", 250)
 #> $message
 #> [1] "Planned N is within MAS."
 #> 
-check_MAS("Frumento tenero (granella)", 210)  # over MAS
+check_MAS("Grano duro (granella)", 210)  # over MAS
 #> $ok
 #> [1] FALSE
 #> 
 #> $mas_N
-#> [1] 200
+#> [1] 190
 #> 
 #> $N_planned
 #> [1] 210
 #> 
 #> $message
-#> [1] "Planned N (210 kg/ha) exceeds MAS (200 kg/ha)."
+#> [1] "Planned N (210 kg/ha) exceeds MAS (190 kg/ha)."
 #> 
 ```

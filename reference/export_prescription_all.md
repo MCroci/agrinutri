@@ -1,7 +1,7 @@
 # Export a prescription map in many formats at once
 
 Convenience wrapper around
-[`export_prescription`](https://mcroci.github.io/NFert/reference/export_prescription.md)
+[`export_prescription`](https://mcroci.github.io/agrinutri/reference/export_prescription.md)
 that writes several formats side-by-side into the same output directory.
 
 ## Usage
@@ -23,7 +23,7 @@ export_prescription_all(
 - x:
 
   Input map (`sf` or raster, see
-  [`export_prescription`](https://mcroci.github.io/NFert/reference/export_prescription.md)).
+  [`export_prescription`](https://mcroci.github.io/agrinutri/reference/export_prescription.md)).
 
 - output_dir:
 
@@ -42,7 +42,7 @@ export_prescription_all(
 - dose_field, area_min, isoxml_opts:
 
   Passed through to
-  [`export_prescription`](https://mcroci.github.io/NFert/reference/export_prescription.md).
+  [`export_prescription`](https://mcroci.github.io/agrinutri/reference/export_prescription.md).
 
 ## Value
 
@@ -50,14 +50,14 @@ Invisibly, a named list of file paths written (one entry per format).
 
 ## See also
 
-[`export_prescription`](https://mcroci.github.io/NFert/reference/export_prescription.md)
+[`export_prescription`](https://mcroci.github.io/agrinutri/reference/export_prescription.md)
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-farm <- NFert::farm_balance(
-  system.file("extdata/example_farm.geojson", package = "NFert"))
+farm <- agrinutri::farm_balance(
+  system.file("extdata/example_farm.geojson", package = "agrinutri"))
 export_prescription_all(farm, "rx_maps", "farm_2026",
   formats = c("shp", "geojson", "isoxml", "johndeere"))
 } # }

@@ -12,7 +12,7 @@ classify_K(
   value,
   unit = c("K", "K2O"),
   soil_group,
-  k_availability.table = nfert_data_get("k_availability.table")
+  k_availability.table = agrinutri_data_get("k_availability.table")
 )
 ```
 
@@ -33,7 +33,7 @@ classify_K(
 - k_availability.table:
 
   Lookup table, default
-  [`NFert::k_availability.table`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::k_availability.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

@@ -9,8 +9,8 @@ deposition based on location and crop category.
 natural_contribution(
   location = "Plain adjacent to urbanized areas",
   ccp = "Autumn-winter crop <150 days",
-  g.table = nfert_data_get("g.table"),
-  coef_time = nfert_data_get("coef_time")
+  g.table = agrinutri_data_get("g.table"),
+  coef_time = agrinutri_data_get("coef_time")
 )
 ```
 
@@ -32,14 +32,14 @@ natural_contribution(
   A data frame containing annual nitrogen deposition rates for different
   locations. It should have at least two columns: `location` (character)
   and `annual_deposition` (numeric). Defaults to
-  [`NFert::g.table`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::g.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 - coef_time:
 
   A data frame containing adjustment factors (C_tempo) based on crop
   category and planting period. It should have at least two columns:
   `ccp` (character) and `C_tempo` (numeric). Defaults to
-  [`NFert::coef_time`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::coef_time`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

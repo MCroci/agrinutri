@@ -15,9 +15,10 @@ soil_P_availability(
   soil_group,
   A_demand_P2O5,
   depth_cm = 30,
-  p_availability.table = nfert_data_get("p_availability.table"),
-  p_availability_meta = nfert_data_get("p_availability_meta"),
-  texture_groups.table = nfert_data_get("texture_groups.table")
+  total_carbonate = NULL,
+  p_availability.table = agrinutri_data_get("p_availability.table"),
+  p_availability_meta = agrinutri_data_get("p_availability_meta"),
+  texture_groups.table = agrinutri_data_get("texture_groups.table")
 )
 ```
 
@@ -39,11 +40,16 @@ soil_P_availability(
 - A_demand_P2O5:
 
   Crop P2O5 demand (kg/ha) (from
-  [`calc_crop_P_demand()`](https://mcroci.github.io/NFert/reference/calc_crop_P_demand.md)).
+  [`calc_crop_P_demand()`](https://mcroci.github.io/agrinutri/reference/calc_crop_P_demand.md)).
 
 - depth_cm:
 
   Soil depth used for weight (default 30 cm).
+
+- total_carbonate:
+
+  Total carbonate (CaCO3, percent) from the soil test. `NULL` (default)
+  uses the legacy constant immobilisation factor.
 
 - p_availability.table, p_availability_meta, texture_groups.table:
 
@@ -57,10 +63,20 @@ A list with `strategy`, `B1` (arricchimento kg/ha), `A_mantenimento`,
 
 ## Details
 
+In "Riduzione" (very high P) the crop removal A is kept and the excess
+over the upper bound of the normal range (68.7 ppm P2O5) times the soil
+weight is returned as B2, to be subtracted.
+
 The B1 arricchimento term equals the distance of the analytical value
-from the upper bound of the "bassa" class (22.9 ppm P2O5), multiplied by
-the soil weight at 30 cm (t/ha) and by the P immobilisation factor
-`P_immobilisation_factor = 1.6`.
+from the lower bound of the normal class (22.9 ppm P2O5), multiplied by
+the soil weight at 30 cm (t/ha) and by the P immobilisation factor. As
+in Fert_Office (foglio `Gri_P`, cell L10) the factor is the
+texture-group base value
+(`texture_groups.table$P_immobilisation_factor`: 1.2 sandy, 1.3 loamy,
+1.4 clay) plus 0.02 times the total carbonate content (percent). When
+`total_carbonate` is not supplied, the legacy constant
+`p_availability_meta$P_immobilisation_factor` (1.6, i.e. a loamy soil
+with 15 percent total carbonate) is used.
 
 ## Examples
 
@@ -77,7 +93,7 @@ soil_P_availability(olsen_value = 15, unit = "P2O5",
 #> [1] "low"
 #> 
 #> $B1
-#> [1] 49.296
+#> [1] 49.29605
 #> 
 #> $A_mantenimento
 #> [1] 63.6

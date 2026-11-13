@@ -8,7 +8,7 @@ previous crop.
 ``` r
 nitrogen_from_previous_crop_residues(
   previous_crop = "Winter cereals straw removal",
-  e.table = nfert_data_get("e.table")
+  e.table = agrinutri_data_get("e.table")
 )
 ```
 
@@ -24,7 +24,7 @@ nitrogen_from_previous_crop_residues(
   A data frame containing the nitrogen values (in kg/ha) for different
   previous crops. It should have at least two columns: `previous_crop`
   (character) and `N` (numeric). The default is
-  [`NFert::e.table`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::e.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

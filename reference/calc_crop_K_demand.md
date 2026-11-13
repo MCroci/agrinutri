@@ -8,7 +8,7 @@ Crop K2O demand
 calc_crop_K_demand(
   expected_yield_tons_ha,
   crop,
-  uptake_table = nfert_data_get("uptake_table")
+  uptake_table = agrinutri_data_get("uptake_table")
 )
 ```
 

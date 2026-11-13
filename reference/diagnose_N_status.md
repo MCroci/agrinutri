@@ -1,7 +1,7 @@
 # Diagnose crop N status from biomass and N content (NNI classes)
 
 Wraps
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md)
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md)
 and turns continuous NNI values into three discrete classes used for
 fertilisation diagnosis and for diagnostic maps in variable-rate
 applications.
@@ -34,7 +34,7 @@ diagnose_N_status(
 - crop:
 
   Crop identifier, passed to
-  [`critical_N_curve`](https://mcroci.github.io/NFert/reference/critical_N_curve.md).
+  [`critical_N_curve`](https://mcroci.github.io/agrinutri/reference/critical_N_curve.md).
 
 - curve:
 

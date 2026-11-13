@@ -12,7 +12,7 @@ value stored in `coef_time$ccp`:
 ## Usage
 
 ``` r
-resolve_ccp(x, table = nfert_data_get("coef_time"))
+resolve_ccp(x, table = agrinutri_data_get("coef_time"))
 ```
 
 ## Arguments
@@ -24,7 +24,7 @@ resolve_ccp(x, table = nfert_data_get("coef_time"))
 - table:
 
   Lookup with column `ccp`; default
-  [`NFert::coef_time`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::coef_time`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

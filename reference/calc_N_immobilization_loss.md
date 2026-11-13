@@ -52,7 +52,7 @@ The estimated nitrogen immobilization loss (D) in kg/ha.
 ## Details
 
 This function uses lookup tables (`ca.table` and `cb.table`) from the
-`NFert` package to determine the immobilization correction factor
+`agrinutri` package to determine the immobilization correction factor
 (`fc_D`) based on soil drainage and oxygen availability. The nitrogen
 immobilization loss is then calculated as:
 

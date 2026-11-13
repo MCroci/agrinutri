@@ -26,7 +26,7 @@ compute_NNI(N_content, biomass, crop, curve = NULL, is_percent = FALSE)
 - crop:
 
   Crop identifier, passed to
-  [`critical_N_curve`](https://mcroci.github.io/NFert/reference/critical_N_curve.md).
+  [`critical_N_curve`](https://mcroci.github.io/agrinutri/reference/critical_N_curve.md).
 
 - curve:
 

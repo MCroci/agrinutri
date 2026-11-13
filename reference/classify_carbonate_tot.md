@@ -7,7 +7,7 @@ Classify total carbonate (CaCO3 %)
 ``` r
 classify_carbonate_tot(
   caco3_tot,
-  total_carbonate.table = nfert_data_get("total_carbonate.table")
+  total_carbonate.table = agrinutri_data_get("total_carbonate.table")
 )
 ```
 

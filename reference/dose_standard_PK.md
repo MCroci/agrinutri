@@ -19,7 +19,7 @@ dose_standard_PK(
   P_increments = numeric(),
   K_decrements = numeric(),
   K_increments = numeric(),
-  standard_pk_doses.table = nfert_data_get("standard_pk_doses.table")
+  standard_pk_doses.table = agrinutri_data_get("standard_pk_doses.table")
 )
 
 scheda_PK(...)
@@ -47,13 +47,13 @@ scheda_PK(...)
 - P_decrements, P_increments, K_decrements, K_increments:
 
   Named numeric vectors of adjustments (kg/ha). See
-  [`scheda_N()`](https://mcroci.github.io/NFert/reference/dose_standard_N.md)
+  [`scheda_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md)
   for the same pattern.
 
 - standard_pk_doses.table:
 
   Lookup (default
-  [`NFert::standard_pk_doses.table`](https://mcroci.github.io/NFert/reference/NFert-data.md)).
+  [`agrinutri::standard_pk_doses.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)).
 
 - ...:
 

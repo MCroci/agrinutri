@@ -2,7 +2,7 @@
 
 Low-level helper that turns `LAI`, `Cm` and a canopy-N raster into the
 two layers consumed by
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md):
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md):
 the aboveground dry biomass `W` (t DM ha\\^{-1}\\) and the plant N
 concentration `N_actual` (pct DM).
 
@@ -40,7 +40,7 @@ biophysical_to_NNI_inputs(
 
   Leaf-to-total aboveground biomass allocation coefficient (default
   0.35; use
-  [`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md)
+  [`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md)
   for crop-specific values).
 
 - k_NChl:
@@ -58,12 +58,12 @@ biophysical_to_NNI_inputs(
 
 A named list with two SpatRaster layers, `W` and `N_actual`, ready to be
 passed to
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md).
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md).
 
 ## Details
 
 Most users should rather call the end-to-end
-[`compute_NNI_from_S2`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md)
+[`compute_NNI_from_S2`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
 wrapper, which handles crop-specific parameters, FVC / SCL masking and
 zone classification in a single call. This function is exposed for
 advanced workflows that need direct control over the conversion.
@@ -80,7 +80,7 @@ critical-N dilution curve is not defined below that biomass.
 
 ## See also
 
-[`compute_NNI_from_S2`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md),
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md),
-[`estimate_biophysical`](https://mcroci.github.io/NFert/reference/estimate_biophysical.md),
-[`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md)
+[`compute_NNI_from_S2`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md),
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md),
+[`estimate_biophysical`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md),
+[`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md)

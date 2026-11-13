@@ -15,7 +15,7 @@ dose_standard_N(
   phase = NULL,
   decrements = numeric(),
   increments = numeric(),
-  mas.table = nfert_data_get("mas.table"),
+  mas.table = agrinutri_data_get("mas.table"),
   apply_mas_cap = TRUE
 )
 
@@ -26,7 +26,7 @@ scheda_N(...)
 
 - crop:
 
-  Crop name exactly as in `NFert::mas.table$crop`.
+  Crop name exactly as in `agrinutri::mas.table$crop`.
 
 - phase:
 
@@ -50,7 +50,7 @@ scheda_N(...)
 - mas.table:
 
   Reference MAS lookup (default
-  [`NFert::mas.table`](https://mcroci.github.io/NFert/reference/NFert-data.md)).
+  [`agrinutri::mas.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)).
 
 - apply_mas_cap:
 

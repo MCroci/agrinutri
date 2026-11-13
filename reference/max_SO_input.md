@@ -9,7 +9,7 @@ dry matter t/ha, based on the classification of initial SO in soil:
 ``` r
 max_SO_input(
   so_class = c("Poor", "Normal", "Rich"),
-  so_max_input = nfert_data_get("so_max_input")
+  so_max_input = agrinutri_data_get("so_max_input")
 )
 ```
 
@@ -22,7 +22,7 @@ max_SO_input(
 - so_max_input:
 
   Lookup table (default
-  [`NFert::so_max_input`](https://mcroci.github.io/NFert/reference/NFert-data.md)).
+  [`agrinutri::so_max_input`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)).
 
 ## Value
 

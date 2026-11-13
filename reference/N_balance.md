@@ -1,7 +1,10 @@
 # Nitrogen Balance Calculation
 
-Calculates the nitrogen balance of a crop considering various soil and
-environmental factors.
+Calculates the nitrogen balance of a crop with the DPI Emilia-Romagna
+2026 balance method (Allegato 2), reproducing the regional tool
+Fert_Office v1.26 term by term. Where the printed DPI tables and
+Fert_Office differ, agrinutri follows Fert_Office (see
+[`vignette("agrinutri-PK-and-distribution")`](https://mcroci.github.io/agrinutri/articles/agrinutri-PK-and-distribution.md)).
 
 ## Usage
 
@@ -28,7 +31,8 @@ N_balance(
   distribution_efficiency = NULL,
   soil_seeding = c("traditional", "no-till"),
   greenhouse = FALSE,
-  E_to_D = TRUE
+  E_to_D = TRUE,
+  n_fixation_pct = NULL
 )
 ```
 
@@ -99,7 +103,7 @@ N_balance(
   Quantity of organic fertilizer applied (m3/ha or t/ha, depending on
   source). Use `0` for no organic application: `Forg` is set to 0
   without calling
-  [`organic_fertilization()`](https://mcroci.github.io/NFert/reference/organic_fertilization.md).
+  [`organic_fertilization()`](https://mcroci.github.io/agrinutri/reference/organic_fertilization.md).
 
 - organic_previous_year_N:
 
@@ -113,7 +117,7 @@ N_balance(
   Optional override for DPI organic-N efficiency (texture class). When
   `NULL` (default), `N_balance()` uses the `soil.group` computed from
   `sand` and `clay` via
-  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/NFert/reference/calc_soil_group_and_id_rag.md),
+  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md),
   so current-year organic (`Forg`) follows the same texture as `B`.
 
 - distribution_efficiency:
@@ -125,8 +129,9 @@ N_balance(
 
 - soil_seeding:
 
-  One of `"traditional"` (default) or `"no-till"`. If `"no-till"`, DPI
-  2026 applies a 3 kg/ha reduction to b1 (readily available N).
+  One of `"traditional"` (default) or `"no-till"`. If `"no-till"`, the
+  soil supply B is reduced by 10 kg/ha (DPI Allegato 2), for crops with
+  a cycle shorter than one year where the DPI allows it.
 
 - greenhouse:
 
@@ -139,7 +144,18 @@ N_balance(
   is added to `D` as in Fert_Office v1.26 sheet C&D, and `E` in the
   output is set to 0. If `FALSE`, `E` stays negative and the balance
   uses
-  [`calculate_N_fertilization()`](https://mcroci.github.io/NFert/reference/calculate_N_fertilization.md).
+  [`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md).
+  `E` is counted only for crop phases where the DPI counts the
+  precession (`coef_time$precession_to_count`), i.e. not for perennial
+  crops in production.
+
+- n_fixation_pct:
+
+  Share (%) of the legume N demand covered by biological fixation.
+  `NULL` (default) uses the value proposed for the crop
+  (`crops.table$n_fixation_pct`). It is booked under `G` when the
+  balance is positive, as in Fert_Office; a value lower than the crop's
+  default (lacking inoculation) lowers the dose ceiling to 120 kg N/ha.
 
 ## Value
 
@@ -148,19 +164,19 @@ in kg/ha):
 
 - A: Total nitrogen demand of the crop (kg/ha).
 
-- B: Total soil nitrogen supply (sum of b1 and b2) (kg/ha).
+- B: Total soil nitrogen supply, b1 + b2 - no-till reduction (kg/ha).
 
 - b1: Readily available mineral nitrogen (DPI B2) (kg/ha).
 
 - b2: Mineralizable N from soil organic matter (DPI B1) (kg/ha).
 
-- C1: Nitrogen leaching loss in winter (kg/ha).
+- C1: Nitrogen leaching loss in autumn-winter (Ca) (kg/ha).
 
-- C2: Nitrogen leaching loss in spring (kg/ha).
+- C2: Nitrogen leaching loss at the end of winter (Cb) (kg/ha).
 
 - D: Nitrogen immobilization loss (kg/ha). Includes the abs(E)
   contribution if `E_to_D = TRUE` and E \< 0, and `+2` if
-  `greenhouse = TRUE`.
+  `greenhouse = TRUE` (not part of the Fert_Office v1.26 balance sheet).
 
 - E: Nitrogen from previous crop residues (kg/ha). If `E_to_D = TRUE`
   and the raw value is negative, this column reports 0 (moved to D).
@@ -170,28 +186,37 @@ in kg/ha):
 - Forg: Nitrogen from organic fertilizer (current year, efficient N)
   (kg/ha).
 
-- G: Natural nitrogen contribution (e.g., from rainfall) (kg/ha).
+- G: Natural contributions (kg/ha): `G_deposition` (atmospheric
+  deposition x time coefficient) plus `G_fixation` (legume N fixation).
+
+- no_till_reduction: Reduction of B for no-till seeding (kg/ha).
+
+- C_tempo, N_pct, N_limit: time coefficient of the phase, share of the
+  balance admitted for the phase and dose ceiling (kg/ha), used by
+  [`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md).
 
 - surplus_pluviometrico: Logical flag (DPI 2026 standard sheet, surplus
   rain).
 
 ## Details
 
-The nitrogen fertilization requirement (DPI formula) is: N_fert = A -
-B + C1 + C2 + D - E - F - Forg - G
+The nitrogen fertilization requirement (DPI formula) is: N = A - B +
+C1 + C2 + D - E - F - G, scaled by `N_pct`, bounded to ; the
+current-year organic N `Forg` is then subtracted to give the mineral N
+([`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md)).
 
 ## Examples
 
 ``` r
-N_balance(expected_yield_tons_ha = 15, crop = "Mais trinciato (classe 700)",
+N_balance(expected_yield_tons_ha = 60, crop = "Mais trinciato (classe 700)",
           ccp = "Spring-summer crop 100-130 days", sand = 50, clay = 35,
           Ntot = 1.2, SOM = 1.2, CN = 9.5, oxygen_availability = "Normal",
           winter_rain = 160, start_spring_rain = 40,
           prev_crop = "Winter cereals straw removal", source = "Cattle slurry",
           fertorg_frequency = "every year", location = "Plain adjacent to urbanized areas",
           forg_quantity = 100)
-#>      A      B    b1    b2    C1 C2       D E F   Forg    G
-#> 1 58.5 38.808 29.16 9.648 2.916  4 21.6424 0 0 180.45 13.4
-#>   surplus_pluviometrico
-#> 1                 FALSE
+#>     A      B   b1    b2   C1 C2       D E F   Forg    G G_deposition G_fixation
+#> 1 234 38.448 28.8 9.648 2.88  0 21.5344 0 0 180.45 13.4         13.4          0
+#>   no_till_reduction C_tempo N_pct N_limit surplus_pluviometrico
+#> 1                 0    0.67     1     340                 FALSE
 ```

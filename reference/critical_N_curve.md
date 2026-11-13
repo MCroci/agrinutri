@@ -36,7 +36,7 @@ Published references:
 - **durum wheat**: same as wheat (Prey & Schmidhalter 2019)
 
 - **maize (C4)**: a = 3.40, b = 0.37, W_min = 1.00 (Plenet & Lemaire
-  2000)
+  1999)
 
 - **rice**: a = 5.18, b = 0.52, W_min = 1.00 (Sheehy et al. 1998)
 
@@ -59,6 +59,6 @@ Crops. Springer, Berlin.
 Justes, E. et al. (1994). Determination of a critical nitrogen dilution
 curve for winter wheat crops. Ann. Bot. 74, 397-407.
 
-Plenet, D. & Lemaire, G. (2000). Relationships between dynamics of
+Plenet, D. & Lemaire, G. (1999). Relationships between dynamics of
 nitrogen uptake and dry matter accumulation in maize crops.
 Determination of critical N concentration. Plant Soil 216, 65-82.

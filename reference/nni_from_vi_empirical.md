@@ -1,7 +1,7 @@
 # Empirical NNI from a vegetation index (no GPR models required)
 
 Alternative to the GPR-based
-[`compute_NNI_from_S2`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md)
+[`compute_NNI_from_S2`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
 pipeline that lets the user derive a Nitrogen Nutrition Index map
 directly from a single vegetation index raster (NDRE, NDVI, or a
 red-edge chlorophyll index) using a published crop-specific empirical
@@ -91,9 +91,9 @@ chlorophyll content index (CCCI). Field Crops Res 2010;116:318-324.
 
 ## See also
 
-[`compute_NNI_from_S2`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md)
+[`compute_NNI_from_S2`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
 for the rigorous PROSAIL + GPR pipeline;
-[`compute_vi`](https://mcroci.github.io/NFert/reference/compute_vi.md)
+[`compute_vi`](https://mcroci.github.io/agrinutri/reference/compute_vi.md)
 for index computation from raw bands.
 
 ## Examples

@@ -4,7 +4,7 @@ Calculates the amount of nitrogen (N) supplied to the soil through
 organic fertilization. Optionally applies **DPI efficiency** by material
 type, soil `distribution_efficiency` are both given). If either is
 `NULL`, falls back to `f.table`: `value * quantity / 100`. Function
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
 passes computed soil texture and defaults distribution to `"medium"` so
 `Forg` matches the DPI path used by Fert_Office (*Apporti al terreno*).
 In the balance formula the term to subtract is the **efficient N** (N
@@ -20,7 +20,7 @@ organic_fertilization(
   quantity = 100,
   soil_group = NULL,
   distribution_efficiency = NULL,
-  f.table = nfert_data_get("f.table")
+  f.table = agrinutri_data_get("f.table")
 )
 ```
 
@@ -44,7 +44,7 @@ organic_fertilization(
 - soil_group:
 
   Optional. Soil group from
-  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/NFert/reference/calc_soil_group_and_id_rag.md)
+  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md)
   (e.g. "Sandy textures", "Franco") to use DPI efficiency by texture. If
   `NULL`, efficiency is taken from `f.table` (no texture/distribution).
 
@@ -58,7 +58,7 @@ organic_fertilization(
 
   A data frame with columns `source`, `frequency`, `value`. Used when
   `soil_group` is `NULL`. Default is
-  [`NFert::f.table`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::f.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

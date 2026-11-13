@@ -1,14 +1,15 @@
 # Variable-rate nitrogen from balance + NDVI
 
 Bridges the constant-rate output of
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md) /
-[`calculate_N_fertilization()`](https://mcroci.github.io/NFert/reference/calculate_N_fertilization.md)
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
+/
+[`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md)
 or
-[`scheda_N()`](https://mcroci.github.io/NFert/reference/dose_standard_N.md)
-with the spatial NDVI-based variable-rate estimators of NFert
-([`estimate_N_rate_from_calibration_curve()`](https://mcroci.github.io/NFert/reference/estimate_N_rate_from_calibration_curve.md)
+[`scheda_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md)
+with the spatial NDVI-based variable-rate estimators of agrinutri
+([`estimate_N_rate_from_calibration_curve()`](https://mcroci.github.io/agrinutri/reference/estimate_N_rate_from_calibration_curve.md)
 and
-[`estimate_N_rate_from_holland_schepers()`](https://mcroci.github.io/NFert/reference/estimate_N_rate_from_holland_schepers.md)).
+[`estimate_N_rate_from_holland_schepers()`](https://mcroci.github.io/agrinutri/reference/estimate_N_rate_from_holland_schepers.md)).
 
 ## Usage
 
@@ -38,8 +39,8 @@ variable_rate_N(
 - n_dose:
 
   Numeric. Field-average N dose (kg/ha) from
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md) +
-  [`calculate_N_fertilization()`](https://mcroci.github.io/NFert/reference/calculate_N_fertilization.md),
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md) +
+  [`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md),
   `scheda_N()$dose_final`, or any custom target.
 
 - method:
@@ -61,7 +62,7 @@ variable_rate_N(
 
   Numeric or NULL. If provided, caps the per-pixel rate so it never
   exceeds the MAS limit (e.g. from
-  [`get_MAS()`](https://mcroci.github.io/NFert/reference/get_MAS.md)).
+  [`get_MAS()`](https://mcroci.github.io/agrinutri/reference/get_MAS.md)).
 
 - plot:
 
@@ -107,15 +108,16 @@ Two integration patterns are supported:
     algorithm.
 
 The output preserves the field-average dose computed by the balance: the
-raster of variable rates integrates (mean) to approximately the input
-`n_dose`, ensuring the agronomic constraint (MAS, ZVN) is respected.
+raster of variable rates has a mean equal to the input `n_dose`
+(water-filling rescaling within ), so the agronomic constraint (MAS,
+ZVN) is kept.
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 library(terra)
-library(NFert)
+library(agrinutri)
 # NDVI raster
 data(s2.rast)
 ndvi <- terra::rast(s2.rast)   # s2.rast is a PackedSpatRaster; unwrap it
@@ -132,11 +134,11 @@ bal <- N_balance(expected_yield_tons_ha = 6,
                  source = "None", fertorg_frequency = "every year",
                  location = "Plain adjacent to urbanized areas",
                  forg_quantity = 0)
-n_dose <- calculate_N_fertilization(bal)   # ~142 kg/ha
+n_dose <- calculate_N_fertilization(bal)   # ~128 kg/ha
 
 # 2) Spatialise via NDVI calibration
 vr <- variable_rate_N(ndvi, n_dose = n_dose, method = "calibration",
-                      mas_cap = get_MAS("Grano duro (pianta intera)")$N_max)
+                      mas_cap = get_MAS("Grano duro (pianta intera)")$mas_N)
 terra::plot(vr$rate_raster)
 vr$mean_kg_ha
 } # }

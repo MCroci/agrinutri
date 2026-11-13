@@ -6,7 +6,7 @@ percentages.
 ## Usage
 
 ``` r
-tri3(clay = 10, sand = 35, tri3.table = nfert_data_get("tri3.table"))
+tri3(clay = 10, sand = 35, tri3.table = agrinutri_data_get("tri3.table"))
 ```
 
 ## Arguments
@@ -34,8 +34,13 @@ not fall within the defined classes in `tri3.table`, returns NA.
 
 - This function provides a simplified classification based on the USDA
   soil texture triangle. For a more detailed classification, consider
-  using the [`tri2()`](https://mcroci.github.io/NFert/reference/tri2.md)
+  using the
+  [`tri2()`](https://mcroci.github.io/agrinutri/reference/tri2.md)
   function.
+
+- As in Fert_Office (foglio `Suolo`), `clay` and `sand` are truncated to
+  whole percentages (`INT`) before the triangle lookup, so 40.6 % clay
+  is read as 40 %.
 
 - Ensure that `clay` and `sand` percentages are valid (within 0-100) and
   their sum does not exceed 100.

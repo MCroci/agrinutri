@@ -1,9 +1,9 @@
 # End-to-end Nitrogen Nutrition Index pipeline from Sentinel-2 L2A
 
 Combines the outputs of
-[`estimate_biophysical`](https://mcroci.github.io/NFert/reference/estimate_biophysical.md)
+[`estimate_biophysical`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md)
 with a crop- specific critical-N dilution curve
-([`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md))
+([`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md))
 to produce a pixel-level NNI map and the derived agronomic zones
 (*deficient* / *optimal* / *excessive*) in a single call.
 
@@ -30,7 +30,7 @@ compute_NNI_from_S2(
 - lai_rast:
 
   SpatRaster or path to the LAI layer produced by
-  [`estimate_biophysical`](https://mcroci.github.io/NFert/reference/estimate_biophysical.md).
+  [`estimate_biophysical`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md).
 
 - cm_rast:
 
@@ -48,12 +48,12 @@ compute_NNI_from_S2(
 - crop:
 
   Character. Crop name, resolved via
-  [`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md).
+  [`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md).
 
 - params:
 
   Optional list overriding the defaults returned by
-  [`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md)
+  [`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md)
   (e.g. for locally calibrated `alpha_leaf` or `k_NChl`).
 
 - fvc:
@@ -111,7 +111,7 @@ W\$\$ \$\$N_c(\\) = a \cdot (W\_{tha})^{-b}\$\$ \$\$NNI = N\_{actual} /
 N_c\$\$ where \\\alpha\_{leaf}\\ is the leaf-to-total aboveground
 allocation coefficient and \\k\\ the N-to-chlorophyll ratio (both
 crop-specific, see
-[`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md)).
+[`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md)).
 \\W\_{tha}\\ is W rescaled to t DM ha\\^{-1}\\.
 
 Two N-content pathways are supported:
@@ -123,7 +123,7 @@ Two N-content pathways are supported:
 - **Chlorophyll path** (`cnc_layer = "CNC_Cab"`). Uses the canopy
   chlorophyll retrieval and multiplies it by a canopy-level N:Chl ratio
   \\k\\ (default ~55-60, requires local calibration — see
-  [`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md)).
+  [`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md)).
   Preferred only when CNC_Cab is the best-trained model for the target
   crop or when the calibration work has already been done.
 
@@ -170,11 +170,11 @@ content. Eur J Agron 2007;27:1-11.
 
 ## See also
 
-[`estimate_biophysical`](https://mcroci.github.io/NFert/reference/estimate_biophysical.md),
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md),
-[`diagnose_N_status`](https://mcroci.github.io/NFert/reference/diagnose_N_status.md),
-[`crop_params_NNI`](https://mcroci.github.io/NFert/reference/crop_params_NNI.md),
-[`variable_rate_N`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)
+[`estimate_biophysical`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md),
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md),
+[`diagnose_N_status`](https://mcroci.github.io/agrinutri/reference/diagnose_N_status.md),
+[`crop_params_NNI`](https://mcroci.github.io/agrinutri/reference/crop_params_NNI.md),
+[`variable_rate_N`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)
 
 ## Examples
 

@@ -4,7 +4,7 @@ Returns the fraction of total organic N that is available to the crop in
 the year of application, according to DPI (tipo di effluente, tessitura,
 modalita di distribuzione). Used when `soil_group` and
 `distribution_efficiency` are passed to
-[`organic_fertilization()`](https://mcroci.github.io/NFert/reference/organic_fertilization.md).
+[`organic_fertilization()`](https://mcroci.github.io/agrinutri/reference/organic_fertilization.md).
 
 ## Usage
 
@@ -21,7 +21,7 @@ organic_N_efficiency(source, soil_group, distribution_efficiency)
 - soil_group:
 
   Character. Soil group from
-  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/NFert/reference/calc_soil_group_and_id_rag.md)
+  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md)
   (e.g. "Sandy textures", "Franco", "Clayey") or DPI class: "sabbioso",
   "franco", "argilloso".
 

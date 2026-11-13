@@ -2,7 +2,7 @@
 
 Generates a spatially explicit nitrogen prescription that combines the
 regulatory cap from the Italian DPI nutrient balance (computed by
-[`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md))
+[`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md))
 with the local economic optimum nitrogen rate (EONR) computed by the
 QUEFTS crop model via **Rquefts**, redistributed across the field
 according to Sentinel-2 nitrogen status (NNI) under a mass-balance
@@ -28,7 +28,7 @@ optimize_VR_DPI(
 - field_inputs:
 
   Named list of inputs accepted by
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
   (e.g. `crop`, `ccp`, `expected_yield_tons_ha`, `sand`, `clay`, ...).
   Extra elements are ignored.
 
@@ -42,7 +42,7 @@ optimize_VR_DPI(
 - crop_params:
 
   Either `NULL` (use
-  [`nfert_to_quefts_crop()`](https://mcroci.github.io/NFert/reference/nfert_to_quefts_crop.md)
+  [`agrinutri_to_quefts_crop()`](https://mcroci.github.io/agrinutri/reference/agrinutri_to_quefts_crop.md)
   on `field_inputs$crop`), a character string (same lookup), or a named
   list of QUEFTS crop parameters passed straight to
   [`Rquefts::quefts()`](https://rdrr.io/pkg/Rquefts/man/quefts.html).
@@ -112,9 +112,9 @@ A list with:
 Four layers:
 
 1.  **Compliance:**
-    [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+    [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
     DPI dose; cap with
-    [`get_MAS()`](https://mcroci.github.io/NFert/reference/get_MAS.md)
+    [`get_MAS()`](https://mcroci.github.io/agrinutri/reference/get_MAS.md)
     and optional ZVN field-mean 170 kg N/ha.
 
 2.  **Spatial:** NNI drives relative deficit weights (lower NNI, higher

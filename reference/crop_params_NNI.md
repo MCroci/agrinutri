@@ -2,7 +2,7 @@
 
 This function returns the default parameters used by the remote-sensing
 NNI pipeline
-([`compute_NNI_from_S2`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md))
+([`compute_NNI_from_S2`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md))
 for a given crop. Values are taken from the peer-reviewed literature and
 represent first-guess defaults — they almost always require local
 recalibration before operational use (see the *Calibration caveats*

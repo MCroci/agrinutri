@@ -16,10 +16,16 @@ DPI 2026 7-class scheme from Fert_Office v1.26 foglio `pH`:
 
 - fortemente alcalino: \> 8.6
 
+The class is found as in Fert_Office (`VLOOKUP` on the lower thresholds
+0, 5.4, 6.0, 6.7, 7.3, 8.1, 8.61), so a value equal to a threshold falls
+in the upper class: for instance pH 6.0 is "leggermente acido". The
+ranges above are those printed in the DPI table for one-decimal pH
+readings.
+
 ## Usage
 
 ``` r
-classify_pH(pH, ph.table = nfert_data_get("ph.table"))
+classify_pH(pH, ph.table = agrinutri_data_get("ph.table"))
 ```
 
 ## Arguments
@@ -31,7 +37,7 @@ classify_pH(pH, ph.table = nfert_data_get("ph.table"))
 - ph.table:
 
   Lookup (default
-  [`NFert::ph.table`](https://mcroci.github.io/NFert/reference/NFert-data.md)).
+  [`agrinutri::ph.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)).
 
 ## Value
 

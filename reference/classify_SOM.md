@@ -8,7 +8,7 @@ maximum annual SO input.
 ## Usage
 
 ``` r
-classify_SOM(SOM, soil_group, so.table = nfert_data_get("so.table"))
+classify_SOM(SOM, soil_group, so.table = agrinutri_data_get("so.table"))
 ```
 
 ## Arguments
@@ -24,7 +24,7 @@ classify_SOM(SOM, soil_group, so.table = nfert_data_get("so.table"))
 - so.table:
 
   Lookup (default
-  [`NFert::so.table`](https://mcroci.github.io/NFert/reference/NFert-data.md)).
+  [`agrinutri::so.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)).
 
 ## Value
 

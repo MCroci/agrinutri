@@ -11,8 +11,8 @@ the conversion factor is P2O5 = P / 0.436681.
 classify_P_olsen(
   value,
   unit = c("P", "P2O5"),
-  p_availability.table = nfert_data_get("p_availability.table"),
-  p_availability_meta = nfert_data_get("p_availability_meta")
+  p_availability.table = agrinutri_data_get("p_availability.table"),
+  p_availability_meta = agrinutri_data_get("p_availability_meta")
 )
 ```
 
@@ -29,12 +29,12 @@ classify_P_olsen(
 - p_availability.table:
 
   Lookup table, default
-  [`NFert::p_availability.table`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::p_availability.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 - p_availability_meta:
 
   Conversion metadata, default
-  [`NFert::p_availability_meta`](https://mcroci.github.io/NFert/reference/NFert-data.md).
+  [`agrinutri::p_availability_meta`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md).
 
 ## Value
 

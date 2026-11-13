@@ -1,9 +1,9 @@
 # Export a variable-rate prescription map for farm machinery
 
 Writes a prescription layer (an `sf` polygons object or a raster from
-[`variable_rate_N`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)
+[`variable_rate_N`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)
 /
-[`farm_balance`](https://mcroci.github.io/NFert/reference/farm_balance.md))
+[`farm_balance`](https://mcroci.github.io/agrinutri/reference/farm_balance.md))
 in one of the formats accepted by the on-board monitors of modern
 tractors and sprayers. Supported formats: plain Shapefile, GeoJSON, KML,
 GeoPackage, *John Deere-ready* Shapefile, *Trimble- ready* Shapefile and
@@ -27,9 +27,9 @@ export_prescription(
 - x:
 
   Input map. Either an `sf` polygons object (as returned by
-  [`farm_balance`](https://mcroci.github.io/NFert/reference/farm_balance.md))
+  [`farm_balance`](https://mcroci.github.io/agrinutri/reference/farm_balance.md))
   or a `RasterLayer` / `SpatRaster` (as returned by
-  [`variable_rate_N`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)).
+  [`variable_rate_N`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)).
   Rasters are polygonised via
   [`terra::as.polygons()`](https://rspatial.github.io/terra/reference/as.polygons.html)
   before export.
@@ -86,16 +86,16 @@ WGS84, validity cleaning, field renaming and sliver removal).
 
 ## See also
 
-[`export_prescription_all`](https://mcroci.github.io/NFert/reference/export_prescription_all.md),
-[`variable_rate_N`](https://mcroci.github.io/NFert/reference/variable_rate_N.md),
-[`farm_balance`](https://mcroci.github.io/NFert/reference/farm_balance.md)
+[`export_prescription_all`](https://mcroci.github.io/agrinutri/reference/export_prescription_all.md),
+[`variable_rate_N`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md),
+[`farm_balance`](https://mcroci.github.io/agrinutri/reference/farm_balance.md)
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-farm <- NFert::farm_balance(
-  system.file("extdata/example_farm.geojson", package = "NFert"))
+farm <- agrinutri::farm_balance(
+  system.file("extdata/example_farm.geojson", package = "agrinutri"))
 
 # Universal Shapefile
 export_prescription(farm, "field_rx.shp")

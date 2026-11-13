@@ -3,7 +3,7 @@
 Convenience wrapper that returns the integer 1/2/3 for any soil group
 text (Italian plural, singular or English) or, alternatively, derives it
 from clay and sand percentages via
-[`calc_soil_group_and_id_rag()`](https://mcroci.github.io/NFert/reference/calc_soil_group_and_id_rag.md).
+[`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md).
 
 ## Usage
 

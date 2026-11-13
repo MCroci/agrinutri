@@ -19,8 +19,8 @@ estimate_soil_P_end_of_cycle(
   P2O5_removed,
   soil_group,
   depth_cm = 30,
-  texture_groups.table = nfert_data_get("texture_groups.table"),
-  p_availability_meta = nfert_data_get("p_availability_meta")
+  texture_groups.table = agrinutri_data_get("texture_groups.table"),
+  p_availability_meta = agrinutri_data_get("p_availability_meta")
 )
 ```
 

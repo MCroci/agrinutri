@@ -1,6 +1,6 @@
-# Normalise a soil-group label across the three NFert conventions
+# Normalise a soil-group label across the three agrinutri conventions
 
-NFert tables use three parallel naming conventions for the DPI 2026
+agrinutri tables use three parallel naming conventions for the DPI 2026
 texture grouping:
 
 ## Usage
@@ -22,7 +22,7 @@ English), `it_plural`, `it_singular`.
 
 ## Details
 
-- English (legacy NFert 0.1.0): "Sandy textures", "Loamy textures",
+- English (legacy agrinutri 0.1.0): "Sandy textures", "Loamy textures",
   "Clay textures".
 
 - Italian plural (canonical DPI; foglio B, SO, Gri_K): "Sabbiosi",
@@ -32,9 +32,9 @@ English), `it_plural`, `it_singular`.
   "Argilloso".
 
 This helper accepts any of these forms (case-insensitive) and returns
-the canonical English form (used by NFert \>= 0.4.0 lookup tables) plus
-the universal `ID_Rag` integer key used internally to join the lookup
-tables.
+the canonical English form (used by agrinutri \>= 0.4.0 lookup tables)
+plus the universal `ID_Rag` integer key used internally to join the
+lookup tables.
 
 ## Examples
 

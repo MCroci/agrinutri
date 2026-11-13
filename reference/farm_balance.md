@@ -1,10 +1,10 @@
-# Apply the NFert balance to every plot of a farm
+# Apply the agrinutri balance to every plot of a farm
 
 Reads a vector layer (GeoJSON, Shapefile, GeoPackage, or an in-memory
 `sf` object) in which each feature is an agronomic plot, runs
-[`N_balance`](https://mcroci.github.io/NFert/reference/N_balance.md) on
-every feature using the attributes as arguments, and returns an enriched
-`sf` object with the field-scale target N\* (`N_target`, kg N
+[`N_balance`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
+on every feature using the attributes as arguments, and returns an
+enriched `sf` object with the field-scale target N\* (`N_target`, kg N
 ha\\^{-1}\\), the crop- specific MAS cap, a compliance flag and the
 total N (kg) required by each plot (`N_total_kg = N_target * area_ha`).
 The enriched layer can be written back to disk as GeoJSON or any other
@@ -33,14 +33,14 @@ farm_balance(
 - p_balance:
 
   Logical. If `TRUE` also run
-  [`P_balance`](https://mcroci.github.io/NFert/reference/P_balance.md)
+  [`P_balance`](https://mcroci.github.io/agrinutri/reference/P_balance.md)
   per plot, using the columns `olsen_value` (ppm) and `olsen_unit`
   (default `"P2O5"`). Adds `P2O5_target` and `P2O5_total_kg`.
 
 - k_balance:
 
   Logical. Same for
-  [`K_balance`](https://mcroci.github.io/NFert/reference/K_balance.md),
+  [`K_balance`](https://mcroci.github.io/agrinutri/reference/K_balance.md),
   with columns `k_value` (ppm) and `k_unit` (default `"K2O"`).
 
 - output:
@@ -79,12 +79,12 @@ Every feature must carry at least:
 | `source` | "Cattle slurry" or "None"/NA | organic source |
 | `fertorg_frequency` | "every year" |  |
 | `location` | "Plain adjacent to urbanized areas" |  |
-| `forg_quantity` | 100 | organic dose this year (m\\^3\\/ha or t/ha, see [`N_balance`](https://mcroci.github.io/NFert/reference/N_balance.md)) |
+| `forg_quantity` | 100 | organic dose this year (m\\^3\\/ha or t/ha, see [`N_balance`](https://mcroci.github.io/agrinutri/reference/N_balance.md)) |
 | `organic_previous_year_N` | 50 | optional; kg N ha\\^{-1}\\ from organic applied last year (term `F`) |
 | `area_ha` | 5.2 | used to derive `N_total_kg` |
 
 Italian aliases (Frumento tenero, Liquame bovino, Cereali vernini -
-paglia asportata, ...) are accepted because the underlying NFert
+paglia asportata, ...) are accepted because the underlying agrinutri
 functions carry the translation layer.
 
 ## Output columns added to the layer
@@ -112,16 +112,16 @@ functions carry the translation layer.
 
 ## See also
 
-[`N_balance`](https://mcroci.github.io/NFert/reference/N_balance.md),
-[`P_balance`](https://mcroci.github.io/NFert/reference/P_balance.md),
-[`K_balance`](https://mcroci.github.io/NFert/reference/K_balance.md),
-[`plan_distribution`](https://mcroci.github.io/NFert/reference/plan_distribution.md)
+[`N_balance`](https://mcroci.github.io/agrinutri/reference/N_balance.md),
+[`P_balance`](https://mcroci.github.io/agrinutri/reference/P_balance.md),
+[`K_balance`](https://mcroci.github.io/agrinutri/reference/K_balance.md),
+[`plan_distribution`](https://mcroci.github.io/agrinutri/reference/plan_distribution.md)
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-ex <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- farm_balance(ex)
 print(farm[, c("plot_id", "crop", "area_ha",
                 "N_target", "MAS_cap", "N_total_kg")])

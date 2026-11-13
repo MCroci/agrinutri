@@ -8,23 +8,23 @@ machine-width grid prescription map, in six steps:
 3.  Define the **calibration curve** (VI -\> N rate) from two anchor
     points.
 4.  Generate **Option A** - a pixel-by-pixel VRT raster with
-    [`variable_rate_N()`](https://mcroci.github.io/NFert/reference/variable_rate_N.md).
+    [`variable_rate_N()`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md).
 5.  Generate **Option B** - a **grid prescription** with
-    [`build_strip_prescription()`](https://mcroci.github.io/NFert/reference/build_strip_prescription.md)
+    [`build_strip_prescription()`](https://mcroci.github.io/agrinutri/reference/build_strip_prescription.md)
     (machine width x cell length, along an A-B line), colour-coded by
     the same calibration.
 6.  Export both as GeoTIFF / Shapefile / ISOXML.
 
-All of this runs on the demo data that ships with NFert.
+All of this runs on the demo data that ships with agrinutri.
 
 ## 1. Load a field polygon
 
 ``` r
 
-library(NFert)
+library(agrinutri)
 library(sf)
 
-ex   <- system.file("extdata/example_farm.geojson", package = "NFert")
+ex   <- system.file("extdata/example_farm.geojson", package = "agrinutri")
 farm <- sf::st_read(ex, quiet = TRUE)
 
 # Pick plot P03 - "Lower Ditch", 7.8 ha grain maize, loamy soil
@@ -136,7 +136,7 @@ text(vi_high, min_dose, sprintf("(NDVI=%.2f, N=%d)", vi_high, min_dose),
 
 ## 4. Option A - pixel-by-pixel VRT raster
 
-[`variable_rate_N()`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)
+[`variable_rate_N()`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)
 applies the calibration to every pixel and rescales the output so the
 area-weighted mean equals the balance target (mass-balance constraint).
 With `method = "calibration"` the two anchor points are taken
@@ -145,7 +145,7 @@ mapped to (`maxN`, `minN`) — i.e. the lowest-vigour pixels get the
 highest dose and vice-versa. If you need to fix the anchors yourself
 (e.g. force them to `vi_low = 0.35` and `vi_high = 0.80` from your local
 calibration), use Option B with
-[`build_strip_prescription()`](https://mcroci.github.io/NFert/reference/build_strip_prescription.md)
+[`build_strip_prescription()`](https://mcroci.github.io/agrinutri/reference/build_strip_prescription.md)
 below, which exposes them as arguments.
 
 ``` r
@@ -177,7 +177,7 @@ cat("Range:           ", round(terra::global(rx_raster, "min", na.rm = TRUE)[1, 
 ```
 
 `%||%` is just defensive code (some versions of
-[`variable_rate_N()`](https://mcroci.github.io/NFert/reference/variable_rate_N.md)
+[`variable_rate_N()`](https://mcroci.github.io/agrinutri/reference/variable_rate_N.md)
 return a list, others a raster directly); it is defined once at the top
 of the vignette in the hidden setup chunk.
 
@@ -186,8 +186,8 @@ of the vignette in the hidden setup chunk.
 The pixel-by-pixel raster in Option A is fine for a self-driving tractor
 with a continuous-rate spreader, but many farm monitors prefer a **block
 prescription**: rectangular cells of `machine_width x cell_length` with
-a single dose per cell. NFert’s
-[`build_strip_prescription()`](https://mcroci.github.io/NFert/reference/build_strip_prescription.md)
+a single dose per cell. agrinutri’s
+[`build_strip_prescription()`](https://mcroci.github.io/agrinutri/reference/build_strip_prescription.md)
 produces exactly that, applying the same calibration internally:
 
 ``` r
@@ -275,8 +275,8 @@ export_prescription_all(rx_grid, "rx_bundle", "campo_grande",
   line is a reasonable default for a 24-36 m machine.
 - **Same pipeline for NNI** - replace `variability = "calibration"` with
   `variability = "nni"` and pass an NNI raster (from
-  [`compute_NNI_from_S2()`](https://mcroci.github.io/NFert/reference/compute_NNI_from_S2.md)
+  [`compute_NNI_from_S2()`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
   or
-  [`nni_from_vi_empirical()`](https://mcroci.github.io/NFert/reference/nni_from_vi_empirical.md))
+  [`nni_from_vi_empirical()`](https://mcroci.github.io/agrinutri/reference/nni_from_vi_empirical.md))
   instead of the VI to drive the strips by nitrogen status zones
   directly.

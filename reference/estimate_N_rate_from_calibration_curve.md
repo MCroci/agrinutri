@@ -59,7 +59,7 @@ with the estimated N rates based on the chosen calibration method.
 
 ``` r
 # Load example NDVI raster (replace with your own)
-# ndvi_raster <- terra::rast(system.file("extdata/s2.tif", package = "NFert"))
+# ndvi_raster <- terra::rast(system.file("extdata/s2.tif", package = "agrinutri"))
 
 # Two-point calibration
 # n_rate_raster_2pt <- estimate_N_rate_from_calibration_curve(ndvi_raster, minN = 40, maxN = 60)

@@ -14,7 +14,7 @@ estimate_biophysical(
   output_dir,
   variables = c("LAI", "Cm", "Cw", "FVC", "Cab", "laiCab", "CNC_Cab", "CNC_Cprot"),
   model_dir = NULL,
-  apply_offset = TRUE,
+  apply_offset = FALSE,
   offset = -1000,
   scale = 10000,
   nodata_in = 0,
@@ -44,13 +44,19 @@ estimate_biophysical(
 
 - apply_offset:
 
-  Logical. If `TRUE` (default) the raster is shifted by `offset` and
-  divided by `scale` before inference.
+  Logical. If `TRUE` the raster is shifted by `offset` before being
+  divided by `scale`. Default `FALSE`: the input is treated as
+  offset-applied reflectance (reflectance = DN / scale), matching
+  [`compute_vi`](https://mcroci.github.io/agrinutri/reference/compute_vi.md)
+  and the bundled scenes. Set `TRUE` only for raw baseline-04.00 L2A DN
+  (see the Inputs and outputs section).
 
 - offset, scale:
 
-  Radiometric conversion from DN to surface reflectance. Defaults match
-  ESA S2 L2A processor baseline 04.00 onwards.
+  Radiometric conversion from DN to surface reflectance: reflectance =
+  (DN + offset) / scale when `apply_offset = TRUE`, else DN / scale.
+  `offset = -1000` matches the ESA S2 L2A processor baseline 04.00
+  `BOA_ADD_OFFSET` and is only used when `apply_offset = TRUE`.
 
 - nodata_in:
 
@@ -84,20 +90,31 @@ distributed as `*.json` files.
 
 ## Inputs and outputs
 
-The S2 raster is expected to store DN values with the ESA L2A convention
-(offset `-1000`, scale `10000`). By default the function applies this
-rescaling; pass `apply_offset = FALSE` if the raster is already in
-surface-reflectance units (0-1.5).
+The S2 raster is expected to store surface reflectance scaled by `scale`
+(default `10000`), i.e. reflectance = DN / scale in the 0-1.5 range.
+This "harmonized" / offset-applied convention is shared with
+[`compute_vi`](https://mcroci.github.io/agrinutri/reference/compute_vi.md),
+matches the bundled example scenes and most analysis-ready L2A products
+(Copernicus harmonized, Google Earth Engine `HARMONIZED`, sen2r), and is
+the reflectance range the bundled GPR models were trained on (per-band
+training means 0.04-0.41). Accordingly **no additive offset is applied
+by default** (`apply_offset = FALSE`). Only for *raw* Processing
+Baseline 04.00+ L2A DN, where the `BOA_ADD_OFFSET` of -1000 has not yet
+been applied, set `apply_offset = TRUE` (with `offset = -1000`) so the
+function computes reflectance = (DN + offset) / scale. Getting this
+wrong shifts every band by ~0.1 reflectance and can drive all pixels out
+of the valid range, in which case the GPR returns empty (all-`NA`) maps;
+the function warns when most valid pixels fall outside 0-1.5.
 
 One GeoTIFF is written per requested variable (plus an `_unc.tif` file
 with prediction standard deviation for variables whose model exposes the
 pre-computed `Linv_pre_calc` matrix). Output rasters inherit the
 geometry (CRS, extent, resolution) of the input.
 
-## Use within NFert
+## Use within agrinutri
 
 Two of the outputs are directly usable as inputs to
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md):
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md):
 
 - **W** (aboveground dry biomass, t DM ha\\^{-1}\\) can be approximated
   from `LAI` \\\times\\ `Cm` (leaf dry-matter mass per unit leaf area, g
@@ -108,7 +125,7 @@ Two of the outputs are directly usable as inputs to
   m\\^{-2}\\ ground) divided by the biomass per unit ground area.
 
 The helper
-[`biophysical_to_NNI_inputs`](https://mcroci.github.io/NFert/reference/biophysical_to_NNI_inputs.md)
+[`biophysical_to_NNI_inputs`](https://mcroci.github.io/agrinutri/reference/biophysical_to_NNI_inputs.md)
 wraps this conversion.
 
 ## References
@@ -121,15 +138,17 @@ data. *Remote Sensing of Environment*, 273, 112958.
 
 ## See also
 
-[`compute_NNI`](https://mcroci.github.io/NFert/reference/compute_NNI.md),
-[`diagnose_N_status`](https://mcroci.github.io/NFert/reference/diagnose_N_status.md),
-[`biophysical_to_NNI_inputs`](https://mcroci.github.io/NFert/reference/biophysical_to_NNI_inputs.md),
-[`estimate_N_rate_from_holland_schepers`](https://mcroci.github.io/NFert/reference/estimate_N_rate_from_holland_schepers.md)
+[`compute_NNI`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md),
+[`diagnose_N_status`](https://mcroci.github.io/agrinutri/reference/diagnose_N_status.md),
+[`biophysical_to_NNI_inputs`](https://mcroci.github.io/agrinutri/reference/biophysical_to_NNI_inputs.md),
+[`estimate_N_rate_from_holland_schepers`](https://mcroci.github.io/agrinutri/reference/estimate_N_rate_from_holland_schepers.md)
 
 ## Examples
 
 ``` r
-scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "NFert")
+# \donttest{
+# Loading the Gaussian-process model takes a few seconds
+scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "agrinutri")
 if (nzchar(scene)) {
   od <- tempfile()
   dir.create(od)
@@ -137,4 +156,5 @@ if (nzchar(scene)) {
   stopifnot(inherits(maps$LAI, "SpatRaster"),
             file.exists(attr(maps, "paths")$LAI))
 }
+# }
 ```

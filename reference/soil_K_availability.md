@@ -12,7 +12,8 @@ soil_K_availability(
   A_demand_K2O,
   clay_pct,
   include_leaching = TRUE,
-  k_availability.table = nfert_data_get("k_availability.table")
+  k_availability.table = agrinutri_data_get("k_availability.table"),
+  texture_groups.table = agrinutri_data_get("texture_groups.table")
 )
 ```
 
@@ -25,7 +26,7 @@ soil_K_availability(
 - A_demand_K2O:
 
   Crop K2O demand (kg/ha) from
-  [`calc_crop_K_demand()`](https://mcroci.github.io/NFert/reference/calc_crop_K_demand.md).
+  [`calc_crop_K_demand()`](https://mcroci.github.io/agrinutri/reference/calc_crop_K_demand.md).
 
 - clay_pct:
 
@@ -35,9 +36,20 @@ soil_K_availability(
 
   Logical, add K leaching to mantenimento term. Default TRUE.
 
-- k_availability.table:
+- k_availability.table, texture_groups.table:
 
-  Lookup table.
+  Lookup tables.
+
+  As in Fert_Office v1.26 (foglio `Gri_K`), with K2O the analytical
+  value and W the soil weight of the 30 cm layer (t/ha):
+
+  - Arricchimento (low / very low): B1 = (lower bound of the "media"
+    class - K2O) x W / 1000 x (1 + 0.018 x clay);
+
+  - Mantenimento: A + H;
+
+  - Riduzione (high): B2 = (K2O - upper bound of the "media" class) x W
+    / 1000, subtracted from A + H.
 
 ## Value
 

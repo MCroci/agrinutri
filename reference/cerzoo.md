@@ -1,6 +1,6 @@
 # CERZOO example datasets (real field, ready to test the functions)
 
-NFert ships a small, real-world example from the CERZOO experimental
+agrinutri ships a small, real-world example from the CERZOO experimental
 farm of the Universita Cattolica del Sacro Cuore (Po Valley, Piacenza,
 Italy) so that users can run the full pipeline on actual data out of the
 box. The files are stored under `inst/extdata` and accessed with
@@ -10,9 +10,9 @@ box. The files are stored under `inst/extdata` and accessed with
 
 - `extdata/cerzoo_field.geojson`: field boundaries of the CERZOO farm
   with the agronomic attributes used by
-  [`N_balance()`](https://mcroci.github.io/NFert/reference/N_balance.md)
+  [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
   and
-  [`farm_balance()`](https://mcroci.github.io/NFert/reference/farm_balance.md)
+  [`farm_balance()`](https://mcroci.github.io/agrinutri/reference/farm_balance.md)
   (crop, expected yield, sand, clay, SOM, C/N, previous crop). Field
   `id = 3` is the case-study silage-maize plot (3.24 ha, 37 percent
   clay, 16.8 percent sand, 1.74 percent organic matter, C/N 8.84).
@@ -24,25 +24,25 @@ box. The files are stored under `inst/extdata` and accessed with
 
 The raster stores digital-number reflectance scaled by 10000 (use
 `scale_factor = 10000` in
-[`compute_vi()`](https://mcroci.github.io/NFert/reference/compute_vi.md)).
+[`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md)).
 
 ## See also
 
-[`compute_vi()`](https://mcroci.github.io/NFert/reference/compute_vi.md),
-[`build_strip_prescription()`](https://mcroci.github.io/NFert/reference/build_strip_prescription.md),
-[`spatial_N_balance()`](https://mcroci.github.io/NFert/reference/spatial_N_balance.md),
-[`farm_balance()`](https://mcroci.github.io/NFert/reference/farm_balance.md)
+[`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md),
+[`build_strip_prescription()`](https://mcroci.github.io/agrinutri/reference/build_strip_prescription.md),
+[`spatial_N_balance()`](https://mcroci.github.io/agrinutri/reference/spatial_N_balance.md),
+[`farm_balance()`](https://mcroci.github.io/agrinutri/reference/farm_balance.md)
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 field <- sf::st_read(system.file("extdata/cerzoo_field.geojson",
-                                 package = "NFert"), quiet = TRUE)
+                                 package = "agrinutri"), quiet = TRUE)
 field3 <- field[field$id == 3, ]
 
 s2   <- terra::rast(system.file("extdata/sentinel-2/S2_cerzoo_field3_20240813.tif",
-                                package = "NFert"))
+                                package = "agrinutri"))
 ndvi <- compute_vi(s2, "NDVI", scale_factor = 10000)
 
 rx <- build_strip_prescription(
