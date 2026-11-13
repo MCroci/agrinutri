@@ -21,7 +21,7 @@ NFERT = r"""@misc{agrinutri2026,
   title = {{agrinutri}: {N}, {P} and {K} Fertilization Following {Emilia-Romagna} {DPI} 2026. {R} package version 1.0.1},
   year = {2026},
   howpublished = {\url{https://github.com/mcroci/agrinutri}},
-  note = {[Zenodo DOI to be added at release]}
+  doi = {10.5281/zenodo.24202414}
 }"""
 
 txt = "\n".join(open(f, encoding="utf-8").read()

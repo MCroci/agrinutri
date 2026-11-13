@@ -1,5 +1,7 @@
 # agrinutri
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202414.svg)](https://doi.org/10.5281/zenodo.24202414)
+
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/mcroci/agrinutri/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mcroci/agrinutri/actions/workflows/R-CMD-check.yaml)
 [![pkgdown](https://github.com/mcroci/agrinutri/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/mcroci/agrinutri/actions/workflows/pkgdown.yaml)

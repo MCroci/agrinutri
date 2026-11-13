@@ -23,6 +23,7 @@ bibentry(
   year = 2026,
   note = paste("R package version", ver),
   url = "https://github.com/mcroci/agrinutri",
+  doi = "10.5281/zenodo.24202414",
   textVersion = paste0(
     "Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N, Tabaglio V, ",
     "Amaducci S (2026). ",
