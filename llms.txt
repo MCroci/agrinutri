@@ -1,5 +1,11 @@
 # agrinutri
 
+![agrinutri: nutrient balances and variable-rate fertilisation planning
+at field scale](reference/figures/agrinutri-banner.png)
+
+agrinutri: nutrient balances and variable-rate fertilisation planning at
+field scale
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202414.svg)](https://doi.org/10.5281/zenodo.24202414)
 
 **Nutrient balances and variable-rate fertilisation planning, from the
