@@ -1,5 +1,11 @@
 # agrinutri News
 
+## Development version
+
+* `variable_rate_N()`: explicit `minN` / `maxN` now also bound the
+  Holland-Schepers rates (they were applied to the calibration method only),
+  while the field mean is still preserved.
+
 ## Version 1.0.1 (2026-11-13)
 
 * Test suite: the online SoilGrids test is skipped when the curl package is

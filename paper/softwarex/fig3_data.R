@@ -18,9 +18,11 @@ terra::writeRaster(x, s2, overwrite = TRUE, NAflag = 0)
 bio <- estimate_biophysical(s2, output_dir = tempdir(), variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
 nni <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
                            crop = "maize", fvc = bio$FVC)
+Nstar <- read.csv("data/farm_2024.csv")$N_target[1]           # balance dose of plot P01 (Fig. 2)
 rx <- build_strip_prescription(field, machine_width = 24, cell_length = 30,
                                variability = "nni", nni_raster = nni$NNI,
-                               n_target = 200, min_dose = 160, max_dose = 240)
+                               n_target = Nstar, min_dose = 0.8 * Nstar, max_dose = 1.2 * Nstar)
+terra::writeRaster(nni$NNI, "data/rs_NNI_full.tif", overwrite = TRUE)
 lai <- terra::mask(terra::crop(bio$LAI, fv), fv)
 nn  <- terra::mask(terra::crop(nni$NNI, fv), fv)
 terra::writeRaster(lai, "data/rs_LAI.tif", overwrite = TRUE)

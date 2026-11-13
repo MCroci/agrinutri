@@ -30,6 +30,8 @@
 #'   `n_dose` for the calibration method. Default 0.25 (i.e. minN = 0.75 *
 #'   n_dose, maxN = 1.25 * n_dose).
 #' @param minN,maxN Optional explicit override of the envelope (in kg/ha).
+#'   When given, they also bound the per-pixel rates of the Holland-Schepers
+#'   method after the mass-balance rescaling.
 #' @param mas_cap Numeric or NULL. If provided, caps the per-pixel rate so it
 #'   never exceeds the MAS limit (e.g. from `get_MAS()`).
 #' @param plot Logical, passed to the underlying estimator. Default FALSE.
@@ -90,6 +92,9 @@ variable_rate_N <- function(ndvi_raster,
     stop("`envelope` must be in (0, 1).")
   }
 
+  # explicit minN / maxN also bound the Holland-Schepers rates (below)
+  lo_user <- if (is.null(minN)) 0 else minN
+  hi_user <- if (is.null(maxN)) Inf else maxN
   if (is.null(minN)) minN <- n_dose * (1 - envelope)
   if (is.null(maxN)) maxN <- n_dose * (1 + envelope)
 
@@ -106,8 +111,9 @@ variable_rate_N <- function(ndvi_raster,
   # Preserve the agronomic mean (mass-balance constraint): pixel mean equals
   # n_dose, with every pixel in [0, mas_cap] (water filling)
   hi <- if (!is.null(mas_cap) && is.numeric(mas_cap) && mas_cap > 0) mas_cap else Inf
+  hi <- min(hi, hi_user)
   vals <- terra::values(rate, mat = FALSE)
-  vals <- .preserve_mean(vals, rep(1, length(vals)), n_dose, lo = 0, hi = hi)
+  vals <- .preserve_mean(vals, rep(1, length(vals)), n_dose, lo = lo_user, hi = hi)
   rate <- terra::setValues(rate, vals)
 
   vals_final <- terra::values(rate, mat = FALSE)

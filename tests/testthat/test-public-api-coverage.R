@@ -154,6 +154,12 @@ test_that("variable_rate_N preserves the field mean and respects the MAS cap", {
   vc <- variable_rate_N(ndvi, n_dose = 142, method = "holland",
                         mas_cap = 150, plot = FALSE)
   expect_lte(vc$max_kg_ha, 150 + 1e-6)
+
+  vb <- variable_rate_N(ndvi, n_dose = 142, method = "holland",
+                        minN = 120, maxN = 160, plot = FALSE)
+  expect_gte(vb$min_kg_ha, 120 - 1e-6)
+  expect_lte(vb$max_kg_ha, 160 + 1e-6)
+  expect_lt(abs(vb$mean_kg_ha - 142), 1)
 })
 
 # ---------------------------------------------------------------------------

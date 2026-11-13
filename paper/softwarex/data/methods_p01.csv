@@ -1,0 +1,8 @@
+"method","min","max","mean"
+"Uniform",189,189,189
+"Calibration (inverse)",186.4,226.8,189.02515343214
+"Calibration (direct)",151.2,190.9,188.96011681791
+"NDVI quantile classes",157.7,226.8,189.024884884638
+"NNI zones",161,226.8,188.981768315696
+"Holland-Schepers",185.532363818656,226.8,187.283207105522
+"QUEFTS economic optimum",28.8848968744278,220.520935058594,111.077447372103

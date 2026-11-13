@@ -11,7 +11,8 @@ Source of the SoftwareX Original Software Publication on agrinutri 1.0.0.
 | `theme_swx.R` | house style of Figs. 2-4 (Arial 7 pt, mako palette for doses, NNI centred at 1, scale bar and north arrow) |
 | `fig2_farm.R` | Fig. 2, `farm_balance()` on eight satellite-delineated fields, 2024 (after `piacenza/a01_inputs.R`) |
 | `fig3_data.R`, `fig3_rs.R` | Fig. 3, Sentinel-2 to prescription on plot P01 of Fig. 2 (`data/rs_*`, local only; env var `PRESTO_DEPLOY`) |
-| `piacenza/` | Section 3.4 and Fig. 4: `a01_inputs.R` (fields, regional soil maps, ERA5), `a02_balance.R` (balance 2019-2026, aggregates), `a03_figure.R`, `crop_map.csv` (crop class to DPI crop). Field-level files stay local (`.gitignore`); env vars `KWASI_DATA`, `RER_SOIL` |
+| `fig4_methods.R` | Fig. 4, every rate-setting method on the farm (field level) and on plot P01 (within field); QUEFTS result cached in `data/rs_quefts.tif` |
+| `piacenza/` | Section 3.5 and Fig. 5: `a01_inputs.R` (fields, regional soil maps, ERA5), `a02_balance.R` (balance 2019-2026, aggregates), `a03_figure.R`, `crop_map.csv` (crop class to DPI crop). Field-level files stay local (`.gitignore`); env vars `KWASI_DATA`, `RER_SOIL` |
 | `pubfig.py` | figure style (journal sizes, fonts, DPI) |
 | `make_refdoc_swx.py` | Word reference document (house style, monospaced code) |
 
@@ -22,6 +23,7 @@ Regenerate, from this folder:
 Rscript paper/softwarex/piacenza/a01_inputs.R && Rscript paper/softwarex/piacenza/a02_balance.R
 Rscript paper/softwarex/fig2_farm.R
 (cd paper/softwarex && Rscript fig3_data.R) && Rscript paper/softwarex/fig3_rs.R
+Rscript paper/softwarex/fig4_methods.R
 Rscript paper/softwarex/piacenza/a03_figure.R
 (cd paper/softwarex && python fig1_architecture.py && python make_bib.py && sh render.sh)
 ```

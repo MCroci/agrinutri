@@ -31,7 +31,9 @@ target.}
 \code{n_dose} for the calibration method. Default 0.25 (i.e. minN = 0.75 *
 n_dose, maxN = 1.25 * n_dose).}
 
-\item{minN, maxN}{Optional explicit override of the envelope (in kg/ha).}
+\item{minN, maxN}{Optional explicit override of the envelope (in kg/ha).
+When given, they also bound the per-pixel rates of the Holland-Schepers
+method after the mass-balance rescaling.}
 
 \item{mas_cap}{Numeric or NULL. If provided, caps the per-pixel rate so it
 never exceeds the MAS limit (e.g. from \code{get_MAS()}).}

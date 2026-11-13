@@ -52,6 +52,7 @@ write.csv(cbind(st_drop_geometry(out)[, c("plot", "c2024", "c2023", "area_ha", "
                                           "N_target", "MAS_cap", "MAS_ok", "N_total_kg")], terms[, -1]),
           "paper/softwarex/data/farm_2024.csv", row.names = FALSE)
 write.csv(data.frame(id = out$id), "paper/softwarex/data/farm_2024_ids.csv", row.names = FALSE)
+saveRDS(as.list(st_drop_geometry(out)[out$plot == "P01", args]), "paper/softwarex/data/p01_inputs.rds")  # for Figs. 3-4
 cat("farm ha", round(sum(out$area_ha), 1), "| N total kg", round(sum(out$N_total_kg)),
     "| over MAS:", paste(out$plot[!out$MAS_ok], collapse = ", "), "\n")
 

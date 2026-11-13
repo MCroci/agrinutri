@@ -1,4 +1,4 @@
-# Fig. 4 of the SoftwareX article: regulatory N requirement of the Piacenza plain, 2019-2026.
+# Fig. 5 of the SoftwareX article: regulatory N requirement of the Piacenza plain, 2019-2026.
 # (a) N requirement of the mapped fields by crop and year, with the October-January rainfall;
 # (b) field dose in 2024, with the farm of Fig. 2 boxed. Run from the package root after a02:
 #   Rscript paper/softwarex/piacenza/a03_figure.R
@@ -39,4 +39,4 @@ pb <- ggplot(f) + geom_sf(aes(fill = dose), colour = NA) +
   geom_sf(data = st_as_sfc(st_bbox(st_buffer(f[f$id %in% read.csv("paper/softwarex/data/farm_2024_ids.csv")$id, ], 400))),
           fill = NA, colour = OKABE[[6]], linewidth = 0.6) +
   map_furniture(st_bbox(f), len = 10000) + coord_sf(datum = NA, expand = FALSE) + theme_map() + cbar()
-save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.25))), "fig4_piacenza", "double", 95)
+save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.25))), "fig5_piacenza", "double", 95)
