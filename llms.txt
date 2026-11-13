@@ -1,21 +1,25 @@
 # agrinutri
 
-**N, P and K fertilization planning following the Emilia-Romagna DPI
-2026**
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202414.svg)](https://doi.org/10.5281/zenodo.24202414)
+
+**Nutrient balances and variable-rate fertilisation planning, from the
+field to the farm**
 
 ## Overview
 
 `agrinutri` is an R package for nitrogen, phosphorus and potassium
-fertilization planning of field and tree crops. It implements the
-balance method (Allegato 2) and the standard-dose method of the
-Emilia-Romagna Integrated Production Guidelines (*Disciplinari di
-Produzione Integrata*, DPI 2026) and reproduces the regional reference
-tool **Fert_Office v1.26** term by term. On top of the regulatory
-balance it provides farm and pixel-level balances, a Sentinel-2
-remote-sensing diagnosis (vegetation indices, Gaussian-process canopy
-traits, Nitrogen Nutrition Index) and variable-rate prescriptions that
-keep the field mean equal to the compliant balance dose, exported to
-tractor formats.
+fertilisation planning of field and tree crops with nutrient balance
+methods. Every coefficient is an editable data table, so the balance can
+be re-parameterised for other regional guidelines. The default
+parameterisation implements the balance method (Annex 2) and the
+standard-dose method of the Emilia-Romagna Integrated Production
+Guidelines (*Disciplinari di Produzione Integrata*, DPI 2026) and
+follows the regional reference tool **Fert_Office v1.26**. On top of the
+regulatory balance it provides farm and pixel-level balances, a
+Sentinel-2 remote-sensing diagnosis (vegetation indices,
+Gaussian-process canopy traits, Nitrogen Nutrition Index) and
+variable-rate prescriptions that keep the field mean equal to the
+compliant balance dose, exported to tractor formats.
 
 All coefficient tables are ordinary R datasets (`uptake_table`,
 `mas.table`, `coef_time`, …), so the balance can be inspected, versioned

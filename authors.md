@@ -21,17 +21,18 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/mcroci/agrinutri/blob/v1.0.1/inst/CITATION)
+[`inst/CITATION`](https://github.com/mcroci/agrinutri/blob/master/inst/CITATION)
 
 Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N,
-Tabaglio V, Amaducci S (2026). agrinutri: N, P and K Fertilization
-Following Emilia-Romagna DPI 2026. R package version 1.0.1.
+Tabaglio V, Amaducci S (2026). agrinutri: Nutrient Balances and
+Variable-Rate Fertilisation Planning. R package version 1.0.1.
 https://github.com/mcroci/agrinutri
 
     @Manual{,
-      title = {agrinutri: N, P and K Fertilization Following Emilia-Romagna DPI 2026},
+      title = {agrinutri: Nutrient Balances and Variable-Rate Fertilisation Planning},
       author = {Michele Croci and Giorgio Impollonia and Andrea Ferrarini and Andrea Fiorini and Manuele Ragazzi and Nicolaj Franceschi and Vincenzo Tabaglio and Stefano Amaducci},
       year = {2026},
       note = {R package version 1.0.1},
       url = {https://github.com/mcroci/agrinutri},
+      doi = {10.5281/zenodo.24202414},
     }
