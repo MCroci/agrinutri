@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>agrinutri banner</title>
+<style>
+  /* 1920 x 600 pkgdown hero; ?v=province|dark|field selects the variant */
+  html, body { margin: 0; padding: 0; }
+  .banner { width: 1920px; height: 600px; position: relative; overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif; background: #fff center / cover no-repeat; }
+  .fade { position: absolute; inset: 0; }
+  .text { position: absolute; left: 192px; top: 50%; transform: translateY(-50%); max-width: 940px; }
+  .name { font-size: 112px; font-weight: 700; letter-spacing: -2px; line-height: 1; margin: 0; }
+  .title { font-size: 40px; line-height: 1.2; margin: 20px 0 0; font-weight: 400; }
+  .meta { font-size: 22px; margin-top: 28px; }
+  .bar { display: flex; height: 10px; width: 360px; margin-top: 30px; border-radius: 2px; overflow: hidden; }
+  .bar span { flex: 1; }
+  .bar span:nth-child(1) { background: #def5e5; } .bar span:nth-child(2) { background: #60ceac; }
+  .bar span:nth-child(3) { background: #3497a9; } .bar span:nth-child(4) { background: #395d9c; }
+  .bar span:nth-child(5) { background: #3b2f5e; } .bar span:nth-child(6) { background: #0b0405; }
+
+  .province { background-image: url(bg_province.png); color: #0b1f33; }
+  .province .fade { background: linear-gradient(90deg, #fff 0%, #fff 38%, rgba(255,255,255,0.85) 52%, rgba(255,255,255,0) 68%); }
+  .province .meta { color: #395d9c; }
+
+  .dark { background-color: #0b1520; background-image: url(bg_dark.png); color: #f2f6f9; }
+  .dark .fade { background: linear-gradient(90deg, #0b1520 0%, #0b1520 38%, rgba(11,21,32,0.85) 52%, rgba(11,21,32,0) 68%); }
+  .dark .meta { color: #60ceac; }
+
+  .field { background-image: url(bg_field.png); color: #0b1f33; }
+  .field .fade { background: linear-gradient(90deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.95) 42%, rgba(255,255,255,0.55) 60%, rgba(255,255,255,0) 78%); }
+  .field .meta { color: #395d9c; }
+</style>
+</head>
+<body>
+<div class="banner" id="b">
+  <div class="fade"></div>
+  <div class="text">
+    <h1 class="name">agrinutri</h1>
+    <p class="title">Nutrient balances and variable-rate fertilisation planning, from the field to the farm</p>
+    <div class="bar"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="meta">N &middot; P &middot; K &nbsp;|&nbsp; R package &nbsp;|&nbsp; Sentinel-2 &nbsp;|&nbsp; machine-ready prescriptions</div>
+  </div>
+</div>
+<script>
+  var v = new URLSearchParams(location.search).get("v") || "province";
+  document.getElementById("b").classList.add(v);
+</script>
+</body>
+</html>
