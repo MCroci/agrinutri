@@ -2376,7 +2376,7 @@ head(uptake_table, 5)
 ### Getting Help
 
 - **Package documentation**:
-  [`help(package = "agrinutri")`](https://mcroci.github.io/NFert/reference)
+  [`help(package = "agrinutri")`](https://mcroci.github.io/agrinutri/reference)
 - **Function help**:
   [`?N_balance`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
   or
