@@ -132,11 +132,9 @@ spatial_N_balance <- function(
     ...
   )
 
-  # Compute N_to_apply from the balance formula
-  compute_N <- function(row) {
-    row[["A"]] - row[["B"]] + row[["C1"]] + row[["C2"]] +
-      row[["D"]] - row[["E"]] - row[["F"]] - row[["Forg"]] - row[["G"]]
-  }
+  # Mineral N to apply, as in farm_balance() and Fert_Office (phase share,
+  # crop ceiling, current-year organic N subtracted, never negative)
+  compute_N <- function(row) calculate_N_fertilization(row)
 
   # Numeric columns only (drop logical like surplus_pluviometrico)
   num_cols <- names(first)[vapply(first, is.numeric, logical(1))]

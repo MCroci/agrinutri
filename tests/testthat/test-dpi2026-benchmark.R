@@ -6,7 +6,8 @@
 #   Pioggia 1/10-31/1 = 150 mm, febbraio = 0 mm
 #   Precessione: Maize stalks removed (E = -10)
 #   Grano duro (pianta intera), resa 6 t/ha, fase primaverile-estiva 100-130 gg
-#   Apporti naturali: pianura limitrofa -> G = 20 kg/ha * C_tempo 0.67 * N_pct 0.75 = 10.05
+#   Disponibilita ossigeno: Imperfetta (NFert "Slow") -> fc_D = 0.40
+#   Apporti naturali: pianura isolata -> G = 15 kg/ha * C_tempo 0.67 = 10.05
 #
 # Expected (from foglio Bilancio):
 #   A = 186.6, B = 73.84, C = 0, D = 39.536, E = 0 (dopo fold to D), G = 10.05
@@ -23,36 +24,37 @@ context("DPI 2026 Fert_Office v1.26 benchmark")
 test_that("N_balance (grano duro) reproduces Fert_Office Bilancio", {
   skip_if_not_installed("NFert")
 
+  # Inputs exactly as in the Fert_Office v1.26 "Inserimento" sample:
+  # oxygen availability "Imperfetta" (ID_Dre 1 = "Slow") and location
+  # "Pianura isolata" (15 kg N/ha/yr).
   bal <- N_balance(
     expected_yield_tons_ha = 6,
     crop = "Grano duro (pianta intera)",
     ccp  = "Spring-summer crop 100-130 days",
     sand = 15.5, clay = 18.5,
-    Ntot = 1.5, SOM = 2, CN = 7.73,
-    oxygen_availability = "Normal",
+    Ntot = 1.5, SOM = 2, CN = 7.733952049497294,
+    oxygen_availability = "Slow",
     winter_rain = 150, start_spring_rain = 0,
     prev_crop = "Maize stalks removed",
     source = "None",
     fertorg_frequency = "every year",
-    location = "Plain adjacent to urbanized areas",
+    location = "Isolated plain",
     forg_quantity = 0,
     soil_seeding = "traditional",
     greenhouse = FALSE,
     E_to_D = TRUE
   )
 
-  # A = 186.6 (31.1 kg N/t * 6 t/ha)
-  expect_equal(round(bal$A, 2),     186.6, tolerance = 1)
-  # D ~ 39.5 (includes abs(E) = 10 folded in)
-  expect_true(bal$D >= 25 && bal$D <= 45)
-  # E now reported 0 because fold-into-D mode is default
-  expect_equal(bal$E, 0)
-  # G = 10.05
-  expect_equal(round(bal$G, 2),      10.05, tolerance = 0.5)
-  # Total required N ~ 142.25 kg/ha
-  nfert <- calculate_N_fertilization(bal)
-  # Fert_Office Bilancio ~142 kg N/ha; allow tolerance for table/coeff updates
-  expect_true(nfert > 120 && nfert < 170)
+  # Term by term against Bilancio!H15:H28
+  expect_equal(bal$A,  186.6,  tolerance = 1e-8)   # 31.1 kg N/t x 6 t/ha
+  expect_equal(bal$C1 + bal$C2, 0)                 # Bilancio!H16
+  expect_equal(bal$D,  39.536, tolerance = 1e-8)   # 0.40 x B + |E| (C&D!G23)
+  expect_equal(bal$B,  73.84,  tolerance = 1e-8)   # Bilancio!H25
+  expect_equal(bal$E,  0)                          # E = -10 folded into D
+  expect_equal(bal$F,  0)
+  expect_equal(bal$G,  10.05,  tolerance = 1e-8)   # 15 x C_tempo 0.67
+  # Apporto ammesso col metodo Bilancio (Bilancio!H33)
+  expect_equal(calculate_N_fertilization(bal), 142.246, tolerance = 1e-8)
 })
 
 test_that("scheda_N reproduces Scheda_N grano duro (200 kg/ha)", {
@@ -80,7 +82,7 @@ test_that("scheda_N cap at MAS when decrements < increments overshoot dose_max",
   expect_equal(res$dose_final, res$max_N_dose)
 })
 
-test_that("no-till soil_seeding reduces b1 by 3 kg/ha", {
+test_that("no-till soil_seeding reduces B by 10 kg/ha (DPI Allegato 2)", {
   skip_if_not_installed("NFert")
   b_trad <- soil_fertility(Ntot = 1.5, SOM = 2, soil.group = "Loamy textures",
                            CN = 8, ccp = "Spring-summer crop 100-130 days",
@@ -88,8 +90,29 @@ test_that("no-till soil_seeding reduces b1 by 3 kg/ha", {
   b_not  <- soil_fertility(Ntot = 1.5, SOM = 2, soil.group = "Loamy textures",
                            CN = 8, ccp = "Spring-summer crop 100-130 days",
                            soil_seeding = "no-till")
-  expect_equal(b_trad$b1 - b_not$b1, 3)
+  expect_equal(b_trad$B - b_not$B, 10)
+  expect_equal(b_not$no_till_reduction, 10)
   expect_equal(b_trad$b2, b_not$b2)
+  # not for perennial crops in production, nor for crops excluded by the DPI
+  b_per <- soil_fertility(Ntot = 1.5, SOM = 2, soil.group = "Loamy textures",
+                          CN = 8, ccp = "full production", soil_seeding = "no-till")
+  expect_equal(b_per$no_till_reduction, 0)
+})
+
+test_that("soil_fertility follows Fert_Office caps and the perennial rule", {
+  skip_if_not_installed("NFert")
+  ccp <- "Spring-summer crop 100-130 days"          # C_tempo 0.67
+  hi <- soil_fertility(Ntot = 3, SOM = 5, soil.group = "Loamy textures",
+                       CN = 10, ccp = ccp)
+  cap <- soil_fertility(Ntot = 2.1, SOM = 3, soil.group = "Loamy textures",
+                        CN = 10, ccp = ccp)
+  expect_equal(hi$B, cap$B)                          # Ntot <= 2.1, SOM <= 3
+  expect_equal(cap$b1, 2.1 * 26)
+  expect_equal(cap$b2, 3 * 24.05 * 0.67)
+  per <- soil_fertility(Ntot = 1.5, SOM = 2, soil.group = "Clay textures",
+                        CN = 13, ccp = "full production")   # C_tempo 1
+  expect_equal(per$b1, 0)                             # B = mineralised N only
+  expect_equal(per$b2, 2 * 6)
 })
 
 test_that("greenhouse adds 2 kg/ha to D", {

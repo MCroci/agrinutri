@@ -10,6 +10,7 @@ soil_P_availability(
   soil_group,
   A_demand_P2O5,
   depth_cm = 30,
+  total_carbonate = NULL,
   p_availability.table = nfert_data_get("p_availability.table"),
   p_availability_meta = nfert_data_get("p_availability_meta"),
   texture_groups.table = nfert_data_get("texture_groups.table")
@@ -27,6 +28,9 @@ soil_P_availability(
 
 \item{depth_cm}{Soil depth used for weight (default 30 cm).}
 
+\item{total_carbonate}{Total carbonate (CaCO3, percent) from the soil test.
+\code{NULL} (default) uses the legacy constant immobilisation factor.}
+
 \item{p_availability.table, p_availability_meta, texture_groups.table}{Lookup tables.}
 }
 \value{
@@ -40,9 +44,19 @@ Implements the DPI 2026 Allegato 2 logic coded in Fert_Office v1.26 foglio
 NECESSITA' side (B1, A anticipations) or onto the DISPONIBILITA' side (B2).
 }
 \details{
+In "Riduzione" (very high P) the crop removal A is kept and the excess over
+the upper bound of the normal range (68.7 ppm P2O5) times the soil weight is
+returned as B2, to be subtracted.
+
 The B1 arricchimento term equals the distance of the analytical value from
-the upper bound of the "bassa" class (22.9 ppm P2O5), multiplied by the soil
-weight at 30 cm (t/ha) and by the P immobilisation factor \code{P_immobilisation_factor = 1.6}.
+the lower bound of the normal class (22.9 ppm P2O5), multiplied by the soil
+weight at 30 cm (t/ha) and by the P immobilisation factor. As in
+Fert_Office (foglio \code{Gri_P}, cell L10) the factor is the texture-group base
+value (\code{texture_groups.table$P_immobilisation_factor}: 1.2 sandy, 1.3 loamy,
+1.4 clay) plus 0.02 times the total carbonate content (percent). When
+\code{total_carbonate} is not supplied, the legacy constant
+\code{p_availability_meta$P_immobilisation_factor} (1.6, i.e. a loamy soil with
+15 percent total carbonate) is used.
 }
 \examples{
 soil_P_availability(olsen_value = 15, unit = "P2O5",

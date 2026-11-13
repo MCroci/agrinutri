@@ -7,7 +7,9 @@
 #'   K2O da apportare = A (asportazione) + H (lisciviazione clay-based) + B1 (arricchimento)
 #'                      + A2 (advance_allowed) - B2 (riduzione)
 #' }
-#' with A set to 0 in "Riduzione" strategy.
+#' where B1 (enrichment) and B2 (reduction) depend on the exchangeable-K class
+#' (see [soil_K_availability()]). The result is bounded to 0-300 kg K2O/ha as in
+#' Fert_Office.
 #'
 #' @param expected_yield_tons_ha Expected yield (t/ha).
 #' @param crop Crop name (matches `uptake_table$crop`).
@@ -61,11 +63,14 @@ K_balance <- function(expected_yield_tons_ha,
                                include_leaching = include_leaching)
 
   # A_mantenimento already includes H leaching
-  K2O_required <- max(0,
-                      avail$A_mantenimento + avail$B1 + advance_K2O - avail$B2)
+  # Reported value: non-negative and capped at 300 kg K2O/ha
+  # (Fert_Office foglio "Valori da riportare", G3:G7)
+  K2O_required <- min(max(0,
+                          avail$A_mantenimento + avail$B1 + advance_K2O - avail$B2),
+                      300)
 
   data.frame(
-    A  = if (!is.na(avail$strategy) && avail$strategy == "Riduzione") 0 else A,
+    A  = A,
     A_fabbisogno = A,
     H  = avail$H,
     B1 = avail$B1,

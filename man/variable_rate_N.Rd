@@ -66,8 +66,8 @@ used as the \strong{base N rate} of the H&S sufficiency-index algorithm.
 }
 
 The output preserves the field-average dose computed by the balance: the
-raster of variable rates integrates (mean) to approximately the input
-\code{n_dose}, ensuring the agronomic constraint (MAS, ZVN) is respected.
+raster of variable rates has a mean equal to the input \code{n_dose} (water-filling
+rescaling within ), so the agronomic constraint (MAS, ZVN) is kept.
 }
 \examples{
 \dontrun{
@@ -89,11 +89,11 @@ bal <- N_balance(expected_yield_tons_ha = 6,
                  source = "None", fertorg_frequency = "every year",
                  location = "Plain adjacent to urbanized areas",
                  forg_quantity = 0)
-n_dose <- calculate_N_fertilization(bal)   # ~142 kg/ha
+n_dose <- calculate_N_fertilization(bal)   # ~128 kg/ha
 
 # 2) Spatialise via NDVI calibration
 vr <- variable_rate_N(ndvi, n_dose = n_dose, method = "calibration",
-                      mas_cap = get_MAS("Grano duro (pianta intera)")$N_max)
+                      mas_cap = get_MAS("Grano duro (pianta intera)")$mas_N)
 terra::plot(vr$rate_raster)
 vr$mean_kg_ha
 }

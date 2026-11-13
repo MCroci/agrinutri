@@ -12,14 +12,20 @@ bibentry(
   author = c(
     person("Michele", "Croci", role = c("aut", "cre"),
            email = "michele.croci@unicatt.it"),
+    person("Giorgio", "Impollonia", role = "aut"),
+    person("Andrea", "Ferrarini", role = "aut"),
+    person("Andrea", "Fiorini", role = "aut"),
     person("Manuele", "Ragazzi", role = "aut"),
+    person("Nicolaj", "Franceschi", role = "aut"),
+    person("Vincenzo", "Tabaglio", role = "aut"),
     person("Stefano", "Amaducci", role = "aut")
   ),
   year = 2026,
   note = paste("R package version", ver),
   url = "https://github.com/mcroci/NFert",
   textVersion = paste0(
-    "Croci M, Ragazzi M, Amaducci S (2026). ",
+    "Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N, Tabaglio V, ",
+    "Amaducci S (2026). ",
     "NFert: N, P and K Fertilization Following Emilia-Romagna DPI 2026. ",
     "R package version ", ver, ". ",
     "https://github.com/mcroci/NFert"

@@ -103,7 +103,7 @@ critical_N_curve("mais")   # italian
 
 The curve is Nc = a * W^(-b), where Nc is the critical N concentration
 (% DM) and W the aboveground dry biomass (t DM / ha). Defaults come
-from Justes 1994 (wheat), Plenet & Lemaire 2000 (maize), Sheehy 1998
+from Justes 1994 (wheat), Plenet & Lemaire 1999 (maize), Sheehy 1998
 (rice), Colnenne 1998 (rapeseed), Duru 1997 (grass), van Oosterom 2010
 (sorghum), Debaeke 2012 (sunflower).
 
@@ -266,7 +266,7 @@ canopies. In: Diagnosis of the Nitrogen Status in Crops. Springer.
 Li, F. et al. (2014). Improving estimation of summer maize nitrogen
 status with red edge-based spectral vegetation indices. F. Crops Res. 157.
 
-Plenet, D. & Lemaire, G. (2000). Relationships between dynamics of
+Plenet, D. & Lemaire, G. (1999). Relationships between dynamics of
 nitrogen uptake and dry matter accumulation in maize crops. Plant Soil 216.
 
 ## Session info

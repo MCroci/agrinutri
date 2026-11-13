@@ -160,3 +160,25 @@ list_crops <- function() {
   }
   data.frame(crop = ut$crop, crop_en = ut$crop_en, stringsAsFactors = FALSE)
 }
+
+# Crop attributes from crops.table (Fert_Office foglio "Coltura") used by the
+# N balance: proposed N-fixation share (%) and default ceiling on the dose.
+.crop_info <- function(crop) {
+  out <- list(n_fixation_pct = 0, N_limit = 340)
+  ct <- tryCatch(nfert_data_get("crops.table"), error = function(e) NULL)
+  if (is.null(ct)) return(out)
+  norm <- function(x) .nfert_ascii_fold(tolower(gsub("[[:space:]]+", " ", trimws(as.character(x)))))
+  key <- norm(crop)
+  i <- match(key, norm(ct$crop))
+  if (is.na(i) && "crop_it" %in% names(ct)) i <- match(key, norm(ct$crop_it))
+  if (is.na(i)) {
+    rc <- suppressWarnings(resolve_crop(crop))
+    i <- match(norm(rc), norm(ct$crop))
+  }
+  if (is.na(i)) return(out)
+  fp <- suppressWarnings(as.numeric(ct$n_fixation_pct[i]))
+  lim <- suppressWarnings(as.numeric(ct$N_limit[i]))
+  if (is.finite(fp)) out$n_fixation_pct <- fp
+  if (is.finite(lim)) out$N_limit <- lim
+  out
+}

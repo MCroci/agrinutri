@@ -1,6 +1,6 @@
 ---
 title: "N, P and K fertilization with NFert — DPI Emilia-Romagna 2026"
-author: "Michele Croci, Manuele Ragazzi, Stefano Amaducci"
+author: "Michele Croci, Manuele Ragazzi, Giorgio Impollonia, Stefano Amaducci"
 date: "`r format(Sys.Date(), '%B %Y')`"
 output:
   rmarkdown::html_vignette:
@@ -106,7 +106,8 @@ start_spring_rain <- 0
 
 # Management
 prev_crop         <- "Maize stalks removed"
-location          <- "Plain adjacent to urbanized areas"
+location          <- "Isolated plain"   # "Pianura isolata" in Fert_Office
+oxygen            <- "Slow"             # "Imperfetta" in Fert_Office
 soil_seeding      <- "traditional"
 greenhouse        <- FALSE
 ```
@@ -166,7 +167,7 @@ n_bal <- N_balance(
   ccp  = "Spring-summer crop 100-130 days",
   sand = sand, clay = clay,
   Ntot = Ntot, SOM = SOM, CN = CN,
-  oxygen_availability = "Normal",
+  oxygen_availability = oxygen,
   winter_rain = winter_rain,
   start_spring_rain = start_spring_rain,
   prev_crop = prev_crop,
@@ -242,13 +243,13 @@ fertility
 
 leach <- leaching_loss(winter_rain = winter_rain,
                        start_spring_rain = start_spring_rain,
-                       oxygen_availability = "Normal",
+                       oxygen_availability = oxygen,
                        id_rag = soil_props$id_rag,
                        b1 = fertility$b1)
 leach
 
 imm <- calc_N_immobilization_loss(B = fertility$b1 + fertility$b2,
-                                  oxygen_availability = "Normal",
+                                  oxygen_availability = oxygen,
                                   id_rag = soil_props$id_rag,
                                   greenhouse = greenhouse,
                                   E_residual = -10)   # maize stalks removed
@@ -755,6 +756,34 @@ texture_groups.table
 - For crops with multiple phases (e.g. grano duro with fase nd), the MAS
   lookup uses the first matching row; pass `phase = ...` explicitly when
   ambiguity matters.
+
+# Agreement with Fert_Office and differences with the DPI text
+
+NFert reproduces Fert_Office v1.26 term by term. The test suite
+(`tests/testthat/test-fertoffice-validation.R`) compares every balance term
+and the reported N, P2O5 and K2O doses with the values computed by the
+spreadsheet itself on 400 random field scenarios (13 crops, all texture
+groups, drainage classes, precessions, previous organic fertilisation and
+no-till); all agree to within 1e-6 kg/ha.
+
+In a few places the printed tables of the DPI Norme Generali (Allegato 2,
+2024/25 edition) and Fert_Office give different numbers. NFert follows
+Fert_Office, which is the tool used to check DPI plans:
+
+| Item | Norme Generali text | Fert_Office v1.26 (used by NFert) |
+|---|---|---|
+| Mineralised N, sandy soil, C/N 9-12 and > 12 | 36 and 24 x SOM | 35 and 28 x SOM (the decomposition rates of the table footnote) |
+| Mineralised N, loamy soil, C/N > 12 | 20 x SOM | 22.1 x SOM |
+| N pronto per g/kg total N (sandy / loamy / clay) | 28.4 / 26 / 24.3 | 28 / 26 / 24, total N capped at 2.1 g/kg |
+| D correction factor, impeded drainage (sandy / loamy / clay) | 0.30 / 0.35 / 0.40 | 0.35 / 0.40 / 0.45 |
+| Residual N of a soybean precession | 0 | 10 kg/ha |
+| End-of-winter loss (Cb) | 1 kg N per 10 mm once winter + February rain exceeds 250 mm | the same, plus the loss of the N pronto not yet leached |
+
+Where the text and the tool agree, NFert follows both: organic matter
+above 3 % adds no mineralised N, perennial crops in production count only
+mineralised N and lose a fixed 30 kg N/ha pool to leaching, no-till seeding
+reduces the soil supply by 10 kg N/ha, and the previous-years' organic term
+is scaled by the time coefficient.
 
 # Session info
 

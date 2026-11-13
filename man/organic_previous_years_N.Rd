@@ -4,7 +4,12 @@
 \alias{organic_previous_years_N}
 \title{N from previous years' organic fertilization (term F in DPI balance)}
 \usage{
-organic_previous_years_N(N_applied_previous_year, source, frequency)
+organic_previous_years_N(
+  N_applied_previous_year,
+  source,
+  frequency,
+  c_tempo = 1
+)
 }
 \arguments{
 \item{N_applied_previous_year}{Numeric. Total N (kg/ha) applied in the previous year
@@ -14,6 +19,9 @@ from organic fertilization (same type and frequency as current practice).}
 
 \item{frequency}{Character. Application frequency: "every year", "every two years",
 "every three years", or "occasional".}
+
+\item{c_tempo}{Time coefficient of the crop phase (\code{coef_time$C_tempo});
+default 1 (whole year).}
 }
 \value{
 Numeric. F in kg/ha (residual N from previous years' organic).
@@ -21,9 +29,11 @@ Returns 0 if N_applied_previous_year is 0, NA, or NULL.
 }
 \description{
 Residual N available to the crop from organic fertilizer applied in previous
-years. DPI formula: F = N_applied_previous_year (kg/ha) x Recovery_coeff.
-Recovery coefficient depends on organic type and application frequency
-(Guida DPI 2026, sec. 3.1.6).
+years. DPI formula: F = N_applied_previous_year (kg/ha) x Recovery_coeff x
+C_tempo. The recovery coefficient depends on organic type and application
+frequency (DPI Allegato 2, Tab. 5-6); the supply becomes available over a
+whole year, so it is scaled by the time coefficient of the crop phase, as in
+Fert_Office v1.26 (foglio \code{F}, cell M14).
 }
 \examples{
 organic_previous_years_N(100, "Cattle slurry", "every year")   # 30 kg/ha

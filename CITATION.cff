@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use NFert, please cite it as below."
+title: "NFert: N, P and K Fertilization Following Emilia-Romagna DPI 2026"
+version: 1.0.0
+date-released: 2026-10-14
+license: MIT
+repository-code: "https://github.com/mcroci/NFert"
+url: "https://mcroci.github.io/NFert/"
+type: software
+keywords:
+  - R package
+  - nutrient balance
+  - fertilization planning
+  - precision agriculture
+  - Sentinel-2
+authors:
+  - family-names: Croci
+    given-names: Michele
+    email: michele.croci@unicatt.it
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Impollonia
+    given-names: Giorgio
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Ferrarini
+    given-names: Andrea
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Fiorini
+    given-names: Andrea
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Ragazzi
+    given-names: Manuele
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Franceschi
+    given-names: Nicolaj
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Tabaglio
+    given-names: Vincenzo
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"
+  - family-names: Amaducci
+    given-names: Stefano
+    affiliation: "Università Cattolica del Sacro Cuore, Piacenza, Italy"

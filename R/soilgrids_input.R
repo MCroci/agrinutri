@@ -55,7 +55,7 @@
 #' @seealso \code{\link{spatial_N_balance}}, \code{\link{farm_balance}}
 #'
 #' @examplesIf requireNamespace("geodata", quietly = TRUE) && interactive()
-#' aoi <- sf::st_read(system.file("extdata/aoi.geojson", package = "NFert"))
+#' aoi <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "NFert"))
 #' soil <- soilgrids_input(aoi, crs_out = 32632)
 #' n <- spatial_N_balance(soil, expected_yield_tons_ha = 9,
 #'                        crop = "Grano tenero FF (granella)",

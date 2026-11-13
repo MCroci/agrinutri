@@ -15,8 +15,8 @@
 #'    used as the **base N rate** of the H&S sufficiency-index algorithm.
 #'
 #' The output preserves the field-average dose computed by the balance: the
-#' raster of variable rates integrates (mean) to approximately the input
-#' `n_dose`, ensuring the agronomic constraint (MAS, ZVN) is respected.
+#' raster of variable rates has a mean equal to the input `n_dose` (water-filling
+#' rescaling within [0, `mas_cap`]), so the agronomic constraint (MAS, ZVN) is kept.
 #'
 #' @param ndvi_raster A `terra::SpatRaster` with NDVI (0--1); layer \code{NDVI}
 #'   if present, otherwise the first layer. Legacy `raster` objects are accepted
@@ -63,11 +63,11 @@
 #'                  source = "None", fertorg_frequency = "every year",
 #'                  location = "Plain adjacent to urbanized areas",
 #'                  forg_quantity = 0)
-#' n_dose <- calculate_N_fertilization(bal)   # ~142 kg/ha
+#' n_dose <- calculate_N_fertilization(bal)   # ~128 kg/ha
 #'
 #' # 2) Spatialise via NDVI calibration
 #' vr <- variable_rate_N(ndvi, n_dose = n_dose, method = "calibration",
-#'                       mas_cap = get_MAS("Grano duro (pianta intera)")$N_max)
+#'                       mas_cap = get_MAS("Grano duro (pianta intera)")$mas_N)
 #' terra::plot(vr$rate_raster)
 #' vr$mean_kg_ha
 #' }
@@ -103,19 +103,12 @@ variable_rate_N <- function(ndvi_raster,
     rate <- res$dose_raster
   }
 
-  # Preserve agronomic mean: rescale so mean(rate) == n_dose (only if numeric mean differs)
+  # Preserve the agronomic mean (mass-balance constraint): pixel mean equals
+  # n_dose, with every pixel in [0, mas_cap] (water filling)
+  hi <- if (!is.null(mas_cap) && is.numeric(mas_cap) && mas_cap > 0) mas_cap else Inf
   vals <- terra::values(rate, mat = FALSE)
-  m <- mean(vals, na.rm = TRUE)
-  if (is.finite(m) && m > 0 && abs(m - n_dose) > 0.01 * n_dose) {
-    rate <- rate * (n_dose / m)
-  }
-
-  # Optional MAS cap
-  if (!is.null(mas_cap) && is.numeric(mas_cap) && mas_cap > 0) {
-    vals <- terra::values(rate, mat = FALSE)
-    vals[!is.na(vals) & vals > mas_cap] <- mas_cap
-    rate <- terra::setValues(rate, vals)
-  }
+  vals <- .preserve_mean(vals, rep(1, length(vals)), n_dose, lo = 0, hi = hi)
+  rate <- terra::setValues(rate, vals)
 
   vals_final <- terra::values(rate, mat = FALSE)
   list(

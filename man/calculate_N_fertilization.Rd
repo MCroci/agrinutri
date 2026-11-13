@@ -9,8 +9,8 @@ calculate_N_fertilization(n_balance, method = "standard")
 \arguments{
 \item{n_balance}{A data frame returned by \code{N_balance()} containing nitrogen balance components.}
 
-\item{method}{The calculation method to use. Default is "standard" which uses the DPI formula:
-N_fert = A - B + C1 + C2 + D - E - F - Forg - G}
+\item{method}{The calculation method to use. Only "standard" (DPI balance)
+is available.}
 }
 \value{
 A numeric value representing the nitrogen fertilization requirement in kg/ha.
@@ -19,12 +19,18 @@ A numeric value representing the nitrogen fertilization requirement in kg/ha.
 Calculates the final nitrogen fertilization requirement (N_fert) from a nitrogen balance result.
 }
 \details{
-This function calculates the final nitrogen fertilization requirement based on the nitrogen
-balance components. If the result is negative, it returns 0 (no fertilization needed).
+This function calculates the mineral nitrogen to apply from the nitrogen
+balance components, as Fert_Office v1.26 does: the balance
 
-The standard (DPI) formula is:
+\if{html}{\out{<div class="sourceCode">}}\preformatted{N = A - B + C1 + C2 + D - E - F - G
+}\if{html}{\out{</div>}}
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+is multiplied by the share admitted for the crop phase (\code{N_pct}; 0 before
+planting, 1 for most phases), bounded to 0 and to the crop's ceiling
+(\code{N_limit}, usually 340 kg N/ha), and the current-year organic N \code{Forg} is
+then subtracted (the result is never negative):
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{N_fert = max(0, min(max(0, N * N_pct), N_limit) - Forg)
 }\if{html}{\out{</div>}}
 
 Where:
@@ -42,7 +48,7 @@ Where:
 \examples{
 # Calculate nitrogen balance
 balance <- N_balance(
-  expected_yield_tons_ha = 15,
+  expected_yield_tons_ha = 60,
   crop = "Mais trinciato (classe 700)",
   ccp = "Spring-summer crop 100-130 days",
   sand = 50, clay = 35,

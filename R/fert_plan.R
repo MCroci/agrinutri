@@ -213,5 +213,3 @@ plan_distribution <- function(soil_group,
   )
 }
 
-# null-coalesce helper
-`%||%` <- function(a, b) if (is.null(a)) b else a

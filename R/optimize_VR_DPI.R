@@ -100,10 +100,9 @@ optimize_VR_DPI <- function(field_inputs,
   bal <- do.call(N_balance, fi)
   bal <- bal[1L, , drop = FALSE]
 
-  # Explicit column references (not with(bal, ...)) so codetools does not flag
-  # the balance terms as undefined globals (R CMD check "no visible binding").
-  N_tot_DPI <- bal$A - bal$B + bal$C1 + bal$C2 + bal$D -
-    bal$E - bal$F - bal$Forg - bal$G
+  # Mineral N admitted by the balance, as reported by Fert_Office (phase
+  # share, crop ceiling, current-year organic N subtracted, never negative)
+  N_tot_DPI <- calculate_N_fertilization(bal)
 
   mas_row <- get_MAS(field_inputs$crop)
   if (is.null(mas_row) || nrow(mas_row) == 0L || is.na(mas_row$mas_N[1])) {
@@ -280,10 +279,8 @@ optimize_VR_DPI <- function(field_inputs,
   K2O_cell  <- eonr[, "K"] * 1.205
 
   .fill_rst <- function(template, idx_logical, vals) {
-    r <- terra::rast(template)
-    vv <- terra::values(r, mat = FALSE)
-    if (is.matrix(vv)) vv <- vv[, 1L]
-    vv[] <- NA_real_
+    r <- terra::rast(template, nlyrs = 1L)
+    vv <- rep(NA_real_, terra::ncell(r))
     vv[idx_logical] <- vals
     terra::values(r) <- vv
     r

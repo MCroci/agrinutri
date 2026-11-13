@@ -2,22 +2,20 @@
 # keep Italian/accented user input resolving to the canonical row.
 
 test_that("no bundled dataset contains non-ASCII characters", {
-  data_files <- list.files(system.file("..", package = "NFert", mustWork = FALSE),
-                           pattern = "\\.rda$", full.names = TRUE)
-  # When testing the source tree, fall back to the data/ directory.
-  if (!length(data_files) && dir.exists("data"))
-    data_files <- list.files("data", pattern = "\\.rda$", full.names = TRUE)
-  skip_if(!length(data_files), "no .rda data files found in this layout")
+  # Works both on the installed package (lazy-load database) and under
+  # load_all(): list the datasets from the package metadata and fetch each one.
+  items <- utils::data(package = "NFert")$results[, "Item"]
+  items <- sub(" .*$", "", items)          # drop "(alias)" suffixes
+  expect_gt(length(items), 10L)
   bad <- character()
-  for (f in data_files) {
-    ev <- new.env(); load(f, envir = ev)
-    for (nm in ls(ev)) {
-      obj <- ev[[nm]]
-      cols <- if (is.data.frame(obj)) obj else list(obj)
-      for (col in cols) {
-        x <- if (is.factor(col)) levels(col) else col
-        if (is.character(x) && any(grepl("[^ -~]", x))) bad <- c(bad, basename(f))
-      }
+  for (nm in items) {
+    obj <- tryCatch(nfert_data_get(nm), error = function(e) NULL)
+    if (is.null(obj)) next
+    cols <- if (is.data.frame(obj)) obj else list(obj)
+    for (col in cols) {
+      x <- if (is.factor(col)) levels(col) else col
+      if (is.character(x) && any(grepl("[^ -~]", x, useBytes = TRUE), na.rm = TRUE))
+        bad <- c(bad, nm)
     }
   }
   expect_identical(unique(bad), character())

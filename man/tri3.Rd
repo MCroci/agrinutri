@@ -28,6 +28,9 @@ Determines a simplified soil texture class based on clay and sand percentages.
 \item This function provides a simplified classification based on the USDA soil
 texture triangle. For a more detailed classification, consider using the
 \code{tri2()} function.
+\item As in Fert_Office (foglio \code{Suolo}), \code{clay} and \code{sand} are truncated to
+whole percentages (\code{INT}) before the triangle lookup, so 40.6 \% clay is
+read as 40 \%.
 \item Ensure that \code{clay} and \code{sand} percentages are valid (within 0-100) and their
 sum does not exceed 100.
 }

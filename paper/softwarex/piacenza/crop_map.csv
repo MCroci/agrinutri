@@ -1,0 +1,18 @@
+class,dpi_crop,ccp,prev_crop,istat
+Soft wheat,Soft wheat FP/FPS (grain),Autumn-winter crop >150 days,Winter cereals straw removal,COMMEAT
+Durum wheat,Durum wheat (grain),Autumn-winter crop >150 days,Winter cereals straw removal,WHEATD
+Barley,Barley (grain),Autumn-winter crop >150 days,Winter cereals straw removal,BARLEY
+Other winter cereals,Barley (grain),Autumn-winter crop >150 days,Winter cereals straw removal,BARLEY
+Maize,Grain maize 500-700 (grain),Spring-summer crop >130 days,Maize stalks buried,MAIZE
+Maize (silage),Silage maize (class 700),Spring-summer crop 100-130 days,Maize stalks removed,CEROIS
+Alfalfa,Alfalfa,full production,Alfalfa in good conditions,
+Meadow,Polyphytic meadows,full production,Mixed meadow with legumes 5-15%,
+Processing tomato,Processing tomato (medium yield),Spring-summer crop 100-130 days,Tomato and other vegetables,
+Soybean,Soybean (grain),Spring-summer crop 100-130 days,Soybean,SOYA
+Sunflower,Sunflower (achenes),Spring-summer crop 100-130 days,Sunflower,SUNFLO
+Sorghum,Grain sorghum (grain only),Spring-summer crop 100-130 days,Sorghum,SORGH
+cereali vernini,Soft wheat FP/FPS (grain),Autumn-winter crop >150 days,Winter cereals straw removal,COMMEAT
+mais,Grain maize 500-700 (grain),Spring-summer crop >130 days,Maize stalks buried,MAIZE
+prato e medica,Alfalfa,full production,Alfalfa in good conditions,
+pomodoro,Processing tomato (medium yield),Spring-summer crop 100-130 days,Tomato and other vegetables,
+altre estive,Soybean (grain),Spring-summer crop 100-130 days,Soybean,SOYA

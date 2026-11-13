@@ -1,11 +1,12 @@
 Package: NFert
 Title: N, P and K Fertilization Following Emilia-Romagna DPI 2026
-Version: 0.14.2
+Version: 1.0.0
 URL: https://github.com/mcroci/NFert, https://mcroci.github.io/NFert/
 BugReports: https://github.com/mcroci/NFert/issues
 Authors@R:
     c(
         person("Michele", "Croci", email = "michele.croci@unicatt.it", role = c("aut", "cre")),
+        person("Giorgio", "Impollonia", role = "aut"),
         person("Andrea", "Ferrarini", role = "aut"),
         person("Andrea", "Fiorini", role = "aut"),
         person("Manuele", "Ragazzi", role = "aut"),
@@ -13,52 +14,34 @@ Authors@R:
         person("Vincenzo", "Tabaglio", role = "aut"),
         person("Stefano", "Amaducci", role = "aut")
     )
-Description: Calculates N, P2O5 and K2O fertilization requirements following
-    the Disciplinari di Produzione Integrata (DPI) Emilia-Romagna – method of
-    the balance (Allegato 2) and the "Scheda a dose Standard" simplified
-    method. It implements the nutrient balance model used by FertDPI /
-    Fert_Office (v1.26, Febbraio 2026) and accounts for crop demand (A), soil
-    supply (B1/B2/A-Mantenimento), leaching (C1, C2, H), immobilization (D),
-    previous crop residues (E), organic fertilization (F, F_org), and natural
-    deposition (G). Includes soil texture classification (USDA and DPI
-    groupings), maximum allowed doses (MAS), Olsen P and exchangeable K
-    availability classes, soil pH / carbonate / CEC classification,
-    fertilization distribution plan with organic and mineral fertilisers,
-    end-of-cycle soil P and K estimation, multi-index vegetation index engine
-    (NDVI, NDRE, GNDVI, CIred-edge, MCARI, MSAVI2) for Sentinel-2 and UAV
-    imagery, Nitrogen Nutrition Index (NNI) computation based on species-
-    specific critical-N dilution curves (Lemaire & Gastal 1997), Gaussian-
-    process retrieval of canopy biophysical variables (LAI, Cw, Cm, Cab,
-    canopy nitrogen content) from Sentinel-2 L2A imagery (pyeogpr GPR
-    models; Estevez et al. 2022) for remote-sensing-driven NNI mapping,
-    and     variable-rate N prescription (calibration and Holland & Schepers)
-    with mass-balance constraint, and optional DPI + QUEFTS coupling
-    (\code{optimize_VR_DPI}) with Rquefts. Includes tools for integrated and
-    precision nutrient management.
+Description: Calculates nitrogen, phosphorus (P2O5) and potassium (K2O) fertilization
+    requirements with the crop nutrient balance and the simplified
+    standard-dose methods of the Emilia-Romagna Integrated Production
+    Guidelines (Disciplinari di Produzione Integrata, DPI 2026), reproducing
+    the regional reference tool Fert_Office (v1.26). The nitrogen balance
+    accounts for crop demand, soil supply, leaching, immobilization, previous
+    crop residues, current and previous organic fertilization and natural
+    deposition. The package also provides soil texture and chemistry
+    classifiers, maximum allowed nitrogen doses, Olsen P and exchangeable K
+    availability classes, an organic plus mineral distribution plan with the
+    Nitrates Directive check, end-of-cycle soil P and K estimation, farm and
+    pixel-level spatial balances, a vegetation index engine for Sentinel-2 and
+    drone imagery, Gaussian-process retrieval of canopy traits from Sentinel-2
+    Level-2A data, the Nitrogen Nutrition Index (Lemaire and Gastal, 1997),
+    and variable-rate prescriptions (calibration ramp, Holland and Schepers
+    sufficiency index, nutrition-index zones) constrained to the balance dose,
+    with optional economic optimisation through 'Rquefts' and export to
+    machine formats. All coefficient tables are editable R objects, so the
+    balance can be re-parameterized for other guidelines.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-GB
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Depends: 
-    R (>= 4.0.0)
-Imports:
-    terra
-Suggests:
-    testthat (>= 3.0.0),
-    knitr,
-    rmarkdown,
-    jsonlite,
-    shiny (>= 1.7.0),
-    shinyjs,
-    DT,
-    ggplot2,
-    patchwork,
-    sf,
-    leaflet,
-    xml2,
-    spelling,
-    Rquefts,
-    limSolve,
-    geodata
+Depends: R (>= 4.0.0)
+Imports: terra
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown, jsonlite, shiny (>= 1.7.0),
+        shinyjs, DT, ggplot2, patchwork, sf, leaflet, xml2, spelling, Rquefts,
+        limSolve, geodata
 VignetteBuilder: knitr

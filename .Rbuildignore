@@ -25,3 +25,5 @@
 ^NFert_.*\.tar\.gz$
 ^.*\.Rcheck$
 ^[^/]*\.pdf$
+^LICENSE\.md$
+^CITATION\.cff$

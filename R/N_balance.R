@@ -1,6 +1,9 @@
 #' Nitrogen Balance Calculation
 #'
-#' Calculates the nitrogen balance of a crop considering various soil and environmental factors.
+#' Calculates the nitrogen balance of a crop with the DPI Emilia-Romagna 2026
+#' balance method (Allegato 2), reproducing the regional tool Fert_Office v1.26
+#' term by term. Where the printed DPI tables and Fert_Office differ, NFert
+#' follows Fert_Office (see `vignette("NFert-PK-and-distribution")`).
 #'
 #' @param expected_yield_tons_ha Expected crop yield in tons per hectare.
 #' @param crop Name of the crop.
@@ -32,37 +35,53 @@
 #'   \code{N_balance()} uses \code{"medium"} for \code{Forg} (typical farm practice
 #'   when not specified). Ignored for \code{Forg} when \code{forg_quantity == 0}.
 #' @param soil_seeding One of `"traditional"` (default) or `"no-till"`. If `"no-till"`,
-#'   DPI 2026 applies a 3 kg/ha reduction to b1 (readily available N).
+#'   the soil supply B is reduced by 10 kg/ha (DPI Allegato 2), for crops with
+#'   a cycle shorter than one year where the DPI allows it.
 #' @param greenhouse Logical. If `TRUE`, 2 kg/ha are added to D (DPI 2026 greenhouse factor).
 #'   Default `FALSE`.
 #' @param E_to_D Logical. If `TRUE` (default), negative `E` (e.g. buried stalks = -40) is
 #'   added to `D` as in Fert_Office v1.26 sheet C&D, and `E` in the output is set to 0.
 #'   If `FALSE`, `E` stays negative and the balance uses `calculate_N_fertilization()`.
+#'   `E` is counted only for crop phases where the DPI counts the precession
+#'   (`coef_time$precession_to_count`), i.e. not for perennial crops in production.
+#' @param n_fixation_pct Share (%) of the legume N demand covered by biological
+#'   fixation. `NULL` (default) uses the value proposed for the crop
+#'   (`crops.table$n_fixation_pct`). It is booked under `G` when the balance is
+#'   positive, as in Fert_Office; a value lower than the crop's default (lacking
+#'   inoculation) lowers the dose ceiling to 120 kg N/ha.
 #'
 #' @return A data frame containing the calculated nitrogen balance components (all in kg/ha):
 #'         \itemize{
 #'           \item A: Total nitrogen demand of the crop (kg/ha).
-#'           \item B: Total soil nitrogen supply (sum of b1 and b2) (kg/ha).
+#'           \item B: Total soil nitrogen supply, b1 + b2 - no-till reduction (kg/ha).
 #'           \item b1: Readily available mineral nitrogen (DPI B2) (kg/ha).
 #'           \item b2: Mineralizable N from soil organic matter (DPI B1) (kg/ha).
-#'           \item C1: Nitrogen leaching loss in winter (kg/ha).
-#'           \item C2: Nitrogen leaching loss in spring (kg/ha).
+#'           \item C1: Nitrogen leaching loss in autumn-winter (Ca) (kg/ha).
+#'           \item C2: Nitrogen leaching loss at the end of winter (Cb) (kg/ha).
 #'           \item D: Nitrogen immobilization loss (kg/ha). Includes the abs(E) contribution
-#'             if `E_to_D = TRUE` and E < 0, and `+2` if `greenhouse = TRUE`.
+#'             if `E_to_D = TRUE` and E < 0, and `+2` if `greenhouse = TRUE`
+#'             (not part of the Fert_Office v1.26 balance sheet).
 #'           \item E: Nitrogen from previous crop residues (kg/ha). If `E_to_D = TRUE` and
 #'             the raw value is negative, this column reports 0 (moved to D).
 #'           \item F: Nitrogen from previous years' organic fertilization (kg/ha).
 #'           \item Forg: Nitrogen from organic fertilizer (current year, efficient N) (kg/ha).
-#'           \item G: Natural nitrogen contribution (e.g., from rainfall) (kg/ha).
+#'           \item G: Natural contributions (kg/ha): `G_deposition` (atmospheric
+#'             deposition x time coefficient) plus `G_fixation` (legume N fixation).
+#'           \item no_till_reduction: Reduction of B for no-till seeding (kg/ha).
+#'           \item C_tempo, N_pct, N_limit: time coefficient of the phase, share
+#'             of the balance admitted for the phase and dose ceiling (kg/ha),
+#'             used by [calculate_N_fertilization()].
 #'           \item surplus_pluviometrico: Logical flag (DPI 2026 standard sheet, surplus rain).
 #'         }
 #'
 #' @details The nitrogen fertilization requirement (DPI formula) is:
-#'          N_fert = A - B + C1 + C2 + D - E - F - Forg - G
+#'          N = A - B + C1 + C2 + D - E - F - G, scaled by `N_pct`, bounded to
+#'          [0, `N_limit`]; the current-year organic N `Forg` is then subtracted
+#'          to give the mineral N ([calculate_N_fertilization()]).
 #' @export
 #'
 #' @examples
-#' N_balance(expected_yield_tons_ha = 15, crop = "Mais trinciato (classe 700)",
+#' N_balance(expected_yield_tons_ha = 60, crop = "Mais trinciato (classe 700)",
 #'           ccp = "Spring-summer crop 100-130 days", sand = 50, clay = 35,
 #'           Ntot = 1.2, SOM = 1.2, CN = 9.5, oxygen_availability = "Normal",
 #'           winter_rain = 160, start_spring_rain = 40,
@@ -78,7 +97,8 @@ N_balance <- function(expected_yield_tons_ha = 15, crop = "Grano tenero FF (gran
                       organic_previous_year_N = 0, soil_group = NULL, distribution_efficiency = NULL,
                       soil_seeding = c("traditional", "no-till"),
                       greenhouse = FALSE,
-                      E_to_D = TRUE){
+                      E_to_D = TRUE,
+                      n_fixation_pct = NULL){
 
   soil_seeding <- match.arg(soil_seeding)
 
@@ -122,42 +142,64 @@ N_balance <- function(expected_yield_tons_ha = 15, crop = "Grano tenero FF (gran
   id_rag <- soil_props$id_rag
   soil.group <- soil_props$soil.group
 
-  # Calculate crop nitrogen demand (returns list, extract numeric value)
-  A_result <- calc_crop_N_demand(expected_yield_tons_ha = expected_yield_tons_ha, crop = crop)
+  # Crop phase: time coefficient, precession rule and admitted share of N
+  coef_time <- nfert_data_get("coef_time")
+  ccp <- resolve_ccp(ccp, table = coef_time)
+  ph <- coef_time[match(ccp, coef_time$ccp), , drop = FALSE]
+  C_tempo <- as.numeric(ph$C_tempo)
+  id_fa_d <- as.integer(ph$ID_Fa_D)
+  count_precession <- isTRUE(as.logical(ph$precession_to_count))
+  N_pct <- if ("N_pct" %in% names(ph)) as.numeric(ph$N_pct) else 1
+
+  # A: crop demand, without the N-fixation discount (which Fert_Office books
+  # under G, see below)
+  A_result <- calc_crop_N_demand(expected_yield_tons_ha = expected_yield_tons_ha,
+                                 crop = crop, apply_n_fixation = FALSE)
   A <- A_result$N_requirement
+  crop_info <- .crop_info(crop)
+  fix_default <- crop_info$n_fixation_pct
+  if (is.null(n_fixation_pct)) n_fixation_pct <- fix_default
+  if (!is.numeric(n_fixation_pct) || length(n_fixation_pct) != 1L ||
+      is.na(n_fixation_pct) || n_fixation_pct < 0 || n_fixation_pct > 100)
+    stop("`n_fixation_pct` must be NULL or a single number between 0 and 100.")
 
-  # Calculate soil fertility (b1 = readily available/N pronto; b2 = mineralised from SOM)
+  # B: soil fertility (b1 = N pronto, b2 = mineralised from SOM)
   B <- soil_fertility(Ntot = Ntot, SOM = SOM, soil.group = soil.group, CN = CN, ccp = ccp,
-                      soil_seeding = soil_seeding)
-  B_total <- sum(B$b1, B$b2)
+                      soil_seeding = soil_seeding, crop = crop)
+  B_total <- B$B
 
-  # Calculate leaching losses
+  # C: leaching. Perennial crops in production lose a fixed 30 kg N/ha pool;
+  # the first phase of each cycle (pre-planting, second crop, 1st cut) has
+  # no autumn-winter loss (Fert_Office C&D!C20:C22).
   C <- leaching_loss(winter_rain = winter_rain, start_spring_rain = start_spring_rain,
-                     oxygen_availability = oxygen_availability, id_rag = id_rag, b1 = B[["b1"]])
+                     oxygen_availability = oxygen_availability, id_rag = id_rag,
+                     b1 = B$b1_potential, perennial = isTRUE(C_tempo >= 1),
+                     autumn_loss = !(id_fa_d %in% c(1L, 5L, 8L, 15L)))
 
-  # Precession residues (may be negative = immobilisation)
+  # E: previous crop, counted only for phases where the DPI counts it
   E_raw <- nitrogen_from_previous_crop_residues(previous_crop = prev_crop)
+  E_counted <- if (count_precession) E_raw else 0
 
-  # Calculate D including optional E<0 redirection and greenhouse factor
+  # D: immobilisation, plus |E| when E < 0 (Fert_Office C&D!G23)
   D <- calc_N_immobilization_loss(B = B_total, oxygen_availability = oxygen_availability,
                                   id_rag = id_rag,
                                   greenhouse = greenhouse,
-                                  E_residual = if (E_to_D) E_raw else 0)
+                                  E_residual = if (E_to_D) E_counted else 0)
 
   # If E<0 is folded into D, expose E = 0 in balance output to avoid double counting
-  E <- if (isTRUE(E_to_D) && !is.na(E_raw) && E_raw < 0) 0 else E_raw
+  E <- if (isTRUE(E_to_D) && !is.na(E_counted) && E_counted < 0) 0 else E_counted
 
+  # F: previous years' organic fertilisation, scaled by the time coefficient
   F_prev <- organic_previous_years_N(
     N_applied_previous_year = if (is.null(organic_previous_year_N)) 0 else organic_previous_year_N,
     source = source,
-    frequency = fertorg_frequency
+    frequency = fertorg_frequency,
+    c_tempo = C_tempo
   )
-  # Current-year organic N (Forg): DPI path N_tot × efficiency when texture + distribution
+  # Current-year organic N (Forg): DPI path N_tot x efficiency when texture + distribution
   # are known. Defaults match Fert_Office-style behaviour when args omitted.
   soil_for_org <- if (!is.null(soil_group)) soil_group else soil.group
   dist_for_org <- if (!is.null(distribution_efficiency)) distribution_efficiency else "medium"
-  # Skip organic_fertilization when quantity is 0 (avoids error in older package versions;
-  # same result as organic_fertilization(..., quantity = 0) returning 0)
   Forg <- if (isTRUE(forg_quantity == 0)) {
     0
   } else {
@@ -169,7 +211,21 @@ N_balance <- function(expected_yield_tons_ha = 15, crop = "Grano tenero FF (gran
       distribution_efficiency = dist_for_org
     )
   }
-  G <- natural_contribution(location = location, ccp = ccp)
+
+  # G: natural deposition, plus biological N fixation of legumes when the
+  # balance net of deposition is positive (Fert_Office foglio G, D13:D20)
+  G_deposition <- natural_contribution(location = location, ccp = ccp)
+  net <- A + C[["C1"]] + C[["C2"]] + D - B_total - E - F_prev - G_deposition
+  G_fixation <- if (isTRUE(net > 0) && n_fixation_pct > 0) A * n_fixation_pct / 100 else 0
+  G <- G_deposition + G_fixation
+
+  # Ceiling on the reported dose (Fert_Office "Valori da riportare", E4:E7):
+  # the crop's default limit, or 120 kg N/ha when the N fixation considered is
+  # lower than the crop's (lacking inoculation)
+  N_limit <- if (n_fixation_pct < fix_default) 120 else crop_info$N_limit
+  if (id_fa_d %in% c(2L, 3L))
+    warning("For young woody crops (1st / 2nd year) Fert_Office uses the ",
+            "standard-dose scheme; consider dose_standard_N().", call. = FALSE)
 
   # Check for NA values and warn user
   na_components <- character()
@@ -192,6 +248,9 @@ N_balance <- function(expected_yield_tons_ha = 15, crop = "Grano tenero FF (gran
   pieces <- list(A = A, B = B_total, b1 = B[["b1"]], b2 = B[["b2"]],
                  C1 = C[["C1"]], C2 = C[["C2"]], D = D, E = E,
                  F = F_prev, Forg = Forg, G = G,
+                 G_deposition = G_deposition, G_fixation = G_fixation,
+                 no_till_reduction = B[["no_till_reduction"]],
+                 C_tempo = C_tempo, N_pct = N_pct, N_limit = N_limit,
                  surplus_pluviometrico = C[["surplus_pluviometrico"]])
   empty <- names(pieces)[vapply(pieces, function(p) length(p) == 0, logical(1))]
   if (length(empty) > 0) {

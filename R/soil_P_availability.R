@@ -38,20 +38,17 @@ classify_P_olsen <- function(value,
     ppm_P    <- value * as.numeric(p_availability_meta$P2O5_to_P[1])
   }
 
-  # Match class by P2O5 range (DPI)
-  t <- p_availability.table
+  # Match class on the P (ppm) lower thresholds, as Fert_Office does
+  # (foglio Gri_P: VLOOKUP of the value converted to P)
+  t <- p_availability.table[order(p_availability.table$min_P_ppm), , drop = FALSE]
+  i <- findInterval(ppm_P, as.numeric(t$min_P_ppm))
   id <- NA_integer_
   rating <- NA_character_
   soil_class <- NA_character_
-  for (i in seq_len(nrow(t))) {
-    lo <- as.numeric(t$min_P2O5_ppm[i])
-    hi <- as.numeric(t$max_P2O5_ppm[i])
-    if (!is.na(lo) && !is.na(hi) && ppm_P2O5 >= lo && ppm_P2O5 < hi) {
-      id <- as.integer(t$ID_Gri_P[i])
-      rating <- as.character(t$rating[i])
-      soil_class <- as.character(t$`class`[i])
-      break
-    }
+  if (i >= 1L) {
+    id <- as.integer(t$ID_Gri_P[i])
+    rating <- as.character(t$rating[i])
+    soil_class <- as.character(t$`class`[i])
   }
 
   # DPI-style strategy: scarsa (1,2) = Arricchimento; normale (3,4) = Mantenimento; molto elevata (5) = Riduzione
@@ -76,9 +73,19 @@ classify_P_olsen <- function(value,
 #' `Mantenimento`, `Riduzione`) returns the contribution that goes onto the
 #' NECESSITA' side (B1, A anticipations) or onto the DISPONIBILITA' side (B2).
 #'
+#' In "Riduzione" (very high P) the crop removal A is kept and the excess over
+#' the upper bound of the normal range (68.7 ppm P2O5) times the soil weight is
+#' returned as B2, to be subtracted.
+#'
 #' The B1 arricchimento term equals the distance of the analytical value from
-#' the upper bound of the "bassa" class (22.9 ppm P2O5), multiplied by the soil
-#' weight at 30 cm (t/ha) and by the P immobilisation factor `P_immobilisation_factor = 1.6`.
+#' the lower bound of the normal class (22.9 ppm P2O5), multiplied by the soil
+#' weight at 30 cm (t/ha) and by the P immobilisation factor. As in
+#' Fert_Office (foglio `Gri_P`, cell L10) the factor is the texture-group base
+#' value (`texture_groups.table$P_immobilisation_factor`: 1.2 sandy, 1.3 loamy,
+#' 1.4 clay) plus 0.02 times the total carbonate content (percent). When
+#' `total_carbonate` is not supplied, the legacy constant
+#' `p_availability_meta$P_immobilisation_factor` (1.6, i.e. a loamy soil with
+#' 15 percent total carbonate) is used.
 #'
 #' @param olsen_value Numeric, Olsen P or P2O5 ppm.
 #' @param unit `"P"` or `"P2O5"` (default `"P"`).
@@ -86,6 +93,8 @@ classify_P_olsen <- function(value,
 #'   (must match `texture_groups.table$group`).
 #' @param A_demand_P2O5 Crop P2O5 demand (kg/ha) (from `calc_crop_P_demand()`).
 #' @param depth_cm Soil depth used for weight (default 30 cm).
+#' @param total_carbonate Total carbonate (CaCO3, percent) from the soil test.
+#'   `NULL` (default) uses the legacy constant immobilisation factor.
 #' @param p_availability.table,p_availability_meta,texture_groups.table Lookup tables.
 #'
 #' @return A list with `strategy`, `B1` (arricchimento kg/ha), `A_mantenimento`,
@@ -99,6 +108,7 @@ soil_P_availability <- function(olsen_value,
                                 soil_group,
                                 A_demand_P2O5,
                                 depth_cm = 30,
+                                total_carbonate = NULL,
                                 p_availability.table = nfert_data_get("p_availability.table"),
                                 p_availability_meta  = nfert_data_get("p_availability_meta"),
                                 texture_groups.table = nfert_data_get("texture_groups.table")) {
@@ -114,20 +124,33 @@ soil_P_availability <- function(olsen_value,
   }
   weight_col <- .texture_group_weight_col(depth_cm, texture_groups.table)
   soil_weight_t_ha <- as.numeric(texture_groups.table[[weight_col]][rt_idx])
-  f_imm <- as.numeric(p_availability_meta$P_immobilisation_factor[1])
+  if (is.null(total_carbonate)) {
+    f_imm <- as.numeric(p_availability_meta$P_immobilisation_factor[1])
+  } else {
+    if (!is.numeric(total_carbonate) || length(total_carbonate) != 1L ||
+        is.na(total_carbonate) || total_carbonate < 0 || total_carbonate > 100)
+      stop("`total_carbonate` must be a single number between 0 and 100 (percent CaCO3).")
+    f_imm <- as.numeric(texture_groups.table$P_immobilisation_factor[rt_idx]) +
+      0.02 * total_carbonate
+  }
 
-  # Upper bound of "bassa" class = 22.9 ppm P2O5 (DPI 2026)
-  # Deficit (positive) when P2O5 ppm < 22.9
-  upper_bassa <- max(p_availability.table$max_P2O5_ppm[p_availability.table$ID_Gri_P == 2], na.rm = TRUE)
+  # Normal range ("normale" = media + elevata): 22.9 - 68.7 ppm P2O5 (DPI 2026)
+  normal <- p_availability.table$`class` == "normale"
+  lower_normal <- min(p_availability.table$min_P2O5_ppm[normal], na.rm = TRUE)
+  upper_normal <- max(p_availability.table$max_P2O5_ppm[normal], na.rm = TRUE)
+
+  # Fert_Office works on the P2O5 value obtained back from P (Gri_P!M8)
+  p2o5 <- cls$value_ppm_P * 2.29
 
   B1 <- 0
   A_mant <- A_demand_P2O5
   B2 <- 0
   if (!is.na(cls$strategy) && cls$strategy == "Arricchimento") {
-    deficit <- max(0, upper_bassa - cls$value_ppm_P2O5)
-    B1 <- deficit * soil_weight_t_ha / 1000 * f_imm
+    # Enrichment up to the lower bound of the normal range (Gri_P!I14)
+    B1 <- max(0, lower_normal - p2o5) * soil_weight_t_ha / 1000 * f_imm
   } else if (!is.na(cls$strategy) && cls$strategy == "Riduzione") {
-    A_mant <- 0
+    # Reduction: the excess over the normal range is subtracted (Gri_P!I16)
+    B2 <- max(0, p2o5 - upper_normal) * soil_weight_t_ha / 1000
   }
 
   list(

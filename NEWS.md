@@ -1,5 +1,122 @@
 # NFert News
 
+## Version 1.0.0 (2026-10-14) — validated against Fert_Office v1.26
+
+This release aligns every term of the nitrogen, phosphorus and potassium
+balances with the regional reference tool Fert_Office v1.26 (DPI 2026) and
+adds a validation suite that compares NFert with the spreadsheet on random
+field scenarios. **Doses change for most inputs**; results of earlier versions
+were exact only for the sample field shipped with Fert_Office.
+
+### Bug fixes
+
+* `tri3.table`: the cell clay 22 %, sand 27 % carried the non-existent code
+  "FSS", so `calc_soil_group_and_id_rag()` (and the N balance) stopped with an
+  error for that texture; it is now "FL" (silt loam), like its neighbours.
+  A test checks that every code of the triangle exists in `soil.table`.
+
+### Breaking changes: nitrogen balance
+
+* `soil_fertility()`: N pronto uses total N capped at 2.1 g/kg and the 20 cm
+  soil weights of Fert_Office (28 / 26 / 24 kg per g/kg); mineralised N is
+  constant above 3 % organic matter and uses the decomposition rates of the
+  DPI footnote (e.g. 35 instead of 36 for sandy soils with balanced C/N).
+  `coefN_readily` and `coefN_mineralised` are rebuilt accordingly
+  (`data-raw/fertoffice_soil_N_coefficients.R`). Perennial crops in production
+  (time coefficient 1) count only mineralised N. No-till seeding reduces the
+  soil supply by 10 kg N/ha (was 3 on N pronto), for the crops where the DPI
+  allows it. New outputs: `b1_potential`, `no_till_reduction`, `B`, `C_tempo`.
+* `leaching_loss()`: perennial crops lose a fixed 30 kg N/ha pool; when winter
+  plus February rain exceeds 250 mm the remaining N pronto is lost and 1 kg
+  N/ha is added per 10 mm of excess (Fert_Office C&D!C24, C32); no autumn
+  loss in the first phase of a cycle. New arguments `perennial`,
+  `autumn_loss`.
+* `N_balance()`: the precession term E (and its negative part folded into D)
+  is counted only for phases where the DPI counts it; F is scaled by the time
+  coefficient; biological N fixation of legumes is no longer subtracted from A
+  but booked under G when the balance is positive (new argument
+  `n_fixation_pct`, new outputs `G_deposition`, `G_fixation`, `C_tempo`,
+  `N_pct`, `N_limit`).
+* `calculate_N_fertilization()`: the balance is multiplied by the share
+  admitted for the phase, bounded to 0 and to the crop ceiling, and the
+  current-year organic N is subtracted afterwards.
+* `organic_previous_years_N()`: new argument `c_tempo`; `"Manures"` (and other
+  amendments) now use the amendment coefficients and `"None"` gives 0 (both
+  were treated as cattle slurry).
+* `tri2()` / `tri3()`: clay and sand are truncated to whole percentages before
+  the triangle lookup, as in Fert_Office (they were rounded).
+
+### Breaking changes: P, K and MAS
+
+* `P_balance()` / `soil_P_availability()`: new argument `total_carbonate`; the
+  P immobilisation factor is the texture value plus 0.02 x CaCO3 (it was fixed
+  at 1.6). Very high P ("Riduzione") now subtracts the excess over the normal
+  range from the crop removal instead of returning 0. Doses are capped at
+  250 kg P2O5/ha.
+* `K_balance()` / `soil_K_availability()`: low K now adds the enrichment term
+  (deficit x soil weight x (1 + 0.018 x clay)), which was 0; high K subtracts
+  the excess from A + H instead of returning 0. Doses are capped at
+  300 kg K2O/ha.
+* `classify_P_olsen()` / `classify_K()`: classes are found on the P and K
+  thresholds after conversion, as Fert_Office does, which changes the class
+  only for values on a class boundary.
+* `get_MAS()` / `check_MAS()` now read the bundled `mas.table` (239 crops, the
+  MAS sheet of Fert_Office v1.26). The previous built-in 2026 table used the
+  "theoretical maximum" (340 kg N/ha) for several crops and other wrong values,
+  e.g. silage maize 340 instead of 280, durum wheat 200 instead of 190, apple
+  340 instead of 120. Generic names such as "Mais da insilato" still resolve.
+
+### Fixes
+
+* `spatial_N_balance()` computed `N_to_apply` with the raw balance formula;
+  it now uses `calculate_N_fertilization()`, like `farm_balance()` and
+  Fert_Office (phase share, crop ceiling, no negative doses).
+* `build_strip_prescription()` drew strips in Web Mercator (EPSG:3857) by
+  default, so at mid latitudes `machine_width` and `cell_length` were too
+  short on the ground (24 m became about 17 m at 45 deg N) and `area_ha` was
+  inflated (about x2). Strips are now drawn in the local UTM zone
+  (`crs_metric = NULL`). `export_prescription()` likewise computed areas in
+  Web Mercator (the ISOXML zone areas and the sliver filter); it now uses the
+  true area.
+* `build_strip_prescription()` and `variable_rate_N()` now meet the
+  mass-balance constraint exactly: the area-weighted (or pixel) mean equals the
+  balance dose within the dose bounds (iterative water filling). Before, the
+  map was rescaled once and then clipped, so the mean drifted when a bound was
+  hit (and `variable_rate_N()` skipped the rescaling below a 1 % gap and
+  applied the MAS cap afterwards).
+* `optimize_VR_DPI()` now caps the economic optimum with the dose reported by
+  `calculate_N_fertilization()` (phase share, crop ceiling, never negative)
+  instead of the raw balance.
+* `optimize_VR_DPI()` no longer warns "raster has no values" when building
+  its output rasters.
+* `nni_from_vi_empirical()` names the unsupported crop in its error message.
+* `ratio_K_CEC()` returns "non calcolato" for a missing CEC instead of failing.
+* Removed a duplicate `%||%` definition that silently overrode the
+  zero-length-aware one.
+* `export_prescription()` no longer triggers GDAL warnings when writing a new
+  Shapefile or KML.
+* `build_strip_prescription()` no longer warns about constant attributes.
+* `soilgrids_input()` is now documented (its Rd file was missing) and its
+  example uses a bundled file.
+* Documentation examples and the P/K vignette use the actual inputs of the
+  Fert_Office sample field.
+
+### Tests and infrastructure
+
+* New validation suite `test-fertoffice-validation.R` with a fixture of
+  random scenarios computed by Fert_Office through Excel
+  (`data-raw/fertoffice_validation.py`).
+* Benchmark tests now require exact agreement with the Fert_Office sample
+  (previously a 120-170 kg/ha window and a 200 % relative tolerance).
+* Many new unit tests; line coverage rose from about 63 % to over 85 %.
+* Spell check of the documentation (`tests/spelling.R`, `inst/WORDLIST`,
+  `Language: en-GB`).
+* A smoke test checks that the Shiny app loads and its server starts.
+* Publisher reprints are no longer tracked in `references/`.
+* `inst/CITATION` lists all authors; new `CITATION.cff` (for GitHub and
+  Zenodo) and `LICENSE.md` with the full MIT text.
+* The README describes the whole package, with examples that run as written.
+
 ## Version 0.14.2 (2026-07-03) — Sentinel-2 biophysical scaling fixed
 
 ### Fixes

@@ -11,13 +11,14 @@ soil_fertility(
   CN = 8,
   ccp = "Autumn-winter crop <150 days",
   soil_seeding = c("traditional", "no-till"),
+  crop = NULL,
   coefN_readily = nfert_data_get("coefN_readily"),
   coefN_mineralised = nfert_data_get("coefN_mineralised"),
   coef_time = nfert_data_get("coef_time")
 )
 }
 \arguments{
-\item{Ntot}{Total nitrogen content in the soil (e.g. g/kg or per mille).}
+\item{Ntot}{Total nitrogen content in the soil (g/kg, per mille).}
 
 \item{SOM}{Soil organic matter content (\%).}
 
@@ -27,23 +28,46 @@ soil_fertility(
 
 \item{ccp}{Crop category and planting period (e.g., "Autumn-winter crop <150 days").}
 
-\item{soil_seeding}{Seeding mode, one of \code{"traditional"} (default) or \code{"no-till"}.
-DPI 2026 applies a detrazione of 3 kg N/ha on b1 (readily available N, "N pronto")
-for semina su sodo, because tillage-driven mineralisation is absent. See
-foglio B, cella \verb{Detrazione per semina su sodo = 3} in Fert_Office v1.26.}
+\item{soil_seeding}{Seeding mode, one of \code{"traditional"} (default) or \code{"no-till"}.}
+
+\item{crop}{Optional crop name; used to check whether the no-till reduction
+applies to the crop. If \code{NULL}, the reduction applies to every crop.}
 
 \item{coefN_readily, coefN_mineralised, coef_time}{Lookup tables.}
 }
 \value{
 A named list containing:
 \itemize{
-\item b1: Readily available nitrogen (kg/ha), DPI B2.
+\item b1: Readily available nitrogen (kg/ha), DPI B2 (0 for perennial crops
+in production).
 \item b2: Mineralized nitrogen from SOM (kg/ha), DPI B1.
+\item b1_potential: N pronto before the perennial rule (used by the leaching
+term).
+\item no_till_reduction: Reduction for no-till seeding (kg/ha).
+\item B: Total soil supply b1 + b2 - no_till_reduction (kg/ha).
+\item C_tempo: Time coefficient of the crop phase.
 \item units: The units of the output values ("kg/ha").
 }
 }
 \description{
-Estimates readily available and mineralized nitrogen in the soil. DPI naming:
-b1 = readily available N from soil total N (DPI B2); b2 = mineralized N from
-SOM (DPI B1). Total B = b1 + b2.
+Estimates readily available and mineralized nitrogen in the soil as in
+Fert_Office v1.26 (foglio \code{B}). DPI naming: b1 = readily available N from
+soil total N ("N pronto", DPI B2); b2 = mineralized N from SOM (DPI B1).
+}
+\details{
+\itemize{
+\item b1 = \code{coef.N.readily} x min(Ntot, 2.1); it is counted only for
+crops with a time coefficient below 1 (cycle shorter than one year).
+Perennial crops in production (\code{C_tempo} = 1) use B = b2 only.
+\item b2 = \code{coef.N.mineralised} x min(SOM, 3) x \code{C_tempo}; the DPI keeps
+the mineralised N constant above 3 percent organic matter.
+\item With \code{soil_seeding = "no-till"} (semina su sodo) the soil supply is
+reduced by 10 kg N/ha, for crops where the DPI allows it
+(\code{crops.table$no_till_reduction}) and only when b1 is counted.
+}
+Total B = b1 + b2 - \code{no_till_reduction}.
+}
+\examples{
+soil_fertility(Ntot = 1.5, SOM = 2, soil.group = "Loamy textures", CN = 7.7,
+               ccp = "Spring-summer crop 100-130 days")
 }

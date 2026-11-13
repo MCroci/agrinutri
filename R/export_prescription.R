@@ -259,11 +259,9 @@ export_prescription_all <- function(x,
                                 gpkg_layer = NULL) {
   if (!dose_field %in% names(sfobj))
     stop("Dose field '", dose_field, "' not found in the input.")
-  # Project to WGS84 (required by all VRT monitors) via a metric CRS
-  # for the area computation.
-  mtr <- if (sf::st_is_longlat(sfobj))
-    sf::st_transform(sfobj, 3857) else sfobj
-  sfobj$area_m2 <- as.numeric(sf::st_area(mtr))
+  # True area (geodesic for lon/lat input; Web Mercator would inflate it by
+  # 1 / cos^2(latitude), i.e. about x2 at 45 deg N)
+  sfobj$area_m2 <- as.numeric(sf::st_area(sfobj))
   keep <- sfobj$area_m2 >= area_min
   sfobj <- sfobj[keep, , drop = FALSE]
   sfobj <- sf::st_make_valid(sfobj)
@@ -282,7 +280,7 @@ export_prescription_all <- function(x,
     sfobj <- sf::st_zm(sfobj, drop = TRUE, what = "ZM")
 
   write_args <- list(obj = sfobj, dsn = path,
-                     delete_dsn = TRUE, quiet = TRUE)
+                     delete_dsn = file.exists(path), quiet = TRUE)
   if (!is.null(driver))     write_args$driver <- driver
   if (!is.null(gpkg_layer)) write_args$layer  <- gpkg_layer
   do.call(sf::st_write, write_args)
@@ -364,9 +362,7 @@ export_prescription_all <- function(x,
 .write_prep_for_isoxml <- function(sfobj, dose_field, area_min) {
   if (!dose_field %in% names(sfobj))
     stop("Dose field '", dose_field, "' not found in the input.")
-  mtr <- if (sf::st_is_longlat(sfobj))
-    sf::st_transform(sfobj, 3857) else sfobj
-  sfobj$area_m2 <- as.numeric(sf::st_area(mtr))
+  sfobj$area_m2 <- as.numeric(sf::st_area(sfobj))
   sfobj <- sfobj[sfobj$area_m2 >= area_min, , drop = FALSE]
   sfobj <- sf::st_make_valid(sfobj)
   sfobj <- sf::st_transform(sfobj, 4326)

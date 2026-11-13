@@ -114,6 +114,8 @@ The helper \code{\link{biophysical_to_NNI_inputs}} wraps this conversion.
 
 \examples{
 \dontshow{if (requireNamespace("terra", quietly = TRUE) && requireNamespace("jsonlite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+\donttest{
+# Loading the Gaussian-process model takes a few seconds
 scene <- system.file("extdata/sentinel-2/S2_field001_20240711.tif", package = "NFert")
 if (nzchar(scene)) {
   od <- tempfile()
@@ -121,6 +123,7 @@ if (nzchar(scene)) {
   maps <- estimate_biophysical(scene, od, variables = "LAI", block_rows = 32)
   stopifnot(inherits(maps$LAI, "SpatRaster"),
             file.exists(attr(maps, "paths")$LAI))
+}
 }
 \dontshow{\}) # examplesIf}
 }

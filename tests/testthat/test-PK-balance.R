@@ -104,10 +104,10 @@ test_that("P_balance reproduces grano duro scenario (112.9 kg P2O5/ha)", {
                  crop = "Grano duro (pianta intera)",
                  olsen_value = 15, olsen_unit = "P2O5",
                  clay = 18.5, sand = 15.5)
-  # A 63.6 + B1 ~49.3 = 112.9
-  expect_equal(round(b$A, 1), 63.6, tolerance = 1.5)
-  expect_equal(round(b$B1, 1), 49.3, tolerance = 1)
-  expect_equal(round(b$P2O5_required, 1), 112.9, tolerance = 2)
+  # Fert_Office v1.26 Bilancio!I15, I20, I33: A 63.6 + B1 49.296 = 112.896
+  expect_equal(b$A, 63.6, tolerance = 1e-6)
+  expect_equal(b$B1, 49.296047736, tolerance = 1e-6)
+  expect_equal(b$P2O5_required, 112.896047736, tolerance = 1e-6)
 })
 
 test_that("classify_K returns correct classes by soil group", {
@@ -135,9 +135,10 @@ test_that("K_balance reproduces grano duro scenario (139.4 kg K2O/ha)", {
                  crop = "Grano duro (pianta intera)",
                  k_value = 150, k_unit = "K2O",
                  clay = 18.5, sand = 15.5)
-  expect_equal(round(b$A, 1), 119.4, tolerance = 2)
+  # Fert_Office v1.26 Bilancio!J15, J16, J33
+  expect_equal(b$A, 119.4, tolerance = 1e-6)
   expect_equal(b$H, 20)
-  expect_equal(round(b$K2O_required, 1), 139.4, tolerance = 2)
+  expect_equal(b$K2O_required, 139.4, tolerance = 1e-6)
 })
 
 test_that("plan_distribution aggregates organic + mineral and checks excess", {

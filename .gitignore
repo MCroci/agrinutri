@@ -19,3 +19,23 @@ docs
 tmp/
 out/
 output/
+
+# Third-party journal articles kept locally for reference only (copyrighted:
+# never commit publisher reprints)
+references/1-s2.0-*.pdf
+references/From_Sensing_to_Intervention_*.pdf
+references/Modelling_and_mapping_maize_*.pdf
+references/Optimizing_nutrient_requirement_*.pdf
+references/The_nitrogen_fertilizer_conundrum_*.pdf
+references/SmalingandJanssen1993.pdf
+
+# Editor backups
+*.orig-backup
+
+# Piacenza application: field-level outputs stay local
+paper/softwarex/piacenza/data/fields.rds
+paper/softwarex/piacenza/data/tasks.rds
+# CERZOO soil data tied to the commercial soil-map provider: keep local
+paper/sat/data/residual_loo.csv
+paper/sat/data/field_soil_means.csv
+paper/sat/data/season/field_soil_means.csv

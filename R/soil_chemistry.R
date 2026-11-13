@@ -10,6 +10,10 @@
 #'   \item alcalino: 8.2 - 8.6
 #'   \item fortemente alcalino: > 8.6
 #' }
+#' The class is found as in Fert_Office (`VLOOKUP` on the lower thresholds
+#' 0, 5.4, 6.0, 6.7, 7.3, 8.1, 8.61), so a value equal to a threshold falls in
+#' the upper class: for instance pH 6.0 is "leggermente acido". The ranges
+#' above are those printed in the DPI table for one-decimal pH readings.
 #' @param pH Numeric.
 #' @param ph.table Lookup (default `NFert::ph.table`).
 #' @return List with `ID_pH` and `class`.
@@ -113,7 +117,9 @@ ratio_Mg_K <- function(mg_ppm, k_ppm) {
 #' @examples ratio_K_CEC(k_meq_per_100g = 0.38, csc_meq = 18)
 #' @export
 ratio_K_CEC <- function(k_meq_per_100g, csc_meq) {
-  if (any(!is.numeric(c(k_meq_per_100g, csc_meq))) || csc_meq <= 0) {
+  if (!is.numeric(k_meq_per_100g) || !is.numeric(csc_meq) ||
+      length(k_meq_per_100g) != 1L || length(csc_meq) != 1L ||
+      is.na(k_meq_per_100g) || is.na(csc_meq) || csc_meq <= 0) {
     return(list(pct = NA_real_, class = "non calcolato"))
   }
   pct <- 100 * k_meq_per_100g / csc_meq
