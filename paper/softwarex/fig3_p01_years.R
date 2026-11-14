@@ -34,7 +34,8 @@ rows <- lapply(YEARS, function(y) {
                  fertorg_frequency = "every year", location = "Isolated plain", forg_quantity = 0)
   pb <- P_balance(yld, m$dpi_crop, olsen_value = s$olsen_p, olsen_unit = "P", clay = s$clay, sand = s$sand)
   kb <- K_balance(yld, m$dpi_crop, k_value = s$k_exch, k_unit = "K", clay = s$clay, sand = s$sand)
-  data.frame(year = y, class = cl, crop = m$dpi_crop, yield = yld, rain = r$precip_mm.ondj,
+  data.frame(year = y, class = cl, crop = m$dpi_crop, ccp = m$ccp, prev_crop = if (length(pv)) pv[1] else "Undefined",
+             yield = yld, rain = r$precip_mm.ondj, spring_rain = r$precip_mm.feb,
              A = b$A, C = b$C1 + b$C2, D = b$D, B = -b$B, E = -b$E, F = -b$F, G = -b$G,
              N = calculate_N_fertilization(b), MAS = get_MAS(m$dpi_crop)$mas_N,
              P2O5 = pb$P2O5_required, K2O = kb[[grep("K2O_required|K2O", names(kb), value = TRUE)[1]]])

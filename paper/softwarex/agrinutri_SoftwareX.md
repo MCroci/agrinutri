@@ -177,7 +177,7 @@ agrinutri is an open R implementation of the Emilia-Romagna DPI 2026 nutrient ba
 
 # Data availability
 
-The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The field boundaries and crop classes of Sections 3.2 to 3.5 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and ISTAT data are public.
+The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The four field boundaries of Sections 3.2 to 3.5, with their crop classes and balance inputs, the Sentinel-2 scene over plot P01 and a clip of the regional soil maps are bundled with the package (`?piacenza`); the other fields of Section 4 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and ISTAT data are public.
 
 # Acknowledgements
 

@@ -5,6 +5,21 @@
 * `variable_rate_N()`: explicit `minN` / `maxN` now also bound the
   Holland-Schepers rates (they were applied to the calibration method only),
   while the field mean is still preserved.
+* New example data from the Piacenza plain (`?piacenza`): four
+  satellite-delineated fields with their crops 2019-2026 and the
+  `farm_balance()` inputs (`piacenza_farm.geojson`), the yearly inputs of plot
+  P01 (`piacenza_p01_rotation.csv`), the Sentinel-2 L2A scene of 13 August 2024
+  over P01 and a clip of the Emilia-Romagna soil maps 0-30 cm
+  (`rer_soil_piacenza.tif`, CC BY 4.0). Built by `data-raw/piacenza_example.R`.
+* Vignettes rewritten on these data: the spatial balance runs on the regional
+  soil maps and is checked against the field balance; the farm vignette adds
+  P2O5/K2O, one field through the rotation 2019-2026 and NNI strips from
+  Sentinel-2; the remote-sensing and prescription vignettes use the real scene;
+  the P/K vignette maps availability classes and doses at scale; the overview
+  vignette has a soil-map-to-farm-total figure.
+* Documentation: `Ntot` of `N_balance()` and the `TN` layer of
+  `spatial_N_balance()` are in g/kg (per mille), as `soil_fertility()` uses them;
+  the `spatial_N_balance()` example now converts the percent Cremonesi raster.
 
 ## Version 1.0.1 (2026-11-13)
 

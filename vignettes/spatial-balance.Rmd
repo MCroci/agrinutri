@@ -12,216 +12,160 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.width = 7,
-  fig.height = 5
+  fig.height = 4,
+  eval = requireNamespace("sf", quietly = TRUE)
 )
 ```
 
 ## Overview
 
-This vignette demonstrates the full agrinutri spatial workflow:
+This vignette runs the spatial workflow of agrinutri on real data from the Po plain
+near Piacenza (Italy):
 
-1. **Load** real soil-property rasters (bundled with the package)
-2. **Compute** a spatially-explicit nitrogen balance with `spatial_N_balance()`
-3. **Generate** a variable-rate (VRT) prescription with `variable_rate_N()` (Holland & Schepers method)
+1. **Load** the regional soil maps 0-30 cm (100 m grid) around a small farm,
+   bundled with the package.
+2. **Compute** a nitrogen balance for every pixel with `spatial_N_balance()`.
+3. **Check** it against the field balance of `farm_balance()`.
+4. **Redistribute** the field dose of one plot with a Sentinel-2 NDVI and
+   `variable_rate_N()`, keeping its mean.
 
-The workflow implements the pipeline described in Section 2.2 of the agrinutri
-SoftwareX article: the field-scale balance provides the regulatory-compliant N
-target, and the VRT functions redistribute it in space under a mass-balance
-constraint.
+The field-scale balance provides the regulatory N target; the variable-rate
+functions move it in space under a mass-balance constraint.
 
-## 1. Load the Cremonesi field rasters
+## 1. Regional soil maps and the farm
 
-agrinutri ships with six GeoTIFF rasters for a 12-ha arable field near Cremona
-(Northern Italy), at ~3.5 m resolution: total nitrogen (TN, %), soil organic
-matter (SOM, %), clay, sand and silt content (%), and the C/N ratio.
+`rer_soil_piacenza.tif` is a clip of the soil maps of Regione Emilia-Romagna
+(CC BY 4.0) over the farm and 1.5 km around it: clay and sand (percent),
+organic carbon (percent), total N (g/kg), Olsen P and exchangeable K (mg/kg).
+`spatial_N_balance()` wants total N, organic matter, clay, sand and the C/N
+ratio, so organic matter and C/N are derived from organic carbon.
 
-```{r load-rasters}
+```{r load}
 library(agrinutri)
 library(terra)
 
-ext <- system.file("extdata", package = "agrinutri")
-
-# Read individually: the bundled GeoTIFFs may have sub-pixel extent
-# mismatches from separate acquisitions, so we resample to a common
-# grid (the TN raster) before stacking.
-r_tn   <- terra::rast(file.path(ext, "Cremonesi_TN.tif"))
-r_som  <- terra::rast(file.path(ext, "Cremonesi_SOM.tif"))
-r_clay <- terra::rast(file.path(ext, "Cremonesi_Clay.tif"))
-r_sand <- terra::rast(file.path(ext, "Cremonesi_Sand.tif"))
-r_cn   <- terra::rast(file.path(ext, "Cremonesi_CNratio.tif"))
-
-align <- function(r, ref) {
-  if (!terra::compareGeom(r, ref, stopOnError = FALSE)) {
-    r <- terra::resample(r, ref, method = "bilinear")
-  }
-  r
-}
-soil <- terra::rast(list(r_tn,
-                         align(r_som,  r_tn),
-                         align(r_clay, r_tn),
-                         align(r_sand, r_tn),
-                         align(r_cn,   r_tn)))
+rer  <- terra::rast(system.file("extdata/rer_soil_piacenza.tif", package = "agrinutri"))
+soil <- c(rer[["ntot"]],                        # g/kg, as Ntot in N_balance()
+          rer[["corg"]] * 1.724,                # organic matter, percent
+          rer[["clay"]], rer[["sand"]],
+          rer[["corg"]] * 10 / rer[["ntot"]])   # C/N
 names(soil) <- c("TN", "SOM", "Clay", "Sand", "CNratio")
 
+farm <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"),
+                    quiet = TRUE)
+farm_v <- terra::vect(sf::st_transform(farm, terra::crs(soil)))
 soil
 ```
 
-```{r plot-inputs, fig.width=7, fig.height=3}
-par(mfrow = c(1, 2), mar = c(3, 3, 2, 4))
-terra::plot(soil[["SOM"]], main = "SOM (%)", col = terrain.colors(30))
-terra::plot(soil[["Clay"]], main = "Clay (%)", col = heat.colors(30))
+```{r plot-inputs, fig.height = 3.2}
+par(mfrow = c(1, 2), mar = c(1, 1, 2, 4))
+terra::plot(soil[["Clay"]], main = "Clay (%)", col = hcl.colors(30, "YlOrBr", rev = TRUE),
+            axes = FALSE)
+terra::lines(farm_v, lwd = 1.5)
+terra::plot(soil[["SOM"]], main = "Organic matter (%)", col = hcl.colors(30, "BrwnYl", rev = TRUE),
+            axes = FALSE)
+terra::lines(farm_v, lwd = 1.5)
 ```
 
-## 2. Compute the spatial nitrogen balance
+## 2. A balance for every pixel
 
-`spatial_N_balance()` iterates `N_balance()` over every non-NA pixel in the
-stack. Agronomic and climatic parameters (crop, yield, rainfall, previous
-crop, organic history) are uniform; the spatial variability is driven by the
-soil rasters alone.
+`spatial_N_balance()` calls `N_balance()` on every non-NA pixel. Crop, yield,
+rainfall, previous crop and organic history are scalars; the soil maps alone
+make the balance vary in space. Here every pixel is computed as the 2024 grain
+maize of plot P01, with the inputs stored in the farm layer.
 
 ```{r spatial-balance}
+p1 <- farm[farm$plot == "P01", ]
 n_map <- spatial_N_balance(
-  soil_stack            = soil,
-  expected_yield_tons_ha = 60,
-  crop                  = "Silage maize (class 700)",
-  ccp                   = "Spring-summer crop 100-130 days",
-  oxygen_availability   = "Normal",
-  winter_rain           = 160,
-  start_spring_rain     = 40,
-  prev_crop             = "Winter cereals straw removal",
-  source                = "Cattle slurry",
-  fertorg_frequency     = "every year",
-  location              = "Plain adjacent to urbanized areas",
-  forg_quantity         = 100
+  soil_stack             = soil,
+  expected_yield_tons_ha = p1$expected_yield_tons_ha,
+  crop                   = p1$crop,
+  ccp                    = p1$ccp,
+  oxygen_availability    = p1$oxygen_availability,
+  winter_rain            = p1$winter_rain,
+  start_spring_rain      = p1$start_spring_rain,
+  prev_crop              = p1$prev_crop,
+  source                 = p1$source,
+  fertorg_frequency      = p1$fertorg_frequency,
+  location               = p1$location,
+  forg_quantity          = 0
 )
-
-n_map
 ```
 
-```{r plot-balance, fig.width=5, fig.height=4}
-terra::plot(n_map[["N_to_apply"]],
-     main = "Mineral N to apply (kg N/ha)",
-     col = rev(terrain.colors(30)))
+```{r plot-balance, fig.width = 5, fig.height = 4}
+terra::plot(n_map[["N_to_apply"]], main = "Mineral N dose, maize 2024 (kg N/ha)",
+            col = hcl.colors(50, "Mako", rev = TRUE), axes = FALSE)
+terra::lines(farm_v, lwd = 1.5)
 ```
 
-The field-average N to apply is:
+## 3. Pixels and field agree
 
-```{r field-mean}
-terra::global(n_map[["N_to_apply"]], "mean", na.rm = TRUE)[1, 1]
+The mean of the pixels that touch plot P01 is close to the field balance computed
+by `farm_balance()` from the field means of the same maps:
+
+```{r check}
+pix <- terra::extract(n_map[["N_to_apply"]], farm_v[farm$plot == "P01"],
+                      fun = mean, na.rm = TRUE, touches = TRUE)[1, 2]
+fld <- farm_balance(farm)$N_target[farm$plot == "P01"]
+c(pixels = round(pix, 1), field = fld)
 ```
 
-## 3. Generate a synthetic NDVI raster
+## 4. Variable rate inside plot P01
 
-In a real application the NDVI raster comes from UAV or satellite imagery.
-Here we simulate one correlated with SOM (higher SOM → better canopy vigor):
-
-```{r synthetic-ndvi}
-set.seed(42)
-som_vals <- terra::values(soil[["SOM"]], mat = FALSE)
-som_01   <- (som_vals - min(som_vals, na.rm = TRUE)) /
-            diff(range(som_vals, na.rm = TRUE))
-ndvi_vals <- 0.52 + 0.25 * som_01 + rnorm(length(som_01), 0, 0.025)
-ndvi_vals <- pmin(pmax(ndvi_vals, 0.35), 0.85)
-ndvi_vals[is.na(som_vals)] <- NA
-
-ndvi <- terra::rast(soil[["SOM"]])
-terra::values(ndvi) <- ndvi_vals
-names(ndvi) <- "NDVI"
-```
-
-## 4. Variable-rate prescription (Holland & Schepers)
-
-The VRT function redistributes the field-mean N target across the
-NDVI-based vigor gradient, under the mass-balance constraint described
-in Section 2.2 of the article:
+`S2_piacenza_P01_20240813.tif` is the Sentinel-2 Level-2A scene of 13 August 2024
+over P01 (reflectance scaled by 10000). The NDVI drives the Holland-Schepers
+sufficiency index; the doses may range between 80 and 120 percent of the field
+balance and their mean is rescaled to it.
 
 ```{r vrt}
-N_target <- terra::global(n_map[["N_to_apply"]], "mean", na.rm = TRUE)[1, 1]
+s2   <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif",
+                                package = "agrinutri"))
+p1_v <- terra::project(farm_v[farm$plot == "P01"], terra::crs(s2))
+ndvi <- terra::mask(compute_vi(s2, "NDVI", scale_factor = 10000), p1_v)
 
-vr <- variable_rate_N(
-  ndvi_raster = ndvi,
-  n_dose      = N_target,
-  method      = "holland",
-  minN        = 40,
-  maxN        = 180
-)
-
-rx <- vr$rate_raster
+vr <- variable_rate_N(ndvi_raster = ndvi, n_dose = fld, method = "holland",
+                      minN = 0.8 * fld, maxN = 1.2 * fld)
 ```
 
-```{r plot-vrt, fig.width=7, fig.height=3}
-par(mfrow = c(1, 2), mar = c(3, 3, 2, 4))
-terra::plot(ndvi, main = "Synthetic NDVI", col = rev(terrain.colors(30)))
-terra::plot(rx,   main = "VRT N prescription (kg N/ha)",
-     col = rev(heat.colors(30)))
+```{r plot-vrt, fig.height = 3.2}
+par(mfrow = c(1, 2), mar = c(1, 1, 2, 4))
+terra::plot(ndvi, main = "NDVI, 13 August 2024", col = hcl.colors(30, "YlGn", rev = TRUE),
+            axes = FALSE)
+terra::lines(p1_v)
+terra::plot(vr$rate_raster, main = "Prescription (kg N/ha)",
+            col = hcl.colors(50, "Mako", rev = TRUE), axes = FALSE)
+terra::lines(p1_v)
 ```
-
-## 5. Verify the mass-balance constraint
-
-The field-mean VRT rate should match the balance-based N target:
 
 ```{r verify}
-cat("Balance N target:", round(N_target, 1), "kg N/ha\n")
-cat("VRT field mean:  ", round(vr$mean_kg_ha, 1), "kg N/ha\n")
-cat("VRT range:       ",
-    round(vr$min_kg_ha, 1), "–",
-    round(vr$max_kg_ha, 1), "kg N/ha\n")
+cat("Field balance:   ", fld, "kg N/ha\n")
+cat("Prescription mean:", round(vr$mean_kg_ha, 1), "kg N/ha\n")
+cat("Range:           ", round(vr$min_kg_ha, 1), "-", round(vr$max_kg_ha, 1), "kg N/ha\n")
 ```
 
-## 6. Export the prescription
+Where the bounds clip many pixels, the mean can stay below the target: the bounds
+take precedence over the mass balance.
 
-The resulting raster can be saved as a GeoTIFF and loaded into any GIS
-or farm-management software:
-```{r export, eval=FALSE}
-terra::writeRaster(rx, "VRT_prescription_Cremonesi.tif", overwrite = TRUE)
-```
+## 5. Export
 
-## 7. Tractor-ready formats
+The raster can be written as a GeoTIFF, or polygonised by `export_prescription()`
+into any of the formats accepted by on-board monitors (Shapefile, GeoJSON, KML,
+GeoPackage, John Deere-ready, Trimble-ready, ISOXML TASKDATA):
 
-`export_prescription()` polygonises a raster on the fly and writes any
-of the seven formats accepted by modern on-board monitors (Shapefile,
-GeoJSON, KML, GeoPackage, John Deere-ready, Trimble-ready, ISOXML
-TASKDATA):
-
-```{r export-multi, eval=FALSE}
-# Single file with auto-detected format
-export_prescription(rx, "VRT_Cremonesi.shp")
-
-# John Deere-ready (integer RATE column, WGS84)
-export_prescription(rx, "JD/VRT_Cremonesi.shp", format = "johndeere")
-
-# ISOXML TASKDATA directory
-export_prescription(rx, "TASKDATA", format = "isoxml",
-  isoxml_opts = list(task_name = "Cremonesi top-dress",
-                      product   = "Urea 46 pct",
-                      unit      = "kg/ha"))
-
-# Or the full multi-format bundle in one shot
-export_prescription_all(rx, "rx_bundle", "Cremonesi_2026",
+```{r export, eval = FALSE}
+terra::writeRaster(vr$rate_raster, "P01_prescription.tif", overwrite = TRUE)
+export_prescription(vr$rate_raster, "TASKDATA", format = "isoxml",
+  isoxml_opts = list(task_name = "P01 top-dress", product = "Urea 46 pct", unit = "kg/ha"))
+export_prescription_all(vr$rate_raster, "rx_bundle", "P01_2024",
   formats = c("shp", "isoxml", "johndeere"))
 ```
 
-## 8. Machine-width strip alternative
+For machine-width strips along an A-B line instead of pixels, see
+`vignette("farm-and-prescription-map")`.
 
-When the field already has a defined A-B driving line, the strip
-builder produces parallel polygons of the working width, each with a
-dose derived from the VRT raster (or from NNI / VI directly):
+## Data sources
 
-```{r strips, eval=FALSE}
-# Field polygon from the same farm GeoJSON
-ex    <- system.file("extdata/example_farm.geojson", package = "agrinutri")
-field <- sf::st_read(ex, quiet = TRUE)[1, ]
-
-rx_strip <- build_strip_prescription(
-  field         = field,
-  machine_width = 24,
-  cell_length   = 50,      # 0 = continuous strips; 50 = 2D grid cells
-  angle_deg     = NA,      # NA = use the long side automatically
-  variability   = "calibration",
-  vi_raster     = ndvi,
-  n_target      = N_target,
-  min_dose      = 40, max_dose = 180)
-
-export_prescription_all(rx_strip, "strip_bundle", "Cremonesi_strips",
-  formats = c("shp", "isoxml"))
-```
+Soil: Regione Emilia-Romagna, carte dei suoli 0-30 cm (tessitura; sostanza organica;
+azoto totale, fosforo assimilabile, potassio scambiabile), CC BY 4.0. Sentinel-2:
+Copernicus Sentinel data 2024. Field boundaries delineated from Sentinel-2; rainfall
+from ERA5. See `?piacenza`.

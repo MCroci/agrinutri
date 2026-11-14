@@ -372,6 +372,52 @@ Scenario: K = 150 ppm K2O is "media" in Medio impasto → Mantenimento.
 
 This matches cell `Gri_K!F30` of Fert_Office (A + H).
 
+# P and K at scale: regional soil maps
+
+The same functions run on every pixel of a soil map. `rer_soil_piacenza.tif` is a
+clip of the Emilia-Romagna soil maps 0-30 cm (100 m grid, CC BY 4.0) over a small
+farm of the Piacenza plain, with Olsen P as elemental P and exchangeable K as
+elemental K (mg/kg); see `?piacenza`. Each pixel gets its availability class and the
+P~2~O~5~ and K~2~O doses for a 7.4 t/ha grain maize, with its own clay and sand.
+
+```{r pk-regional, fig.width = 7, fig.height = 5.5, out.width = "100%"}
+rer <- terra::rast(system.file("extdata/rer_soil_piacenza.tif", package = "agrinutri"))
+v   <- terra::values(rer)
+ok  <- stats::complete.cases(v)
+grp <- vapply(which(ok), function(i)
+  calc_soil_group_and_id_rag(v[i, "clay"], v[i, "sand"])$soil.group, "")
+p_cls <- vapply(v[ok, "olsen_p"], function(x)
+  as.character(classify_P_olsen(x, unit = "P")$rating), "")
+k_cls <- mapply(function(x, g) as.character(classify_K(x, unit = "K", soil_group = g)$rating),
+                v[ok, "k_exch"], grp)
+p_dose <- mapply(function(x, cl, sa) P_balance(7.4, "Grain maize 500-700 (grain)", olsen_value = x,
+                 olsen_unit = "P", clay = cl, sand = sa)$P2O5_required,
+                 v[ok, "olsen_p"], v[ok, "clay"], v[ok, "sand"])
+k_dose <- mapply(function(x, cl, sa) K_balance(7.4, "Grain maize 500-700 (grain)", k_value = x,
+                 k_unit = "K", clay = cl, sand = sa)$K2O_required,
+                 v[ok, "k_exch"], v[ok, "clay"], v[ok, "sand"])
+table(P = p_cls); table(K = k_cls)
+
+put <- function(x) { r <- rer[[1]]; r[] <- NA; r[which(ok)] <- x; r }
+lv  <- c("very low", "low", "medium", "high", "very high")
+cls <- function(x) put(match(x, lv))
+farm <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"), quiet = TRUE)
+fv  <- terra::vect(sf::st_transform(farm, terra::crs(rer)))
+par(mfrow = c(2, 2), mar = c(1, 1, 2, 5))
+for (z in list(list(cls(p_cls), "Olsen P class"), list(cls(k_cls), "Exchangeable K class"))) {
+  terra::plot(z[[1]], main = z[[2]], col = hcl.colors(5, "Temps", rev = TRUE), type = "classes",
+              levels = lv, all_levels = TRUE, axes = FALSE)
+  terra::lines(fv)
+}
+terra::plot(put(p_dose), main = "P2O5 dose, maize (kg/ha)", col = hcl.colors(30, "Mako", rev = TRUE), axes = FALSE)
+terra::lines(fv)
+terra::plot(put(k_dose), main = "K2O dose, maize (kg/ha)", col = hcl.colors(30, "Rocket", rev = TRUE), axes = FALSE)
+terra::lines(fv)
+```
+
+Where P is high the P~2~O~5~ dose stays at crop removal (maintenance); where K is low
+the K~2~O dose adds an enrichment quota.
+
 # Scheda a dose Standard
 
 For contexts with limited soil analyses, DPI 2026 provides a standard-dose

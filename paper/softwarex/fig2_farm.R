@@ -57,6 +57,7 @@ write.csv(cbind(st_drop_geometry(out)[, c("plot", "c2024", "c2023", "area_ha", "
           "paper/softwarex/data/farm_2024.csv", row.names = FALSE)
 write.csv(data.frame(id = out$id), "paper/softwarex/data/farm_2024_ids.csv", row.names = FALSE)
 saveRDS(as.list(st_drop_geometry(out)[out$plot == "P01", args]), "paper/softwarex/data/p01_inputs.rds")  # for Figs. 4-5
+saveRDS(out, "paper/softwarex/data/rs_farm_2024.rds")                 # farm layer for data-raw/piacenza_example.R
 st_write(out[out$plot == "P01", c("ha", "c2024")], "paper/softwarex/data/rs_field.geojson",   # boundary of P01 for Figs. 3-5
          delete_dsn = TRUE, quiet = TRUE)
 cat("farm ha", round(sum(out$area_ha), 1), "| N total kg", round(sum(out$N_total_kg)),

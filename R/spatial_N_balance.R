@@ -9,7 +9,7 @@
 #'   and converted with \code{terra::rast()}).
 #'   Required layers (matched by name, case-insensitive):
 #'   \describe{
-#'     \item{TN}{Total soil nitrogen, pct}
+#'     \item{TN}{Total soil nitrogen, g/kg (per mille, as \code{Ntot} in \code{\link{N_balance}()})}
 #'     \item{SOM}{Soil organic matter, pct}
 #'     \item{Clay}{Clay content, pct}
 #'     \item{Sand}{Sand content, pct}
@@ -60,6 +60,7 @@
 #'   file.path(ext, "Cremonesi_CNratio.tif")
 #' ))
 #' names(soil) <- c("TN", "SOM", "Clay", "Sand", "CNratio")
+#' soil[["TN"]] <- soil[["TN"]] * 10   # the Cremonesi TN raster is in percent; Ntot is g/kg
 #'
 #' n_map <- spatial_N_balance(
 #'   soil_stack = soil,

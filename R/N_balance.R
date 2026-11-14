@@ -10,7 +10,7 @@
 #' @param ccp Crop calendar period (e.g., "Spring-summer crop 100-130 days").
 #' @param sand Percentage of sand in the soil.
 #' @param clay Percentage of clay in the soil.
-#' @param Ntot Total nitrogen content in the soil (%).
+#' @param Ntot Total nitrogen content in the soil (g/kg, per mille; 1.5 g/kg = 0.15 percent).
 #' @param SOM Soil organic matter content (%).
 #' @param CN Carbon to nitrogen ratio of the soil.
 #' @param oxygen_availability Oxygen availability level in the soil (e.g., "Normal").

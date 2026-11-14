@@ -1,0 +1,9 @@
+"year","crop_class","crop","ccp","prev_crop","expected_yield_tons_ha","winter_rain","start_spring_rain"
+2019,"Soft wheat","Soft wheat FP/FPS (grain)","Autumn-winter crop >150 days","Undefined",4.97,249.3,59.2
+2020,"Processing tomato","Processing tomato (medium yield)","Spring-summer crop 100-130 days","Winter cereals straw removal",70,449.9,3.2
+2021,"Durum wheat","Durum wheat (grain)","Autumn-winter crop >150 days","Tomato and other vegetables",7.02,493,43.4
+2022,"Processing tomato","Processing tomato (medium yield)","Spring-summer crop 100-130 days","Winter cereals straw removal",70,330.6,39.7
+2023,"Soft wheat","Soft wheat FP/FPS (grain)","Autumn-winter crop >150 days","Tomato and other vegetables",6.48,328.2,11.2
+2024,"Maize","Grain maize 500-700 (grain)","Spring-summer crop >130 days","Winter cereals straw removal",7.38,325.2,191.7
+2025,"Durum wheat","Durum wheat (grain)","Autumn-winter crop >150 days","Maize stalks buried",5.6,445.4,75.3
+2026,"Other summer crops","Soybean (grain)","Spring-summer crop 100-130 days","Winter cereals straw removal",3.5,308.6,108.9

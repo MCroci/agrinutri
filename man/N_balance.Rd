@@ -41,7 +41,7 @@ N_balance(
 
 \item{clay}{Percentage of clay in the soil.}
 
-\item{Ntot}{Total nitrogen content in the soil (\%).}
+\item{Ntot}{Total nitrogen content in the soil (g/kg, per mille; 1.5 g/kg = 0.15 percent).}
 
 \item{SOM}{Soil organic matter content (\%).}
 
