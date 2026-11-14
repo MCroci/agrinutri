@@ -69,166 +69,191 @@
 
     
     
-<p>This vignette walks through the end-to-end workflow that agrinutri
-v0.13 supports:</p>
+<p>This vignette follows the workflow of the agrinutri article on a real
+farm of the Po plain near Piacenza (Italy):</p>
 <ol style="list-style-type: decimal">
-<li>Load a farm layout (GeoJSON) with per-plot agronomic inputs.</li>
-<li>Run the DPI-2026 N balance on every plot.</li>
-<li>Build a machine-width strip prescription map for one plot.</li>
-<li>Export the prescription in the formats accepted by the on-board
-monitor of the target tractor (Shapefile, ISOXML TASKDATA.XML, John
-Deere / Trimble flavours, etc.).</li>
+<li>Load a farm layer whose columns carry the balance inputs.</li>
+<li>Run the N, P<sub>2</sub>O<sub>5</sub> and K<sub>2</sub>O balances on
+every plot with <code><a href="../reference/farm_balance.html">farm_balance()</a></code>.</li>
+<li>Follow one plot through eight years of rotation.</li>
+<li>Turn a Sentinel-2 scene into a strip prescription for that
+plot.</li>
+<li>Export it for the on-board monitor.</li>
 </ol>
 <div class="section level2">
-<h2 id="load-the-demo-farm">1. Load the demo farm<a class="anchor" aria-label="anchor" href="#load-the-demo-farm"></a>
+<h2 id="the-farm">1. The farm<a class="anchor" aria-label="anchor" href="#the-farm"></a>
 </h2>
-<p>The package ships with a fictitious 35.5 ha farm near Piacenza with 8
-plots carrying all the columns required by <code><a href="../reference/N_balance.html">N_balance()</a></code>:</p>
+<p><code>piacenza_farm.geojson</code> holds four neighbouring fields
+delineated from Sentinel-2 (46.7 ha), one for each crop of 2024. The
+crop of every year from 2019 to 2026 was estimated from satellite data;
+soil values are field means of the regional soil maps; rainfall comes
+from ERA5 and yields from the provincial statistics.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mcroci/agrinutri" class="external-link">agrinutri</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span><span class="va">ex</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/example_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
-<span><span class="va">farm</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="va">ex</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">farm</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plot_id"</span>, <span class="st">"plot_name"</span>, <span class="st">"crop"</span>, <span class="st">"area_ha"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; Simple feature collection with 8 features and 4 fields</span></span>
-<span><span class="co">#&gt; Geometry type: POLYGON</span></span>
-<span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: 9.7122 ymin: 45.048 xmax: 9.7257 ymax: 45.05645</span></span>
-<span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span><span class="co">#&gt;   plot_id      plot_name                           crop area_ha</span></span>
-<span><span class="co">#&gt; 1     P01   Campo Grande       Silage maize (class 700)     5.2</span></span>
-<span><span class="co">#&gt; 2     P02   Poplar Strip Soft wheat FF - strong (grain)     3.4</span></span>
-<span><span class="co">#&gt; 3     P03    Lower Ditch    Grain maize 500-700 (grain)     7.8</span></span>
-<span><span class="co">#&gt; 4     P04 Dovecote Field                Soybean (grain)     2.1</span></span>
-<span><span class="co">#&gt; 5     P05     Old Meadow                        Alfalfa     4.5</span></span>
-<span><span class="co">#&gt; 6     P06      Riverbank       Silage maize (class 500)     6.0</span></span>
-<span><span class="co">#&gt; 7     P07       New Barn            Durum wheat (grain)     3.7</span></span>
-<span><span class="co">#&gt; 8     P08  Woodlot Field                 Barley (grain)     2.8</span></span>
-<span><span class="co">#&gt;                         geometry</span></span>
-<span><span class="co">#&gt; 1 POLYGON ((9.715 45.048, 9.7...</span></span>
-<span><span class="co">#&gt; 2 POLYGON ((9.7187 45.048, 9....</span></span>
-<span><span class="co">#&gt; 3 POLYGON ((9.7215 45.048, 9....</span></span>
-<span><span class="co">#&gt; 4 POLYGON ((9.7125 45.051, 9....</span></span>
-<span><span class="co">#&gt; 5 POLYGON ((9.7122 45.0535, 9...</span></span>
-<span><span class="co">#&gt; 6 POLYGON ((9.7185 45.0512, 9...</span></span>
-<span><span class="co">#&gt; 7 POLYGON ((9.7222 45.0512, 9...</span></span>
-<span><span class="co">#&gt; 8 POLYGON ((9.7155 45.0542, 9...</span></span></code></pre></div>
+<span><span class="va">farm</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/piacenza_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span>,</span>
+<span>                    quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">farm</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plot"</span>, <span class="st">"area_ha"</span>, <span class="st">"c2023"</span>, <span class="st">"c2024"</span>, <span class="st">"clay"</span>, <span class="st">"olsen_value"</span>, <span class="st">"k_value"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   plot area_ha             c2023             c2024   clay olsen_value k_value</span></span>
+<span><span class="co">#&gt; 1  P01   8.612        Soft wheat             Maize 19.399      17.025  88.375</span></span>
+<span><span class="co">#&gt; 2  P02   7.565       Durum wheat Processing tomato 20.776      18.844  99.669</span></span>
+<span><span class="co">#&gt; 3  P03  23.148 Processing tomato        Soft wheat 17.342      18.960  84.855</span></span>
+<span><span class="co">#&gt; 4  P04   7.403 Processing tomato       Durum wheat 16.949      18.280  78.653</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="per-plot-n-balance">2. Per-plot N balance<a class="anchor" aria-label="anchor" href="#per-plot-n-balance"></a>
+<h2 id="balances-for-every-plot">2. Balances for every plot<a class="anchor" aria-label="anchor" href="#balances-for-every-plot"></a>
 </h2>
 <p><code><a href="../reference/farm_balance.html">farm_balance()</a></code> applies <code><a href="../reference/N_balance.html">N_balance()</a></code> to every
 feature and appends <code>N_target</code>, <code>MAS_cap</code>,
-<code>MAS_ok</code> and <code>N_total_kg</code> to the layer. Italian
-legacy strings are accepted in input and translated on the fly.</p>
+<code>MAS_ok</code> and <code>N_total_kg</code>. With
+<code>p_balance</code> and <code>k_balance</code> it also runs the
+P<sub>2</sub>O<sub>5</sub> and K<sub>2</sub>O balances from the columns
+<code>olsen_value</code>/<code>olsen_unit</code> and
+<code>k_value</code>/<code>k_unit</code> (here Olsen P and exchangeable
+K as elements, mg/kg).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">farm_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/farm_balance.html">farm_balance</a></span><span class="op">(</span><span class="va">farm</span><span class="op">)</span></span>
-<span><span class="va">farm_out</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plot_id"</span>, <span class="st">"crop"</span>, <span class="st">"N_target"</span>, <span class="st">"MAS_cap"</span>,</span>
-<span>             <span class="st">"MAS_ok"</span>, <span class="st">"N_total_kg"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; Simple feature collection with 8 features and 6 fields</span></span>
-<span><span class="co">#&gt; Geometry type: POLYGON</span></span>
-<span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: 9.7122 ymin: 45.048 xmax: 9.7257 ymax: 45.05645</span></span>
-<span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span><span class="co">#&gt;   plot_id                           crop N_target MAS_cap MAS_ok N_total_kg</span></span>
-<span><span class="co">#&gt; 1     P01       Silage maize (class 700)     26.1     280   TRUE      135.7</span></span>
-<span><span class="co">#&gt; 2     P02 Soft wheat FF - strong (grain)    190.2     190  FALSE      646.7</span></span>
-<span><span class="co">#&gt; 3     P03    Grain maize 500-700 (grain)     73.6     280   TRUE      574.1</span></span>
-<span><span class="co">#&gt; 4     P04                Soybean (grain)      0.0      30   TRUE        0.0</span></span>
-<span><span class="co">#&gt; 5     P05                        Alfalfa      0.0     170   TRUE        0.0</span></span>
-<span><span class="co">#&gt; 6     P06       Silage maize (class 500)     35.5     280   TRUE      213.0</span></span>
-<span><span class="co">#&gt; 7     P07            Durum wheat (grain)    137.6     190   TRUE      509.1</span></span>
-<span><span class="co">#&gt; 8     P08                 Barley (grain)     27.6     150   TRUE       77.3</span></span>
-<span><span class="co">#&gt;                         geometry</span></span>
-<span><span class="co">#&gt; 1 POLYGON ((9.715 45.048, 9.7...</span></span>
-<span><span class="co">#&gt; 2 POLYGON ((9.7187 45.048, 9....</span></span>
-<span><span class="co">#&gt; 3 POLYGON ((9.7215 45.048, 9....</span></span>
-<span><span class="co">#&gt; 4 POLYGON ((9.7125 45.051, 9....</span></span>
-<span><span class="co">#&gt; 5 POLYGON ((9.7122 45.0535, 9...</span></span>
-<span><span class="co">#&gt; 6 POLYGON ((9.7185 45.0512, 9...</span></span>
-<span><span class="co">#&gt; 7 POLYGON ((9.7222 45.0512, 9...</span></span>
-<span><span class="co">#&gt; 8 POLYGON ((9.7155 45.0542, 9...</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="strip-prescription-along-an-a-b-line">3. Strip prescription along an A-B line<a class="anchor" aria-label="anchor" href="#strip-prescription-along-an-a-b-line"></a>
-</h2>
-<p><code><a href="../reference/build_strip_prescription.html">build_strip_prescription()</a></code> tiles one plot with parallel
-strips of a user-supplied working width. If no A-B line is given, the
-longest side of the field is used as driving direction. Dose variability
-can be driven by a uniform target, a VI calibration curve, NNI zones, or
-quantile classes.</p>
+<code class="sourceCode R"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/farm_balance.html">farm_balance</a></span><span class="op">(</span><span class="va">farm</span>, p_balance <span class="op">=</span> <span class="cn">TRUE</span>, k_balance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plot"</span>, <span class="st">"crop"</span>, <span class="st">"N_target"</span>, <span class="st">"MAS_cap"</span>, <span class="st">"MAS_ok"</span>,</span>
+<span>                              <span class="st">"N_total_kg"</span>, <span class="st">"P2O5_target"</span>, <span class="st">"K2O_target"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   plot                             crop N_target MAS_cap MAS_ok N_total_kg</span></span>
+<span><span class="co">#&gt; 1  P01      Grain maize 500-700 (grain)    175.0     280   TRUE     1507.1</span></span>
+<span><span class="co">#&gt; 2  P02 Processing tomato (medium yield)    193.1     180  FALSE     1460.8</span></span>
+<span><span class="co">#&gt; 3  P03        Soft wheat FP/FPS (grain)    133.6     180   TRUE     3092.6</span></span>
+<span><span class="co">#&gt; 4  P04              Durum wheat (grain)    105.4     190   TRUE      780.3</span></span>
+<span><span class="co">#&gt;   P2O5_target K2O_target</span></span>
+<span><span class="co">#&gt; 1        50.9      121.5</span></span>
+<span><span class="co">#&gt; 2        91.0      281.1</span></span>
+<span><span class="co">#&gt; 3        41.3      139.5</span></span>
+<span><span class="co">#&gt; 4        35.0      174.7</span></span></code></pre></div>
+<p>The processing tomato exceeds its maximum allowed dose (MAS) and is
+flagged. The standard-dose scheme of the guidelines gives one value per
+crop instead:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">field</span> <span class="op">&lt;-</span> <span class="va">farm</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>          <span class="co"># Campo Grande, 5.2 ha silage maize</span></span>
-<span></span>
-<span><span class="co"># Option A: uniform 226 kg N/ha (from the balance), 24 m spreader</span></span>
-<span><span class="va">rx_uni</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_strip_prescription.html">build_strip_prescription</a></span><span class="op">(</span></span>
-<span>  field         <span class="op">=</span> <span class="va">field</span>,</span>
-<span>  machine_width <span class="op">=</span> <span class="fl">24</span>,</span>
-<span>  variability   <span class="op">=</span> <span class="st">"uniform"</span>,</span>
-<span>  n_target      <span class="op">=</span> <span class="fl">226</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">rx_uni</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"#D5E4F0"</span>,</span>
-<span>     border <span class="op">=</span> <span class="st">"#1F4E79"</span>, main <span class="op">=</span> <span class="st">"Uniform strips, 24 m"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="farm-and-prescription-map_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
-<p>Swapping in a VI calibration curve makes the dose decrease with
-vigour; the mean across the field is preserved (mass-balance constraint)
-by default.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">crop</span>, <span class="kw">function</span><span class="op">(</span><span class="va">cr</span><span class="op">)</span> <span class="fu"><a href="../reference/dose_standard_N.html">dose_standard_N</a></span><span class="op">(</span><span class="va">cr</span><span class="op">)</span><span class="op">$</span><span class="va">dose_final</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      Grain maize 500-700 (grain) Processing tomato (medium yield) </span></span>
+<span><span class="co">#&gt;                              240                              130 </span></span>
+<span><span class="co">#&gt;        Soft wheat FP/FPS (grain)              Durum wheat (grain) </span></span>
+<span><span class="co">#&gt;                              155                              160</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Option B: VI calibration (requires an NDVI raster)</span></span>
-<span><span class="va">rx_cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_strip_prescription.html">build_strip_prescription</a></span><span class="op">(</span></span>
-<span>  field         <span class="op">=</span> <span class="va">field</span>,</span>
-<span>  machine_width <span class="op">=</span> <span class="fl">24</span>,</span>
-<span>  variability   <span class="op">=</span> <span class="st">"calibration"</span>,</span>
-<span>  vi_raster     <span class="op">=</span> <span class="va">my_ndvi_raster</span>,</span>
-<span>  n_target      <span class="op">=</span> <span class="fl">226</span>,</span>
-<span>  min_dose      <span class="op">=</span> <span class="fl">80</span>,  max_dose <span class="op">=</span> <span class="fl">260</span>,</span>
-<span>  vi_low        <span class="op">=</span> <span class="fl">0.35</span>, vi_high <span class="op">=</span> <span class="fl">0.80</span><span class="op">)</span></span></code></pre></div>
-<p>A 2-D <strong>grid</strong> (variable dose cell-by-cell) is produced
-by passing <code>cell_length &gt; 0</code>; an explicit A-B direction is
-set with <code>angle_deg</code> (degrees, 0 = east, 90 = north) or by
-supplying an <code>sf</code> LINESTRING in <code>ab_line</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Option C: 24 m working width x 50 m along-strip cells, AB = 30 deg</span></span>
-<span><span class="va">rx_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_strip_prescription.html">build_strip_prescription</a></span><span class="op">(</span></span>
-<span>  field         <span class="op">=</span> <span class="va">field</span>,</span>
-<span>  machine_width <span class="op">=</span> <span class="fl">24</span>,</span>
-<span>  cell_length   <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>  angle_deg     <span class="op">=</span> <span class="fl">30</span>,</span>
-<span>  variability   <span class="op">=</span> <span class="st">"classes"</span>,</span>
-<span>  vi_raster     <span class="op">=</span> <span class="va">my_ndvi_raster</span>,</span>
-<span>  n_target      <span class="op">=</span> <span class="fl">226</span>,</span>
-<span>  min_dose      <span class="op">=</span> <span class="fl">80</span>, max_dose <span class="op">=</span> <span class="fl">260</span>,</span>
-<span>  n_classes     <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Option D: NNI-driven zones</span></span>
-<span><span class="va">rx_nni</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_strip_prescription.html">build_strip_prescription</a></span><span class="op">(</span></span>
-<span>  field         <span class="op">=</span> <span class="va">field</span>,</span>
-<span>  machine_width <span class="op">=</span> <span class="fl">24</span>,</span>
-<span>  cell_length   <span class="op">=</span> <span class="fl">0</span>,           <span class="co"># continuous strips</span></span>
-<span>  variability   <span class="op">=</span> <span class="st">"nni"</span>,</span>
-<span>  nni_raster    <span class="op">=</span> <span class="va">my_nni_map</span>,</span>
-<span>  n_target      <span class="op">=</span> <span class="fl">226</span>,</span>
-<span>  min_dose      <span class="op">=</span> <span class="fl">80</span>, max_dose <span class="op">=</span> <span class="fl">260</span>,</span>
-<span>  thr_lo        <span class="op">=</span> <span class="fl">0.90</span>, thr_hi <span class="op">=</span> <span class="fl">1.10</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out</span><span class="op">[</span><span class="st">"N_target"</span><span class="op">]</span>, main <span class="op">=</span> <span class="st">"Mineral N dose 2024 (kg N/ha)"</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">300</span>, <span class="fl">20</span><span class="op">)</span>,</span>
+<span>     pal <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="va">n</span>, <span class="st">"Mako"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, key.pos <span class="op">=</span> <span class="fl">4</span>, reset <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">out</span><span class="op">[</span><span class="op">!</span><span class="va">out</span><span class="op">$</span><span class="va">MAS_ok</span>, <span class="op">]</span><span class="op">)</span>, border <span class="op">=</span> <span class="st">"#D55E00"</span>, lwd <span class="op">=</span> <span class="fl">3</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_point_on_surface</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, labels <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">plot</span>,</span>
+<span>     cex <span class="op">=</span> <span class="fl">0.8</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">N_target</span> <span class="op">&gt;</span> <span class="fl">150</span>, <span class="st">"white"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="farm-and-prescription-map_files/figure-html/map-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
-<h2 id="export-to-tractor-ready-formats">4. Export to tractor-ready formats<a class="anchor" aria-label="anchor" href="#export-to-tractor-ready-formats"></a>
+<h2 id="one-plot-through-the-rotation">3. One plot through the rotation<a class="anchor" aria-label="anchor" href="#one-plot-through-the-rotation"></a>
+</h2>
+<p>Because the inputs are columns, the balance runs over years as easily
+as over plots. <code>piacenza_p01_rotation.csv</code> holds the yearly
+inputs of plot P01; the soil is the same every year.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/piacenza_p01_rotation.csv"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">p1</span>  <span class="op">&lt;-</span> <span class="va">farm</span><span class="op">[</span><span class="va">farm</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span>, <span class="op">]</span></span>
+<span><span class="va">yr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rot</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">r</span> <span class="op">&lt;-</span> <span class="va">rot</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span></span>
+<span>  <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span>expected_yield_tons_ha <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">expected_yield_tons_ha</span>, crop <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">crop</span>, ccp <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">ccp</span>,</span>
+<span>                 sand <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">sand</span>, clay <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">clay</span>, Ntot <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">Ntot</span>, SOM <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">SOM</span>, CN <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">CN</span>,</span>
+<span>                 oxygen_availability <span class="op">=</span> <span class="st">"Normal"</span>, winter_rain <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">winter_rain</span>,</span>
+<span>                 start_spring_rain <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">start_spring_rain</span>, prev_crop <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">prev_crop</span>,</span>
+<span>                 source <span class="op">=</span> <span class="st">"None"</span>, fertorg_frequency <span class="op">=</span> <span class="st">"every year"</span>,</span>
+<span>                 location <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">location</span>, forg_quantity <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>year <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">year</span>, crop <span class="op">=</span> <span class="va">r</span><span class="op">$</span><span class="va">crop_class</span>,</span>
+<span>             N    <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/calculate_N_fertilization.html">calculate_N_fertilization</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>             MAS  <span class="op">=</span> <span class="fu"><a href="../reference/get_MAS.html">get_MAS</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">crop</span><span class="op">)</span><span class="op">$</span><span class="va">mas_N</span>,</span>
+<span>             P2O5 <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/P_balance.html">P_balance</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">expected_yield_tons_ha</span>, <span class="va">r</span><span class="op">$</span><span class="va">crop</span>, olsen_value <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">olsen_value</span>,</span>
+<span>                                    olsen_unit <span class="op">=</span> <span class="st">"P"</span>, clay <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">clay</span>, sand <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">sand</span><span class="op">)</span><span class="op">$</span><span class="va">P2O5_required</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>             K2O  <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/K_balance.html">K_balance</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">expected_yield_tons_ha</span>, <span class="va">r</span><span class="op">$</span><span class="va">crop</span>, k_value <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">k_value</span>,</span>
+<span>                                    k_unit <span class="op">=</span> <span class="st">"K"</span>, clay <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">clay</span>, sand <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">sand</span><span class="op">)</span><span class="op">$</span><span class="va">K2O_required</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">yr</span></span>
+<span><span class="co">#&gt;   year               crop     N MAS P2O5   K2O</span></span>
+<span><span class="co">#&gt; 1 2019         Soft wheat 131.2 180 38.8 118.3</span></span>
+<span><span class="co">#&gt; 2 2020  Processing tomato 187.0 180 91.0 300.0</span></span>
+<span><span class="co">#&gt; 3 2021        Durum wheat 195.2 190 59.7 134.8</span></span>
+<span><span class="co">#&gt; 4 2022  Processing tomato 178.8 180 91.0 300.0</span></span>
+<span><span class="co">#&gt; 5 2023         Soft wheat 149.0 180 50.5 125.8</span></span>
+<span><span class="co">#&gt; 6 2024              Maize 174.9 280 50.9 121.4</span></span>
+<span><span class="co">#&gt; 7 2025        Durum wheat 219.5 190 47.6 126.4</span></span>
+<span><span class="co">#&gt; 8 2026 Other summer crops   0.0  30 47.6 163.8</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="va">yr</span><span class="op">$</span><span class="va">N</span>, names.arg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">yr</span><span class="op">$</span><span class="va">year</span>, <span class="va">yr</span><span class="op">$</span><span class="va">crop</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span>, las <span class="op">=</span> <span class="fl">2</span>, cex.names <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>              col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"Mako"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, border <span class="op">=</span> <span class="cn">NA</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">340</span><span class="op">)</span>,</span>
+<span>              ylab <span class="op">=</span> <span class="st">"N dose (kg N/ha)"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/segments.html" class="external-link">segments</a></span><span class="op">(</span><span class="va">bp</span> <span class="op">-</span> <span class="fl">0.45</span>, <span class="va">yr</span><span class="op">$</span><span class="va">MAS</span>, <span class="va">bp</span> <span class="op">+</span> <span class="fl">0.45</span>, <span class="va">yr</span><span class="op">$</span><span class="va">MAS</span>, col <span class="op">=</span> <span class="st">"#D55E00"</span>, lwd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"balance dose"</span>, <span class="st">"MAS"</span><span class="op">)</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"Mako"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="cn">NA</span><span class="op">)</span>, horiz <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>       border <span class="op">=</span> <span class="cn">NA</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">1</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">"#D55E00"</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span>, cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
+<p><img src="farm-and-prescription-map_files/figure-html/rotation-plot-1.png" class="r-plt" alt="" width="672"></p>
+<p>The dose changes with the crop, its expected yield, the autumn-winter
+rainfall of the leaching terms and the previous crop; where the bar
+passes the orange line the MAS, not the balance, sets the plan. The
+legume of 2026 needs no mineral N. With low exchangeable K the
+K<sub>2</sub>O balance follows the enrichment strategy every year.</p>
+</div>
+<div class="section level2">
+<h2 id="from-sentinel-2-to-a-strip-prescription">4. From Sentinel-2 to a strip prescription<a class="anchor" aria-label="anchor" href="#from-sentinel-2-to-a-strip-prescription"></a>
+</h2>
+<p><code><a href="../reference/estimate_biophysical.html">estimate_biophysical()</a></code> retrieves leaf area index, leaf
+dry matter and canopy N content from the Level-2A scene of 13 August
+2024 with Gaussian-process regression;
+<code><a href="../reference/compute_NNI_from_S2.html">compute_NNI_from_S2()</a></code> turns them into the Nitrogen
+Nutrition Index.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">s2f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240813.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
+<span><span class="va">bio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_biophysical.html">estimate_biophysical</a></span><span class="op">(</span><span class="va">s2f</span>, output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>                            variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LAI"</span>, <span class="st">"Cm"</span>, <span class="st">"CNC_Cprot"</span>, <span class="st">"FVC"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">nni</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compute_NNI_from_S2.html">compute_NNI_from_S2</a></span><span class="op">(</span><span class="va">bio</span><span class="op">$</span><span class="va">LAI</span>, <span class="va">bio</span><span class="op">$</span><span class="va">Cm</span>, <span class="va">bio</span><span class="op">$</span><span class="va">CNC_Cprot</span>, cnc_layer <span class="op">=</span> <span class="st">"CNC_Cprot"</span>,</span>
+<span>                           crop <span class="op">=</span> <span class="st">"maize"</span>, fvc <span class="op">=</span> <span class="va">bio</span><span class="op">$</span><span class="va">FVC</span><span class="op">)</span></span>
+<span><span class="va">N_star</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">N_target</span><span class="op">[</span><span class="va">out</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span><span class="op">]</span></span></code></pre></div>
+<p><code><a href="../reference/build_strip_prescription.html">build_strip_prescription()</a></code> tiles the plot along the A-B
+line of a 24 m spreader, with 30 m cells. NNI zones set the cells to the
+upper bound (deficient), the target (optimal) or the lower bound
+(excessive); the free cells are then shifted so that the area-weighted
+mean equals the field balance.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_strip_prescription.html">build_strip_prescription</a></span><span class="op">(</span><span class="va">p1</span>, machine_width <span class="op">=</span> <span class="fl">24</span>, cell_length <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>                               variability <span class="op">=</span> <span class="st">"nni"</span>, nni_raster <span class="op">=</span> <span class="va">nni</span><span class="op">$</span><span class="va">NNI</span>,</span>
+<span>                               n_target <span class="op">=</span> <span class="va">N_star</span>, min_dose <span class="op">=</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">N_star</span>,</span>
+<span>                               max_dose <span class="op">=</span> <span class="fl">1.2</span> <span class="op">*</span> <span class="va">N_star</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">rx</span><span class="op">$</span><span class="va">dose</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 141.1 176.4   210 </span></span>
+<span><span class="co">#&gt;    16   118    18</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">N_star</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/weighted.mean.html" class="external-link">weighted.mean</a></span><span class="op">(</span><span class="va">rx</span><span class="op">$</span><span class="va">dose</span>, <span class="va">rx</span><span class="op">$</span><span class="va">area_ha</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; target   mean </span></span>
+<span><span class="co">#&gt;    175    175</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">p1_v</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">nni</span><span class="op">$</span><span class="va">NNI</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">nni</span><span class="op">$</span><span class="va">NNI</span>, <span class="va">p1_v</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"NNI"</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"RdBu"</span><span class="op">)</span>,</span>
+<span>            range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">1.4</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">p1_v</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rx</span><span class="op">[</span><span class="st">"dose"</span><span class="op">]</span>, main <span class="op">=</span> <span class="st">"Dose (kg N/ha)"</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.2</span>, <span class="fl">0.05</span><span class="op">)</span> <span class="op">*</span> <span class="va">N_star</span>,</span>
+<span>     pal <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="va">n</span>, <span class="st">"Mako"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, key.pos <span class="op">=</span> <span class="fl">4</span>, reset <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="farm-and-prescription-map_files/figure-html/strips-plot-1.png" class="r-plt" alt="" width="672"><img src="farm-and-prescription-map_files/figure-html/strips-plot-2.png" class="r-plt" alt="" width="672"></p>
+<p>Other variabilities use the same call: <code>"uniform"</code>,
+<code>"calibration"</code> (a VI ramp with
+<code>vi_low</code>/<code>vi_high</code>), <code>"classes"</code> (VI
+quantile classes). Pass <code>angle_deg</code> or an
+<code>ab_line</code> to force the driving direction.</p>
+</div>
+<div class="section level2">
+<h2 id="export-to-tractor-ready-formats">5. Export to tractor-ready formats<a class="anchor" aria-label="anchor" href="#export-to-tractor-ready-formats"></a>
 </h2>
 <p><code><a href="../reference/export_prescription.html">export_prescription()</a></code> writes a single file;
 <code><a href="../reference/export_prescription_all.html">export_prescription_all()</a></code> bundles several formats in one
-output folder.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/export_prescription.html">export_prescription</a></span><span class="op">(</span><span class="va">rx_uni</span>, <span class="st">"rx.shp"</span>,       format <span class="op">=</span> <span class="st">"shp"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/export_prescription.html">export_prescription</a></span><span class="op">(</span><span class="va">rx_uni</span>, <span class="st">"JD/rx.shp"</span>,    format <span class="op">=</span> <span class="st">"johndeere"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/export_prescription.html">export_prescription</a></span><span class="op">(</span><span class="va">rx_uni</span>, <span class="st">"TASKDATA"</span>,     format <span class="op">=</span> <span class="st">"isoxml"</span>,</span>
-<span>  isoxml_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>task_name <span class="op">=</span> <span class="st">"N top-dress"</span>,</span>
-<span>                      product   <span class="op">=</span> <span class="st">"Urea 46 pct"</span>,</span>
-<span>                      unit      <span class="op">=</span> <span class="st">"kg/ha"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/export_prescription_all.html">export_prescription_all</a></span><span class="op">(</span><span class="va">rx_uni</span>, <span class="st">"rx_bundle"</span>, <span class="st">"campo_grande"</span>,</span>
-<span>  formats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shp"</span>, <span class="st">"isoxml"</span>, <span class="st">"johndeere"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+folder.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/export_prescription.html">export_prescription</a></span><span class="op">(</span><span class="va">rx</span>, <span class="st">"rx.shp"</span>,    format <span class="op">=</span> <span class="st">"shp"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/export_prescription.html">export_prescription</a></span><span class="op">(</span><span class="va">rx</span>, <span class="st">"JD/rx.shp"</span>, format <span class="op">=</span> <span class="st">"johndeere"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/export_prescription.html">export_prescription</a></span><span class="op">(</span><span class="va">rx</span>, <span class="st">"TASKDATA"</span>,  format <span class="op">=</span> <span class="st">"isoxml"</span>,</span>
+<span>  isoxml_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>task_name <span class="op">=</span> <span class="st">"P01 top-dress"</span>, product <span class="op">=</span> <span class="st">"Urea 46 pct"</span>, unit <span class="op">=</span> <span class="st">"kg/ha"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/export_prescription_all.html">export_prescription_all</a></span><span class="op">(</span><span class="va">rx</span>, <span class="st">"rx_bundle"</span>, <span class="st">"P01_2024"</span>, formats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shp"</span>, <span class="st">"isoxml"</span>, <span class="st">"johndeere"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The Shiny interface (<code><a href="../reference/run_app.html">agrinutri::run_app()</a></code>) exposes the
-same flow with interactive forms and a leaflet preview.</p>
+same flow with interactive forms and a map preview. Data sources are
+listed in <code><a href="../reference/piacenza.html">?piacenza</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

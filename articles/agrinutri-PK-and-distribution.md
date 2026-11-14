@@ -548,6 +548,63 @@ $`A = 119.4`$ kg K2O/ha - $`H = 20`$ (clay 18.5% → step “15.1-25.1 →
 
 This matches cell `Gri_K!F30` of Fert_Office (A + H).
 
+## P and K at scale: regional soil maps
+
+The same functions run on every pixel of a soil map.
+`rer_soil_piacenza.tif` is a clip of the Emilia-Romagna soil maps 0-30
+cm (100 m grid, CC BY 4.0) over a small farm of the Piacenza plain, with
+Olsen P as elemental P and exchangeable K as elemental K (mg/kg); see
+[`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md).
+Each pixel gets its availability class and the P₂O₅ and K₂O doses for a
+7.4 t/ha grain maize, with its own clay and sand.
+
+``` r
+
+rer <- terra::rast(system.file("extdata/rer_soil_piacenza.tif", package = "agrinutri"))
+v   <- terra::values(rer)
+ok  <- stats::complete.cases(v)
+grp <- vapply(which(ok), function(i)
+  calc_soil_group_and_id_rag(v[i, "clay"], v[i, "sand"])$soil.group, "")
+p_cls <- vapply(v[ok, "olsen_p"], function(x)
+  as.character(classify_P_olsen(x, unit = "P")$rating), "")
+k_cls <- mapply(function(x, g) as.character(classify_K(x, unit = "K", soil_group = g)$rating),
+                v[ok, "k_exch"], grp)
+p_dose <- mapply(function(x, cl, sa) P_balance(7.4, "Grain maize 500-700 (grain)", olsen_value = x,
+                 olsen_unit = "P", clay = cl, sand = sa)$P2O5_required,
+                 v[ok, "olsen_p"], v[ok, "clay"], v[ok, "sand"])
+k_dose <- mapply(function(x, cl, sa) K_balance(7.4, "Grain maize 500-700 (grain)", k_value = x,
+                 k_unit = "K", clay = cl, sand = sa)$K2O_required,
+                 v[ok, "k_exch"], v[ok, "clay"], v[ok, "sand"])
+table(P = p_cls); table(K = k_cls)
+#> P
+#>      high       low    medium very high 
+#>      1222         6       509        26
+#> K
+#>     high      low   medium very low 
+#>       34     1410      305       14
+
+put <- function(x) { r <- rer[[1]]; r[] <- NA; r[which(ok)] <- x; r }
+lv  <- c("very low", "low", "medium", "high", "very high")
+cls <- function(x) put(match(x, lv))
+farm <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"), quiet = TRUE)
+fv  <- terra::vect(sf::st_transform(farm, terra::crs(rer)))
+par(mfrow = c(2, 2), mar = c(1, 1, 2, 5))
+for (z in list(list(cls(p_cls), "Olsen P class"), list(cls(k_cls), "Exchangeable K class"))) {
+  terra::plot(z[[1]], main = z[[2]], col = hcl.colors(5, "Temps", rev = TRUE), type = "classes",
+              levels = lv, all_levels = TRUE, axes = FALSE)
+  terra::lines(fv)
+}
+terra::plot(put(p_dose), main = "P2O5 dose, maize (kg/ha)", col = hcl.colors(30, "Mako", rev = TRUE), axes = FALSE)
+terra::lines(fv)
+terra::plot(put(k_dose), main = "K2O dose, maize (kg/ha)", col = hcl.colors(30, "Rocket", rev = TRUE), axes = FALSE)
+terra::lines(fv)
+```
+
+![](agrinutri-PK-and-distribution_files/figure-html/pk-regional-1.png)
+
+Where P is high the P₂O₅ dose stays at crop removal (maintenance); where
+K is low the K₂O dose adds an enrichment quota.
+
 ## Scheda a dose Standard
 
 For contexts with limited soil analyses, DPI 2026 provides a
@@ -1414,12 +1471,14 @@ sessionInfo()
 #> [1] terra_1.9-50    agrinutri_1.0.1
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] cli_3.6.6         knitr_1.52        rlang_1.3.0       xfun_0.62        
-#>  [5] otel_0.3.0        textshaping_1.0.5 jsonlite_2.0.0    htmltools_0.5.9  
-#>  [9] ragg_1.5.2        sass_0.4.10       rmarkdown_2.32    evaluate_1.0.5   
-#> [13] jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  
-#> [17] compiler_4.6.2    codetools_0.2-20  fs_2.1.0          htmlwidgets_1.6.4
-#> [21] Rcpp_1.1.2        systemfonts_1.3.2 digest_0.6.39     R6_2.6.1         
-#> [25] bslib_0.12.0      tools_4.6.2       pkgdown_2.2.1     cachem_1.1.0     
-#> [29] desc_1.4.3
+#>  [1] cli_3.6.6          knitr_1.52         rlang_1.3.0        xfun_0.62         
+#>  [5] KernSmooth_2.23-27 DBI_1.3.0          otel_0.3.0         sf_1.1-3          
+#>  [9] textshaping_1.0.5  jsonlite_2.0.0     e1071_1.7-17       htmltools_0.5.9   
+#> [13] ragg_1.5.2         sass_0.4.10        rmarkdown_2.32     grid_4.6.2        
+#> [17] classInt_0.4-11    evaluate_1.0.5     jquerylib_0.1.4    fastmap_1.2.0     
+#> [21] yaml_2.3.12        lifecycle_1.0.5    compiler_4.6.2     codetools_0.2-20  
+#> [25] fs_2.1.0           htmlwidgets_1.6.4  Rcpp_1.1.2         systemfonts_1.3.2 
+#> [29] digest_0.6.39      R6_2.6.1           class_7.3-24       bslib_0.12.0      
+#> [33] proxy_0.4-29       tools_4.6.2        units_1.0-1        pkgdown_2.2.1     
+#> [37] cachem_1.1.0       desc_1.4.3
 ```

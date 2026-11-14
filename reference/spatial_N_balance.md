@@ -39,7 +39,8 @@ spatial_N_balance(
 
   TN
 
-  :   Total soil nitrogen, pct
+  :   Total soil nitrogen, g/kg (per mille, as `Ntot` in
+      [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md))
 
   SOM
 
@@ -139,6 +140,7 @@ soil <- terra::rast(c(
   file.path(ext, "Cremonesi_CNratio.tif")
 ))
 names(soil) <- c("TN", "SOM", "Clay", "Sand", "CNratio")
+soil[["TN"]] <- soil[["TN"]] * 10   # the Cremonesi TN raster is in percent; Ntot is g/kg
 
 n_map <- spatial_N_balance(
   soil_stack = soil,

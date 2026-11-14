@@ -2068,10 +2068,59 @@ your Sentinel‑2 or UAV NDVI layer.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="a-real-example-from-the-soil-map-to-the-farm-total">A Real Example: From the Soil Map to the Farm Total<a class="anchor" aria-label="anchor" href="#a-real-example-from-the-soil-map-to-the-farm-total"></a>
+</h2>
+<p>The package ships a small farm of the Piacenza plain (four fields,
+46.7 ha) with the regional soil maps 0-30 cm around it (see
+<code><a href="../reference/piacenza.html">?piacenza</a></code>). One figure follows the chain of the package:
+the soil map feeds a balance for every pixel, the same balance on the
+field means gives one dose per field, and the doses times the areas give
+the nitrogen the farm needs.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">farm</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/piacenza_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span>,</span>
+<span>                    quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">rer</span>  <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/rer_soil_piacenza.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fv</span>   <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">farm</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">rer</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">rer</span>  <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">rer</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span> <span class="op">+</span> <span class="fl">300</span><span class="op">)</span>            <span class="co"># the farm and 300 m around it</span></span>
+<span><span class="va">soil</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">rer</span><span class="op">[[</span><span class="st">"ntot"</span><span class="op">]</span><span class="op">]</span>, <span class="va">rer</span><span class="op">[[</span><span class="st">"corg"</span><span class="op">]</span><span class="op">]</span> <span class="op">*</span> <span class="fl">1.724</span>, <span class="va">rer</span><span class="op">[[</span><span class="st">"clay"</span><span class="op">]</span><span class="op">]</span>, <span class="va">rer</span><span class="op">[[</span><span class="st">"sand"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>          <span class="va">rer</span><span class="op">[[</span><span class="st">"corg"</span><span class="op">]</span><span class="op">]</span> <span class="op">*</span> <span class="fl">10</span> <span class="op">/</span> <span class="va">rer</span><span class="op">[[</span><span class="st">"ntot"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">soil</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TN"</span>, <span class="st">"SOM"</span>, <span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"CNratio"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">farm</span><span class="op">[</span><span class="va">farm</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span>, <span class="op">]</span>                          <span class="co"># every pixel as the maize of P01</span></span>
+<span><span class="va">px</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spatial_N_balance.html">spatial_N_balance</a></span><span class="op">(</span><span class="va">soil</span>, expected_yield_tons_ha <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">expected_yield_tons_ha</span>,</span>
+<span>        crop <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">crop</span>, ccp <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">ccp</span>, winter_rain <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">winter_rain</span>,</span>
+<span>        start_spring_rain <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">start_spring_rain</span>, prev_crop <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">prev_crop</span>,</span>
+<span>        source <span class="op">=</span> <span class="st">"None"</span>, location <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">location</span>, forg_quantity <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/farm_balance.html">farm_balance</a></span><span class="op">(</span><span class="va">farm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mako</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="va">n</span>, <span class="st">"Mako"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">soil</span><span class="op">[[</span><span class="st">"Clay"</span><span class="op">]</span><span class="op">]</span>, main <span class="op">=</span> <span class="st">"1. Soil map: clay (%)"</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"YlOrBr"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>            axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>; <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">px</span><span class="op">[[</span><span class="st">"N_to_apply"</span><span class="op">]</span><span class="op">]</span>, main <span class="op">=</span> <span class="st">"2. Balance per pixel, maize (kg N/ha)"</span>, col <span class="op">=</span> <span class="fu">mako</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span>,</span>
+<span>            axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>; <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu">mako</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">N_target</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">300</span>, <span class="fl">10</span><span class="op">)</span>, labels <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>     border <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">MAS_ok</span>, <span class="st">"grey30"</span>, <span class="st">"#D55E00"</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">MAS_ok</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>     main <span class="op">=</span> <span class="st">"3. Balance per field (kg N/ha)"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_point_on_surface</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>     labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">plot</span>, <span class="st">"\n"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">N_target</span><span class="op">)</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>     col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">N_target</span> <span class="op">&gt;</span> <span class="fl">150</span>, <span class="st">"white"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">N_total_kg</span><span class="op">)</span>, names.arg <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">plot</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">" .*"</span>, <span class="st">""</span>, <span class="va">out</span><span class="op">$</span><span class="va">crop</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        horiz <span class="op">=</span> <span class="cn">TRUE</span>, las <span class="op">=</span> <span class="fl">1</span>, col <span class="op">=</span> <span class="fu">mako</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, border <span class="op">=</span> <span class="cn">NA</span>, xlab <span class="op">=</span> <span class="st">"kg N"</span>,</span>
+<span>        main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"4. Farm total: %.1f t N"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">N_total_kg</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="agrinutri_files/figure-html/overview-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
+<p>The orange outline marks the processing tomato, whose balance exceeds
+its maximum allowed dose.
+<code><a href="../articles/farm-and-prescription-map.html">vignette("farm-and-prescription-map")</a></code> continues with the
+rotation of one field and a Sentinel-2 prescription;
+<code><a href="../articles/spatial-balance.html">vignette("spatial-balance")</a></code> with the pixel balance.</p>
+</div>
+<div class="section level2">
 <h2 id="batch-processing-multiple-fields">Batch Processing Multiple Fields<a class="anchor" aria-label="anchor" href="#batch-processing-multiple-fields"></a>
 </h2>
 <p>For agricultural consultants managing multiple fields:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create field data</span></span>
 <span><span class="va">fields_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  field_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Field_A"</span>, <span class="st">"Field_B"</span>, <span class="st">"Field_C"</span><span class="op">)</span>,</span>
@@ -2146,7 +2195,7 @@ your Sentinel‑2 or UAV NDVI layer.</p>
 <h2 id="advanced-sensitivity-analysis">Advanced: Sensitivity Analysis<a class="anchor" aria-label="anchor" href="#advanced-sensitivity-analysis"></a>
 </h2>
 <p>Understand how different factors affect nitrogen requirements:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Base scenario</span></span>
 <span><span class="va">base_scenario</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span></span>
 <span>  expected_yield_tons_ha <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -2281,7 +2330,7 @@ accurate results</li>
 </h3>
 <p>Make sure to use the exact crop name as it appears in the
 database:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check available crops</span></span>
 <span><span class="va">available_crops</span> <span class="op">&lt;-</span> <span class="va">uptake_table</span><span class="op">$</span><span class="va">crop</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Available crops (first 10):\n"</span><span class="op">)</span></span>
@@ -2342,7 +2391,7 @@ leaching)</li>
 <div class="section level3">
 <h3 id="issue-1-crop-not-found">Issue 1: Crop not found<a class="anchor" aria-label="anchor" href="#issue-1-crop-not-found"></a>
 </h3>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Error: Crop not found</span></span>
 <span><span class="co"># Solution: Check exact spelling and match with database</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
@@ -2357,7 +2406,7 @@ leaching)</li>
 <div class="section level3">
 <h3 id="issue-2-invalid-soil-texture">Issue 2: Invalid soil texture<a class="anchor" aria-label="anchor" href="#issue-2-invalid-soil-texture"></a>
 </h3>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Error: Invalid clay and sand combination</span></span>
 <span><span class="co"># Solution: Ensure clay + sand ≤ 100</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
@@ -2372,7 +2421,7 @@ leaching)</li>
 <div class="section level3">
 <h3 id="issue-3-na-values-in-results">Issue 3: NA values in results<a class="anchor" aria-label="anchor" href="#issue-3-na-values-in-results"></a>
 </h3>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If you get NA values, check:</span></span>
 <span><span class="co"># 1. Location name matches g.table</span></span>
 <span><span class="co"># 2. CCP matches coef_time</span></span>
@@ -2397,7 +2446,7 @@ leaching)</li>
 <h3 id="internal-data-tables">Internal Data Tables<a class="anchor" aria-label="anchor" href="#internal-data-tables"></a>
 </h3>
 <p>All internal datasets are documented and accessible:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View available datasets</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Available internal datasets:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Available internal datasets:</span></span>

@@ -662,6 +662,60 @@ K2O/ha</strong></p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="p-and-k-at-scale-regional-soil-maps">P and K at scale: regional soil maps<a class="anchor" aria-label="anchor" href="#p-and-k-at-scale-regional-soil-maps"></a>
+</h2>
+<p>The same functions run on every pixel of a soil map.
+<code>rer_soil_piacenza.tif</code> is a clip of the Emilia-Romagna soil
+maps 0-30 cm (100 m grid, CC BY 4.0) over a small farm of the Piacenza
+plain, with Olsen P as elemental P and exchangeable K as elemental K
+(mg/kg); see <code><a href="../reference/piacenza.html">?piacenza</a></code>. Each pixel gets its availability
+class and the P<sub>2</sub>O<sub>5</sub> and K<sub>2</sub>O doses for a
+7.4 t/ha grain maize, with its own clay and sand.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rer</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/rer_soil_piacenza.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">v</span>   <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">rer</span><span class="op">)</span></span>
+<span><span class="va">ok</span>  <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
+<span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">ok</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/calc_soil_group_and_id_rag.html">calc_soil_group_and_id_rag</a></span><span class="op">(</span><span class="va">v</span><span class="op">[</span><span class="va">i</span>, <span class="st">"clay"</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="va">i</span>, <span class="st">"sand"</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">soil.group</span>, <span class="st">""</span><span class="op">)</span></span>
+<span><span class="va">p_cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"olsen_p"</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="../reference/classify_P_olsen.html">classify_P_olsen</a></span><span class="op">(</span><span class="va">x</span>, unit <span class="op">=</span> <span class="st">"P"</span><span class="op">)</span><span class="op">$</span><span class="va">rating</span><span class="op">)</span>, <span class="st">""</span><span class="op">)</span></span>
+<span><span class="va">k_cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">g</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="../reference/classify_K.html">classify_K</a></span><span class="op">(</span><span class="va">x</span>, unit <span class="op">=</span> <span class="st">"K"</span>, soil_group <span class="op">=</span> <span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">rating</span><span class="op">)</span>,</span>
+<span>                <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"k_exch"</span><span class="op">]</span>, <span class="va">grp</span><span class="op">)</span></span>
+<span><span class="va">p_dose</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">cl</span>, <span class="va">sa</span><span class="op">)</span> <span class="fu"><a href="../reference/P_balance.html">P_balance</a></span><span class="op">(</span><span class="fl">7.4</span>, <span class="st">"Grain maize 500-700 (grain)"</span>, olsen_value <span class="op">=</span> <span class="va">x</span>,</span>
+<span>                 olsen_unit <span class="op">=</span> <span class="st">"P"</span>, clay <span class="op">=</span> <span class="va">cl</span>, sand <span class="op">=</span> <span class="va">sa</span><span class="op">)</span><span class="op">$</span><span class="va">P2O5_required</span>,</span>
+<span>                 <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"olsen_p"</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"clay"</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"sand"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">k_dose</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">cl</span>, <span class="va">sa</span><span class="op">)</span> <span class="fu"><a href="../reference/K_balance.html">K_balance</a></span><span class="op">(</span><span class="fl">7.4</span>, <span class="st">"Grain maize 500-700 (grain)"</span>, k_value <span class="op">=</span> <span class="va">x</span>,</span>
+<span>                 k_unit <span class="op">=</span> <span class="st">"K"</span>, clay <span class="op">=</span> <span class="va">cl</span>, sand <span class="op">=</span> <span class="va">sa</span><span class="op">)</span><span class="op">$</span><span class="va">K2O_required</span>,</span>
+<span>                 <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"k_exch"</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"clay"</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="va">ok</span>, <span class="st">"sand"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>P <span class="op">=</span> <span class="va">p_cls</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>K <span class="op">=</span> <span class="va">k_cls</span><span class="op">)</span></span>
+<span><span class="co">#&gt; P</span></span>
+<span><span class="co">#&gt;      high       low    medium very high </span></span>
+<span><span class="co">#&gt;      1222         6       509        26</span></span>
+<span><span class="co">#&gt; K</span></span>
+<span><span class="co">#&gt;     high      low   medium very low </span></span>
+<span><span class="co">#&gt;       34     1410      305       14</span></span>
+<span></span>
+<span><span class="va">put</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="va">r</span> <span class="op">&lt;-</span> <span class="va">rer</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>; <span class="va">r</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>; <span class="va">r</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">ok</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">x</span>; <span class="va">r</span> <span class="op">}</span></span>
+<span><span class="va">lv</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"very low"</span>, <span class="st">"low"</span>, <span class="st">"medium"</span>, <span class="st">"high"</span>, <span class="st">"very high"</span><span class="op">)</span></span>
+<span><span class="va">cls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">put</span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">lv</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">farm</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/piacenza_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">fv</span>  <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">farm</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">rer</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">z</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">cls</span><span class="op">(</span><span class="va">p_cls</span><span class="op">)</span>, <span class="st">"Olsen P class"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">cls</span><span class="op">(</span><span class="va">k_cls</span><span class="op">)</span>, <span class="st">"Exchangeable K class"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">z</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, main <span class="op">=</span> <span class="va">z</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">5</span>, <span class="st">"Temps"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"classes"</span>,</span>
+<span>              levels <span class="op">=</span> <span class="va">lv</span>, all_levels <span class="op">=</span> <span class="cn">TRUE</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">put</span><span class="op">(</span><span class="va">p_dose</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"P2O5 dose, maize (kg/ha)"</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"Mako"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">put</span><span class="op">(</span><span class="va">k_dose</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"K2O dose, maize (kg/ha)"</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"Rocket"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span></span></code></pre></div>
+<p><img src="agrinutri-PK-and-distribution_files/figure-html/pk-regional-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
+<p>Where P is high the P<sub>2</sub>O<sub>5</sub> dose stays at crop
+removal (maintenance); where K is low the K<sub>2</sub>O dose adds an
+enrichment quota.</p>
+</div>
+<div class="section level2">
 <h2 id="scheda-a-dose-standard">Scheda a dose Standard<a class="anchor" aria-label="anchor" href="#scheda-a-dose-standard"></a>
 </h2>
 <p>For contexts with limited soil analyses, DPI 2026 provides a
@@ -673,7 +727,7 @@ standard-dose method. agrinutri mirrors the flag catalogue of
 </h3>
 <p>The N standard dose is modified by five decrements and five
 increments, then capped by MAS.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Durum wheat with buried straw + compacted / no-till</span></span>
 <span><span class="fu"><a href="../reference/dose_standard_N.html">scheda_N</a></span><span class="op">(</span></span>
 <span>  crop <span class="op">=</span> <span class="va">crop</span>,</span>
@@ -754,7 +808,7 @@ increments, then capped by MAS.</p>
 <span><span class="co">#&gt; [1] "DPI Emilia-Romagna 2026, Fert_Office v1.26 (Scheda_N)"</span></span></code></pre></div>
 <p>When the cumulated dose overshoots <code>max_N_dose</code>, the
 function caps it and flags <code>mas_exceeded = TRUE</code>:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dose_standard_N.html">scheda_N</a></span><span class="op">(</span></span>
 <span>  crop <span class="op">=</span> <span class="va">crop</span>,</span>
 <span>  increments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>straw_burial <span class="op">=</span> <span class="fl">100</span>, compacted_no_till <span class="op">=</span> <span class="fl">100</span>, low_SOM <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
@@ -798,7 +852,7 @@ function caps it and flags <code>mas_exceeded = TRUE</code>:</p>
 </h3>
 <p>For P and K the base dose depends on the initial soil dotation
 class:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dose_standard_PK.html">scheda_PK</a></span><span class="op">(</span></span>
 <span>  crop <span class="op">=</span> <span class="va">crop</span>,</span>
 <span>  soil_P_class <span class="op">=</span> <span class="st">"normal"</span>,</span>
@@ -911,7 +965,7 @@ modality-epoch).</li>
 <li>Optional target doses (for Eccesso/Deficit alerts) and a ZVN
 flag.</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plan_distribution.html">plan_distribution</a></span><span class="op">(</span></span>
 <span>  soil_group <span class="op">=</span> <span class="st">"Medio impasto"</span>,</span>
 <span>  n_balance  <span class="op">=</span> <span class="va">n_dose</span>,</span>
@@ -963,7 +1017,7 @@ flag.</li>
 <p>Modalities are catalogued in
 <code>distribution_modalities.table</code> and their compatibility with
 crop cycles in <code>cycle_modality.table</code>:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">distribution_modalities.table</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    ID_Mo                            modality_epoch</span></span>
 <span><span class="co">#&gt; 1      1        Bare soil, sown the following year</span></span>
@@ -996,7 +1050,7 @@ crop cycles in <code>cycle_modality.table</code>:</p>
 <h3 id="fertiliser-sources">Fertiliser sources<a class="anchor" aria-label="anchor" href="#fertiliser-sources"></a>
 </h3>
 <p>Available organic matrices and mineral products:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Organic: 21 matrices with their N, P, K and dry-matter titres</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">organic_fertilizers.table</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fertilizer"</span>, <span class="st">"avg_dm"</span>, <span class="st">"avg_N"</span>,</span>
 <span>                               <span class="st">"avg_P2O5"</span>, <span class="st">"avg_K2O"</span>, <span class="st">"fully_zootec"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">10</span><span class="op">)</span></span>
@@ -1044,7 +1098,7 @@ crop cycles in <code>cycle_modality.table</code>:</p>
 classes), the dose level (bassa / media / alta), the sector (avi, bov,
 sui, dig_tq, dig_sui, dig_avi, dig_chi, fanghi) and the modality level.
 The full matrix has 220 entries:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Medium impasto, dose media (125-249 kg N/ha), bovino:</span></span>
 <span><span class="va">efficiency.table</span><span class="op">[</span></span>
 <span>  <span class="va">efficiency.table</span><span class="op">$</span><span class="va">ID_Rag</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">&amp;</span></span>
@@ -1062,7 +1116,7 @@ The full matrix has 220 entries:</p>
 </h2>
 <p>After the plan is executed, agrinutri estimates the residual soil P
 and K in ppm, usable as input for the following year’s calculation:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">P_end</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_soil_P_end_of_cycle.html">estimate_soil_P_end_of_cycle</a></span><span class="op">(</span></span>
 <span>  P2O5_start_ppm <span class="op">=</span> <span class="va">olsen_P</span>,</span>
 <span>  P2O5_applied   <span class="op">=</span> <span class="va">plan</span><span class="op">$</span><span class="va">totals</span><span class="op">[</span><span class="st">"P2O5_useful"</span><span class="op">]</span>,</span>
@@ -1089,7 +1143,7 @@ and K in ppm, usable as input for the following year’s calculation:</p>
 </h2>
 <p>A second scenario with different crop, cycle, irrigation and
 precessione.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mais_bal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span></span>
 <span>  expected_yield_tons_ha <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  crop <span class="op">=</span> <span class="st">"Silage maize (class 700)"</span>,</span>
@@ -1116,7 +1170,7 @@ precessione.</p>
 <div class="section level2">
 <h2 id="alternative-scenario-apple-orchard-in-piena-produzione">Alternative scenario: apple orchard in piena produzione<a class="anchor" aria-label="anchor" href="#alternative-scenario-apple-orchard-in-piena-produzione"></a>
 </h2>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">apple_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span></span>
 <span>  expected_yield_tons_ha <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  crop <span class="op">=</span> <span class="st">"Melo frutti, legno e foglie"</span>,</span>
@@ -1188,7 +1242,7 @@ caps each pixel at the MAS limit.</p>
 <div class="section level3">
 <h3 id="example-variable-rate-n-for-grano-duro">Example: variable-rate N for grano duro<a class="anchor" aria-label="anchor" href="#example-variable-rate-n-for-grano-duro"></a>
 </h3>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; terra 1.9.50</span></span>
 <span></span>
@@ -1205,7 +1259,7 @@ caps each pixel at the MAS limit.</p>
 <span><span class="co">#&gt; names       :    B02,    B03,    B04,    B05,    B08</span></span>
 <span><span class="co">#&gt; min values  : 0.0548, 0.0874, 0.0529, 0.1214, 0.2989</span></span>
 <span><span class="co">#&gt; max values  : 0.0928, 0.1356, 0.1138, 0.1793, 0.4632</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Field-average N from the balance</span></span>
 <span><span class="va">n_dose</span>                 <span class="co"># ~142 kg/ha (computed earlier in this vignette)</span></span>
 <span><span class="co">#&gt; [1] 142.246</span></span>
@@ -1234,7 +1288,7 @@ caps each pixel at the MAS limit.</p>
 <div class="section level3">
 <h3 id="example-holland-schepers-method">Example: Holland &amp; Schepers method<a class="anchor" aria-label="anchor" href="#example-holland-schepers-method"></a>
 </h3>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vr_hs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variable_rate_N.html">variable_rate_N</a></span><span class="op">(</span></span>
 <span>  ndvi_raster <span class="op">=</span> <span class="va">ndvi</span>,</span>
 <span>  n_dose      <span class="op">=</span> <span class="va">n_dose</span>,</span>
@@ -1252,7 +1306,7 @@ caps each pixel at the MAS limit.</p>
 <div class="section level3">
 <h3 id="comparison-and-aggregation">Comparison and aggregation<a class="anchor" aria-label="anchor" href="#comparison-and-aggregation"></a>
 </h3>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Total N applied to the field (assuming each pixel has the same area)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">vr_cal</span><span class="op">$</span><span class="va">rate_raster</span>, mat <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 142.246</span></span>
@@ -1266,7 +1320,7 @@ caps each pixel at the MAS limit.</p>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">vr_hs</span><span class="op">$</span><span class="va">rate_raster</span>,  mat <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,  main <span class="op">=</span> <span class="st">"Holland &amp; Schepers"</span>,</span>
 <span>     xlab <span class="op">=</span> <span class="st">"N rate (kg/ha)"</span>, col <span class="op">=</span> <span class="st">"tomato"</span>,   border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="agrinutri-PK-and-distribution_files/figure-html/prec-ag-compare-1.png" class="r-plt" alt="" width="720" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">oldpar</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -1276,7 +1330,7 @@ caps each pixel at the MAS limit.</p>
 application (typically the <strong>copertura</strong>) inside
 <code><a href="../reference/plan_distribution.html">plan_distribution()</a></code>: read the mean rate from the raster and
 pass it as the mineral row.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mean_rate</span> <span class="op">&lt;-</span> <span class="va">vr_cal</span><span class="op">$</span><span class="va">mean_kg_ha</span></span>
 <span><span class="co"># Quintals/ha of UREA needed to deliver mean_rate (titre 46% N)</span></span>
 <span><span class="va">q_urea_per_ha</span> <span class="op">&lt;-</span> <span class="va">mean_rate</span> <span class="op">/</span> <span class="fl">46</span></span>
@@ -1306,7 +1360,7 @@ pass it as the mineral row.</p>
 <p>For more refined NDVI-rate relationships you can call the underlying
 estimator directly, providing a <code>meanN</code> for the average
 NDVI:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_rate_3pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_N_rate_from_calibration_curve.html">estimate_N_rate_from_calibration_curve</a></span><span class="op">(</span></span>
 <span>  raster <span class="op">=</span> <span class="va">ndvi</span>,</span>
 <span>  minN <span class="op">=</span> <span class="fl">100</span>, meanN <span class="op">=</span> <span class="fl">140</span>, maxN <span class="op">=</span> <span class="fl">180</span>,</span>
@@ -1322,7 +1376,7 @@ NDVI:</p>
 </h2>
 <p>agrinutri exposes 33 internal tables; the most useful in day-to-day
 work:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Crop master list</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">uptake_table</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"crop_id"</span>, <span class="st">"crop"</span>, <span class="st">"N"</span>, <span class="st">"P2O5"</span>, <span class="st">"K2O"</span>,</span>
 <span>                              <span class="st">"reference_yield"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span>
@@ -1506,7 +1560,7 @@ previous-years’ organic term is scaled by the time coefficient.</p>
 <div class="section level2">
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.6.2 (2026-10-29)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -1532,14 +1586,16 @@ previous-years’ organic term is scaled by the time coefficient.</p>
 <span><span class="co">#&gt; [1] terra_1.9-50    agrinutri_1.0.1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] cli_3.6.6         knitr_1.52        rlang_1.3.0       xfun_0.62        </span></span>
-<span><span class="co">#&gt;  [5] otel_0.3.0        textshaping_1.0.5 jsonlite_2.0.0    htmltools_0.5.9  </span></span>
-<span><span class="co">#&gt;  [9] ragg_1.5.2        sass_0.4.10       rmarkdown_2.32    evaluate_1.0.5   </span></span>
-<span><span class="co">#&gt; [13] jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  </span></span>
-<span><span class="co">#&gt; [17] compiler_4.6.2    codetools_0.2-20  fs_2.1.0          htmlwidgets_1.6.4</span></span>
-<span><span class="co">#&gt; [21] Rcpp_1.1.2        systemfonts_1.3.2 digest_0.6.39     R6_2.6.1         </span></span>
-<span><span class="co">#&gt; [25] bslib_0.12.0      tools_4.6.2       pkgdown_2.2.1     cachem_1.1.0     </span></span>
-<span><span class="co">#&gt; [29] desc_1.4.3</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] cli_3.6.6          knitr_1.52         rlang_1.3.0        xfun_0.62         </span></span>
+<span><span class="co">#&gt;  [5] KernSmooth_2.23-27 DBI_1.3.0          otel_0.3.0         sf_1.1-3          </span></span>
+<span><span class="co">#&gt;  [9] textshaping_1.0.5  jsonlite_2.0.0     e1071_1.7-17       htmltools_0.5.9   </span></span>
+<span><span class="co">#&gt; [13] ragg_1.5.2         sass_0.4.10        rmarkdown_2.32     grid_4.6.2        </span></span>
+<span><span class="co">#&gt; [17] classInt_0.4-11    evaluate_1.0.5     jquerylib_0.1.4    fastmap_1.2.0     </span></span>
+<span><span class="co">#&gt; [21] yaml_2.3.12        lifecycle_1.0.5    compiler_4.6.2     codetools_0.2-20  </span></span>
+<span><span class="co">#&gt; [25] fs_2.1.0           htmlwidgets_1.6.4  Rcpp_1.1.2         systemfonts_1.3.2 </span></span>
+<span><span class="co">#&gt; [29] digest_0.6.39      R6_2.6.1           class_7.3-24       bslib_0.12.0      </span></span>
+<span><span class="co">#&gt; [33] proxy_0.4-29       tools_4.6.2        units_1.0-1        pkgdown_2.2.1     </span></span>
+<span><span class="co">#&gt; [37] cachem_1.1.0       desc_1.4.3</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

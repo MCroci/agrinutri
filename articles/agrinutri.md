@@ -2012,6 +2012,61 @@ par(op2)
 #                    overwrite=TRUE)
 ```
 
+## A Real Example: From the Soil Map to the Farm Total
+
+The package ships a small farm of the Piacenza plain (four fields, 46.7
+ha) with the regional soil maps 0-30 cm around it (see
+[`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md)).
+One figure follows the chain of the package: the soil map feeds a
+balance for every pixel, the same balance on the field means gives one
+dose per field, and the doses times the areas give the nitrogen the farm
+needs.
+
+``` r
+
+farm <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"),
+                    quiet = TRUE)
+rer  <- terra::rast(system.file("extdata/rer_soil_piacenza.tif", package = "agrinutri"))
+fv   <- terra::vect(sf::st_transform(farm, terra::crs(rer)))
+rer  <- terra::crop(rer, terra::ext(fv) + 300)            # the farm and 300 m around it
+soil <- c(rer[["ntot"]], rer[["corg"]] * 1.724, rer[["clay"]], rer[["sand"]],
+          rer[["corg"]] * 10 / rer[["ntot"]])
+names(soil) <- c("TN", "SOM", "Clay", "Sand", "CNratio")
+
+p1 <- farm[farm$plot == "P01", ]                          # every pixel as the maize of P01
+px <- spatial_N_balance(soil, expected_yield_tons_ha = p1$expected_yield_tons_ha,
+        crop = p1$crop, ccp = p1$ccp, winter_rain = p1$winter_rain,
+        start_spring_rain = p1$start_spring_rain, prev_crop = p1$prev_crop,
+        source = "None", location = p1$location, forg_quantity = 0)
+out <- farm_balance(farm)
+
+mako <- function(n) hcl.colors(n, "Mako", rev = TRUE)
+par(mfrow = c(2, 2), mar = c(2, 1, 2, 5))
+terra::plot(soil[["Clay"]], main = "1. Soil map: clay (%)", col = hcl.colors(30, "YlOrBr", rev = TRUE),
+            axes = FALSE); terra::lines(fv)
+terra::plot(px[["N_to_apply"]], main = "2. Balance per pixel, maize (kg N/ha)", col = mako(30),
+            axes = FALSE); terra::lines(fv)
+plot(sf::st_geometry(out), col = mako(30)[cut(out$N_target, seq(0, 300, 10), labels = FALSE)],
+     border = ifelse(out$MAS_ok, "grey30", "#D55E00"), lwd = ifelse(out$MAS_ok, 1, 3),
+     main = "3. Balance per field (kg N/ha)")
+text(sf::st_coordinates(sf::st_point_on_surface(sf::st_geometry(out))),
+     labels = paste0(out$plot, "\n", round(out$N_target)), cex = 0.7,
+     col = ifelse(out$N_target > 150, "white", "black"))
+par(mar = c(4, 6, 2, 1))
+barplot(rev(out$N_total_kg), names.arg = rev(paste(out$plot, sub(" .*", "", out$crop))),
+        horiz = TRUE, las = 1, col = mako(5)[3], border = NA, xlab = "kg N",
+        main = sprintf("4. Farm total: %.1f t N", sum(out$N_total_kg) / 1000))
+```
+
+![](agrinutri_files/figure-html/overview-1.png)
+
+The orange outline marks the processing tomato, whose balance exceeds
+its maximum allowed dose.
+[`vignette("farm-and-prescription-map")`](https://mcroci.github.io/agrinutri/articles/farm-and-prescription-map.md)
+continues with the rotation of one field and a Sentinel-2 prescription;
+[`vignette("spatial-balance")`](https://mcroci.github.io/agrinutri/articles/spatial-balance.md)
+with the pixel balance.
+
 ## Batch Processing Multiple Fields
 
 For agricultural consultants managing multiple fields:

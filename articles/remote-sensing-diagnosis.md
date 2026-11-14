@@ -27,11 +27,12 @@ correct diagnostic variable is the NNI, which uses the dilution curve to
 convert biomass + N% into a dimensionless deficiency / sufficiency
 index.
 
-## 1. A synthetic multi-band stack (for the vignette)
+## 1. A Sentinel-2 scene
 
-In a real application the multi-band input comes from a Sentinel-2 L2A
-scene or a UAV multispectral flight. Here we synthesise a small stack so
-the vignette is reproducible offline.
+The package ships the Sentinel-2 Level-2A scene of 13 August 2024 over
+plot P01 of the Piacenza example farm (grain maize, 10 bands,
+reflectance scaled by 10000; see
+[`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md)):
 
 ``` r
 
@@ -39,18 +40,14 @@ library(agrinutri)
 library(terra)
 #> terra 1.9.50
 
-set.seed(1)
-template <- terra::rast(nrows = 40, ncols = 40,
-                        xmin = 0, xmax = 100, ymin = 0, ymax = 100)
-
-# Plausible canopy reflectances (fraction 0-1)
-B03 <- terra::setValues(template, runif(terra::ncell(template), 0.05, 0.12))  # green
-B04 <- terra::setValues(template, runif(terra::ncell(template), 0.04, 0.08))  # red
-B05 <- terra::setValues(template, runif(terra::ncell(template), 0.10, 0.25))  # red-edge
-B08 <- terra::setValues(template, runif(terra::ncell(template), 0.35, 0.55))  # NIR
-
-s2 <- terra::rast(list(B03, B04, B05, B08))
-names(s2) <- c("B03", "B04", "B05", "B08")
+s2f   <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif", package = "agrinutri")
+field <- terra::vect(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"))
+field <- terra::project(field[field$plot == "P01"], terra::crs(terra::rast(s2f)))
+s2    <- terra::mask(terra::rast(s2f), field)                       # keep the field only
+s2f   <- tempfile(fileext = ".tif")                                   # estimate_biophysical() reads a file
+terra::writeRaster(s2, s2f, NAflag = 0, datatype = "INT2U")
+names(s2)
+#>  [1] "B02" "B03" "B04" "B05" "B06" "B07" "B08" "B8A" "B11" "B12"
 ```
 
 ## 2. Multi-index VI engine
@@ -58,21 +55,22 @@ names(s2) <- c("B03", "B04", "B05", "B08")
 [`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md)
 computes any of NDVI, NDRE, GNDVI, CIred-edge, MCARI, MSAVI2 from the
 stack, with configurable band mapping. Default mapping follows
-Sentinel-2 L2A naming.
+Sentinel-2 L2A naming; `scale_factor = 10000` converts the stored
+integers to reflectance.
 
 ``` r
 
-ndvi  <- compute_vi(s2, "NDVI")
-ndre  <- compute_vi(s2, "NDRE")
-gndvi <- compute_vi(s2, "GNDVI")
-cire  <- compute_vi(s2, "CIred")
+ndvi  <- compute_vi(s2, "NDVI",  scale_factor = 10000)
+ndre  <- compute_vi(s2, "NDRE",  scale_factor = 10000)
+gndvi <- compute_vi(s2, "GNDVI", scale_factor = 10000)
+cire  <- compute_vi(s2, "CIred", scale_factor = 10000)
 
 summary(terra::values(ndvi, mat = FALSE))
-#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.6329  0.7314  0.7662  0.7655  0.8055  0.8615
+#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
+#>  0.3231  0.7523  0.8415  0.7812  0.8540  0.8971     712
 summary(terra::values(ndre, mat = FALSE))
-#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.1751  0.3596  0.4406  0.4456  0.5384  0.6886
+#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
+#>  0.2372  0.5660  0.6959  0.6340  0.7130  0.7441     712
 ```
 
 ``` r
@@ -149,24 +147,30 @@ compute_NNI(2.8, 4, crop = "maize", is_percent = TRUE)
 
 ## 5. Raster-wise NNI diagnosis
 
-In a realistic workflow biomass (W) and N concentration (N%) are both
-raster layers, derived from remote sensing + empirical relationships.
-Here we illustrate with two synthetic layers that emulate the output of
-a biomass retrieval model + a leaf-N retrieval model.
+Biomass (W) and plant N concentration (N%) come from the Sentinel-2
+scene:
+[`estimate_biophysical()`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md)
+retrieves leaf area index, leaf dry matter and canopy N content with
+Gaussian-process regression, and
+[`compute_NNI_from_S2()`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
+converts them into W, N% and the NNI along the maize dilution curve.
+[`diagnose_N_status()`](https://mcroci.github.io/agrinutri/reference/diagnose_N_status.md)
+gives the same diagnosis from any pair of W and N% layers.
 
 ``` r
 
-# Synthetic biomass and N% layers
-w_map <- terra::setValues(template, runif(terra::ncell(template), 1.5, 6.0))
-n_map <- terra::setValues(template, runif(terra::ncell(template), 2.2, 3.9))
+bio <- estimate_biophysical(s2f, output_dir = tempdir(),
+                            variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
+nni <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
+                           crop = "maize", fvc = bio$FVC)
 
-d <- diagnose_N_status(N_content = n_map, biomass = w_map,
-                       crop = "wheat", is_percent = TRUE)
+d <- diagnose_N_status(N_content = nni$N_actual, biomass = nni$W,
+                       crop = "maize", is_percent = TRUE)
 
 par(mfrow = c(1, 2), mar = c(3, 3, 2, 4))
 terra::plot(d$NNI,
      main = "NNI (continuous)",
-     col  = hcl.colors(30, "RdYlGn"))
+     col  = hcl.colors(30, "RdBu"), range = c(0.6, 1.4))
 terra::plot(d$class,
      main = "NNI class (1=deficient, 2=optimal, 3=excessive)",
      col  = c("#d73027", "#fee08b", "#1a9850"))
@@ -174,44 +178,47 @@ terra::plot(d$class,
 
 ![](remote-sensing-diagnosis_files/figure-html/raster-nni-1.png)
 
+Most deficient pixels lie on the field edge, where a 10 m pixel mixes
+the crop with the margin.
+
 ``` r
 
 d$summary
 #> $counts
 #> $counts$deficient
-#> [1] 588
+#> [1] 75
 #> 
 #> $counts$optimal
-#> [1] 465
+#> [1] 546
 #> 
 #> $counts$excessive
-#> [1] 547
+#> [1] 138
 #> 
 #> 
 #> $fractions
 #> $fractions$deficient
-#> [1] 0.3675
+#> [1] 0.09881423
 #> 
 #> $fractions$optimal
-#> [1] 0.290625
+#> [1] 0.7193676
 #> 
 #> $fractions$excessive
-#> [1] 0.341875
+#> [1] 0.1818182
 d$thresholds
 #> deficient excessive 
 #>       0.9       1.1
 d$curve
 #> $a
-#> [1] 5.35
+#> [1] 3.4
 #> 
 #> $b
-#> [1] 0.44
+#> [1] 0.37
 #> 
 #> $W_min
-#> [1] 1.55
+#> [1] 1
 #> 
 #> $reference
-#> [1] "Justes et al. 1994"
+#> [1] "Plenet & Lemaire 1999"
 ```
 
 ## 6. Diagnosis-guided variable rate
@@ -225,14 +232,11 @@ where the crop is already over-supplied.
 
 ``` r
 
-N_target <- 160   # e.g. from a preliminary N_balance()
+N_target <- 175   # balance dose of P01 in 2024, see vignette("farm-and-prescription-map")
 
 vr <- variable_rate_N(ndre, n_dose = N_target,
                       method = "holland",
-                      minN = 60, maxN = 200)
-#> Warning: [is.lonlat] unknown crs
-#> Warning in estimate_N_rate_from_holland_schepers(ndvi_raster = ndvi_raster, :
-#> Raster projection information missing. Ensure NDVI values are in 0-1 range.
+                      minN = 0.8 * N_target, maxN = 1.2 * N_target)
 
 # Mask out pixels classified as "excessive" (class == 3)
 rate_guided <- vr$rate_raster
@@ -253,17 +257,17 @@ terra::plot(rate_guided,
 
 cat("Full prescription  mean :",
     round(terra::global(vr$rate_raster, "mean", na.rm = TRUE)[1, 1], 1), "kg/ha\n")
-#> Full prescription  mean : 160 kg/ha
+#> Full prescription  mean : 175 kg/ha
 cat("NNI-guided        mean  :",
     round(terra::global(rate_guided, "mean", na.rm = TRUE)[1, 1], 1), "kg/ha\n")
-#> NNI-guided        mean  : 104.5 kg/ha
+#> NNI-guided        mean  : 149.7 kg/ha
 cat("N saved by NNI mask     :",
     round(terra::global(vr$rate_raster - rate_guided, "mean", na.rm = TRUE)[1, 1], 1),
     "kg/ha avg, or",
     round(terra::global(vr$rate_raster - rate_guided, "sum", na.rm = TRUE)[1, 1] *
           prod(terra::res(rate_guided)) / 10000, 1),
     "kg total over the field\n")
-#> N saved by NNI mask     : 55.5 kg/ha avg, or 55.5 kg total over the field
+#> N saved by NNI mask     : 25.3 kg/ha avg, or 234.5 kg total over the field
 ```
 
 ## 7. Empirical NNI from a single VI raster (no GPR models)
@@ -303,15 +307,17 @@ machine-width strips directly exportable to any tractor monitor:
 
 ``` r
 
-ex    <- system.file("extdata/example_farm.geojson", package = "agrinutri")
-field <- sf::st_read(ex, quiet = TRUE)[1, ]
+farm  <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"),
+                     quiet = TRUE)
+field <- farm[farm$plot == "P01", ]
 
 rx <- build_strip_prescription(
   field         = field,
   machine_width = 24,
-  nni_raster    = out$NNI,
+  cell_length   = 30,
+  nni_raster    = nni$NNI,
   variability   = "nni",
-  n_target      = 180, min_dose = 60, max_dose = 220)
+  n_target      = 175, min_dose = 140, max_dose = 210)
 
 export_prescription(rx, "rx_nni.shp", format = "shp")
 ```

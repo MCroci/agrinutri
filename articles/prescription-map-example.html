@@ -72,8 +72,8 @@
 <p>This vignette shows the <strong>full workflow</strong> from an NDVI
 raster to a machine-width grid prescription map, in six steps:</p>
 <ol style="list-style-type: decimal">
-<li>Load the field polygon (bundled demo farm).</li>
-<li>Synthesise or load an NDVI raster on that field.</li>
+<li>Load a field polygon (plot P01 of the bundled Piacenza farm).</li>
+<li>Compute its NDVI from the bundled Sentinel-2 scene.</li>
 <li>Define the <strong>calibration curve</strong> (VI -&gt; N rate) from
 two anchor points.</li>
 <li>Generate <strong>Option A</strong> - a pixel-by-pixel VRT raster
@@ -84,7 +84,8 @@ prescription</strong> with <code><a href="../reference/build_strip_prescription.
 same calibration.</li>
 <li>Export both as GeoTIFF / Shapefile / ISOXML.</li>
 </ol>
-<p>All of this runs on the demo data that ships with agrinutri.</p>
+<p>All of this runs on the Piacenza example data that ships with
+agrinutri (see <code><a href="../reference/piacenza.html">?piacenza</a></code>).</p>
 <div class="section level2">
 <h2 id="load-a-field-polygon">1. Load a field polygon<a class="anchor" aria-label="anchor" href="#load-a-field-polygon"></a>
 </h2>
@@ -92,71 +93,44 @@ same calibration.</li>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mcroci/agrinutri" class="external-link">agrinutri</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ex</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/example_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
-<span><span class="va">farm</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="va">ex</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Pick plot P03 - "Lower Ditch", 7.8 ha grain maize, loamy soil</span></span>
-<span><span class="va">field</span> <span class="op">&lt;-</span> <span class="va">farm</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span></span>
-<span><span class="va">field</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plot_id"</span>, <span class="st">"plot_name"</span>, <span class="st">"crop"</span>, <span class="st">"area_ha"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; Simple feature collection with 1 feature and 4 fields</span></span>
-<span><span class="co">#&gt; Geometry type: POLYGON</span></span>
-<span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: 9.7215 ymin: 45.048 xmax: 9.7257 ymax: 45.0508</span></span>
-<span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span><span class="co">#&gt;   plot_id   plot_name                        crop area_ha</span></span>
-<span><span class="co">#&gt; 3     P03 Lower Ditch Grain maize 500-700 (grain)     7.8</span></span>
-<span><span class="co">#&gt;                         geometry</span></span>
-<span><span class="co">#&gt; 3 POLYGON ((9.7215 45.048, 9....</span></span>
+<span><span class="va">farm</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/piacenza_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span>,</span>
+<span>                     quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">field</span> <span class="op">&lt;-</span> <span class="va">farm</span><span class="op">[</span><span class="va">farm</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span>, <span class="op">]</span>      <span class="co"># grain maize in 2024, 8.6 ha</span></span>
+<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">field</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plot"</span>, <span class="st">"crop"</span>, <span class="st">"area_ha"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   plot                        crop area_ha</span></span>
+<span><span class="co">#&gt; 1  P01 Grain maize 500-700 (grain)   8.612</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">field</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"#D5E4F0"</span>, border <span class="op">=</span> <span class="st">"#1F4E79"</span>,</span>
-<span>     main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Field: %s (%.1f ha)"</span>,</span>
-<span>                    <span class="va">field</span><span class="op">$</span><span class="va">plot_name</span>, <span class="va">field</span><span class="op">$</span><span class="va">area_ha</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>     main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Field: %s (%.1f ha)"</span>, <span class="va">field</span><span class="op">$</span><span class="va">plot</span>, <span class="va">field</span><span class="op">$</span><span class="va">area_ha</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="prescription-map-example_files/figure-html/field-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
-<h2 id="synthesise-or-load-an-ndvi-raster">2. Synthesise (or load) an NDVI raster<a class="anchor" aria-label="anchor" href="#synthesise-or-load-an-ndvi-raster"></a>
+<h2 id="ndvi-from-sentinel-2">2. NDVI from Sentinel-2<a class="anchor" aria-label="anchor" href="#ndvi-from-sentinel-2"></a>
 </h2>
-<p>In a real workflow you would read a GeoTIFF from UAV or Sentinel-2.
-Here we build a plausible NDVI in one line using the internal demo
-helper (same synthesiser used by the Shiny “Load demo NDVI” button):</p>
+<p>The bundled scene is the Sentinel-2 Level-2A acquisition of 13 August
+2024 over P01, with reflectance scaled by 10000:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Two-patch NDVI with smooth base + noise</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span>
-<span><span class="va">fp</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">field</span>, <span class="fl">3857</span><span class="op">)</span></span>
-<span><span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">fp</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">nx</span> <span class="op">&lt;-</span> <span class="fl">150</span></span>
-<span><span class="va">ny</span> <span class="op">&lt;-</span> <span class="fl">110</span></span>
-<span><span class="va">r</span>  <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="va">bb</span><span class="op">$</span><span class="va">xmin</span>, xmax <span class="op">=</span> <span class="va">bb</span><span class="op">$</span><span class="va">xmax</span>,</span>
-<span>                  ymin <span class="op">=</span> <span class="va">bb</span><span class="op">$</span><span class="va">ymin</span>, ymax <span class="op">=</span> <span class="va">bb</span><span class="op">$</span><span class="va">ymax</span>,</span>
-<span>                  ncols <span class="op">=</span> <span class="va">nx</span>, nrows <span class="op">=</span> <span class="va">ny</span>, crs <span class="op">=</span> <span class="st">"EPSG:3857"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">x</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="va">nx</span><span class="op">)</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="va">ny</span><span class="op">)</span></span>
-<span><span class="va">gx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">x</span>, nrow <span class="op">=</span> <span class="va">ny</span>, ncol <span class="op">=</span> <span class="va">nx</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">gy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">y</span>, nrow <span class="op">=</span> <span class="va">ny</span>, ncol <span class="op">=</span> <span class="va">nx</span><span class="op">)</span></span>
-<span><span class="va">base</span>   <span class="op">&lt;-</span> <span class="fl">0.72</span> <span class="op">+</span> <span class="fl">0.05</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">4</span> <span class="op">*</span> <span class="va">gx</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.04</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fl">5</span> <span class="op">*</span> <span class="va">gy</span><span class="op">)</span></span>
-<span><span class="va">patch1</span> <span class="op">&lt;-</span> <span class="fl">0.22</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="op">(</span><span class="op">(</span><span class="va">gx</span> <span class="op">-</span> <span class="fl">0.30</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="va">gy</span> <span class="op">-</span> <span class="fl">0.35</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.010</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">patch2</span> <span class="op">&lt;-</span> <span class="fl">0.26</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="op">(</span><span class="op">(</span><span class="va">gx</span> <span class="op">-</span> <span class="fl">0.70</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="va">gy</span> <span class="op">-</span> <span class="fl">0.55</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.008</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">ndvi_vals</span> <span class="op">&lt;-</span> <span class="va">base</span> <span class="op">-</span> <span class="va">patch1</span> <span class="op">-</span> <span class="va">patch2</span> <span class="op">+</span> <span class="fl">0.03</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">nx</span> <span class="op">*</span> <span class="va">ny</span><span class="op">)</span></span>
-<span><span class="va">ndvi_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="va">ndvi_vals</span>, <span class="fl">0.30</span><span class="op">)</span>, <span class="fl">0.92</span><span class="op">)</span></span>
-<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">ndvi_vals</span></span>
-<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">r</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">fp</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240813.tif"</span>,</span>
+<span>                              package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">field</span><span class="op">)</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">r</span>  <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_vi.html">compute_vi</a></span><span class="op">(</span><span class="va">s2</span>, <span class="st">"NDVI"</span>, scale_factor <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span>, <span class="va">fv</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"NDVI"</span></span>
 <span><span class="va">r</span></span>
 <span><span class="co">#&gt; class       : SpatRaster</span></span>
-<span><span class="co">#&gt; size        : 110, 150, 1  (nrow, ncol, nlyr)</span></span>
-<span><span class="co">#&gt; resolution  : 3.116946, 4.010757  (x, y)</span></span>
-<span><span class="co">#&gt; extent      : 1082192, 1082660, 5629081, 5629522  (xmin, xmax, ymin, ymax)</span></span>
-<span><span class="co">#&gt; coord. ref. : WGS 84 / Pseudo-Mercator (EPSG:3857)</span></span>
+<span><span class="co">#&gt; size        : 42, 39, 1  (nrow, ncol, nlyr)</span></span>
+<span><span class="co">#&gt; resolution  : 10, 10  (x, y)</span></span>
+<span><span class="co">#&gt; extent      : 552350, 552740, 4977010, 4977430  (xmin, xmax, ymin, ymax)</span></span>
+<span><span class="co">#&gt; coord. ref. : WGS 84 / UTM zone 32N (EPSG:32632)</span></span>
 <span><span class="co">#&gt; source(s)   : memory</span></span>
+<span><span class="co">#&gt; varname     : S2_piacenza_P01_20240813</span></span>
 <span><span class="co">#&gt; name        :     NDVI</span></span>
-<span><span class="co">#&gt; min value   : 0.383404</span></span>
-<span><span class="co">#&gt; max value   : 0.901509</span></span>
+<span><span class="co">#&gt; min value   :  0.32309</span></span>
+<span><span class="co">#&gt; max value   : 0.897106</span></span>
 <span></span>
-<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span>, main <span class="op">=</span> <span class="st">"Input NDVI (synthetic)"</span>,</span>
-<span>            col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"YlGn"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span>, main <span class="op">=</span> <span class="st">"Input NDVI (Sentinel-2, 13 August 2024)"</span>,</span>
+<span>            col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"YlGn"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">fv</span><span class="op">)</span></span></code></pre></div>
 <p><img src="prescription-map-example_files/figure-html/ndvi-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
@@ -167,14 +141,15 @@ reference (lowest vigour) to <code>max_dose</code> (to push canopy
 development) and a high-vigour NDVI to <code>min_dose</code> (canopy
 already lush, less N needed):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Agronomic N target from the field-scale balance (example: 220 kg N/ha</span></span>
-<span><span class="co"># for an 11 t/ha grain maize in Pianura Padana)</span></span>
-<span><span class="va">N_target</span> <span class="op">&lt;-</span> <span class="fl">220</span></span>
-<span><span class="va">min_dose</span> <span class="op">&lt;-</span> <span class="fl">60</span></span>
-<span><span class="va">max_dose</span> <span class="op">&lt;-</span> <span class="fl">260</span></span>
+<code class="sourceCode R"><span><span class="co"># N target from the field-scale balance of P01 (2024), bounds 80-120 percent</span></span>
+<span><span class="va">N_target</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/farm_balance.html">farm_balance</a></span><span class="op">(</span><span class="va">farm</span><span class="op">)</span><span class="op">$</span><span class="va">N_target</span><span class="op">[</span><span class="va">farm</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span><span class="op">]</span></span>
+<span><span class="va">min_dose</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">N_target</span></span>
+<span><span class="va">max_dose</span> <span class="op">&lt;-</span> <span class="fl">1.2</span> <span class="op">*</span> <span class="va">N_target</span></span>
 <span></span>
-<span><span class="va">vi_low</span>  <span class="op">&lt;-</span> <span class="fl">0.35</span>    <span class="co"># anchor for max_dose</span></span>
-<span><span class="va">vi_high</span> <span class="op">&lt;-</span> <span class="fl">0.80</span>    <span class="co"># anchor for min_dose</span></span>
+<span><span class="co"># Anchors from the field NDVI: 5th percentile -&gt; max_dose, 95th -&gt; min_dose</span></span>
+<span><span class="va">q</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">r</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">v</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.95</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">vi_low</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">q</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">vi_high</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">q</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot the calibration</span></span>
 <span><span class="va">vi</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.20</span>, <span class="fl">0.95</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
@@ -189,9 +164,9 @@ already lush, less N needed):</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">min_dose</span>, <span class="va">max_dose</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"#888"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">points</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">vi_low</span>, <span class="va">vi_high</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">max_dose</span>, <span class="va">min_dose</span><span class="op">)</span>,</span>
 <span>       pch <span class="op">=</span> <span class="fl">19</span>, col <span class="op">=</span> <span class="st">"#C0392B"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">vi_low</span>,  <span class="va">max_dose</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"(NDVI=%.2f, N=%d)"</span>, <span class="va">vi_low</span>, <span class="va">max_dose</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">vi_low</span>,  <span class="va">max_dose</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"(NDVI=%.2f, N=%g)"</span>, <span class="va">vi_low</span>, <span class="va">max_dose</span><span class="op">)</span>,</span>
 <span>     pos <span class="op">=</span> <span class="fl">4</span>, cex <span class="op">=</span> <span class="fl">0.9</span>, col <span class="op">=</span> <span class="st">"#C0392B"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">vi_high</span>, <span class="va">min_dose</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"(NDVI=%.2f, N=%d)"</span>, <span class="va">vi_high</span>, <span class="va">min_dose</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">vi_high</span>, <span class="va">min_dose</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"(NDVI=%.2f, N=%g)"</span>, <span class="va">vi_high</span>, <span class="va">min_dose</span><span class="op">)</span>,</span>
 <span>     pos <span class="op">=</span> <span class="fl">2</span>, cex <span class="op">=</span> <span class="fl">0.9</span>, col <span class="op">=</span> <span class="st">"#C0392B"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="prescription-map-example_files/figure-html/cal-curve-1.png" class="r-plt" alt="" width="672"></p>
 </div>
@@ -206,10 +181,9 @@ automatically from the <strong>empirical <code>min</code> /
 <code>max</code> of the NDVI raster</strong> mapped to
 (<code>maxN</code>, <code>minN</code>) — i.e. the lowest-vigour pixels
 get the highest dose and vice-versa. If you need to fix the anchors
-yourself (e.g. force them to <code>vi_low = 0.35</code> and
-<code>vi_high = 0.80</code> from your local calibration), use Option B
-with <code><a href="../reference/build_strip_prescription.html">build_strip_prescription()</a></code> below, which exposes them
-as arguments.</p>
+yourself (e.g. the field percentiles above, or values from your local
+calibration), use Option B with <code><a href="../reference/build_strip_prescription.html">build_strip_prescription()</a></code>
+below, which exposes them as arguments.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variable_rate_N.html">variable_rate_N</a></span><span class="op">(</span></span>
 <span>  ndvi_raster <span class="op">=</span> <span class="va">r</span>,</span>
@@ -227,10 +201,10 @@ as arguments.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Mean applied N:  "</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">rx_raster</span>, <span class="st">"mean"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    <span class="st">"kg N/ha\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mean applied N:   220 kg N/ha</span></span>
+<span><span class="co">#&gt; Mean applied N:   175 kg N/ha</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Range:           "</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">rx_raster</span>, <span class="st">"min"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    <span class="st">"-"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">rx_raster</span>, <span class="st">"max"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"kg N/ha\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Range:            103.9 - 260 kg N/ha</span></span></code></pre></div>
+<span><span class="co">#&gt; Range:            159.9 - 210 kg N/ha</span></span></code></pre></div>
 <p><code>%||%</code> is just defensive code (some versions of
 <code><a href="../reference/variable_rate_N.html">variable_rate_N()</a></code> return a list, others a raster directly);
 it is defined once at the top of the vignette in the hidden setup
@@ -265,7 +239,7 @@ that, applying the same calibration internally:</p>
 <span><span class="va">col_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span></span>
 <span>  <span class="op">(</span><span class="va">rx_grid</span><span class="op">$</span><span class="va">dose</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">rx_grid</span><span class="op">$</span><span class="va">dose</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span></span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">rx_grid</span><span class="op">$</span><span class="va">dose</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">99</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">rx_grid</span>, <span class="fl">3857</span><span class="op">)</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">rx_grid</span><span class="op">)</span>,</span>
 <span>     col <span class="op">=</span> <span class="va">pal</span><span class="op">[</span><span class="va">col_idx</span><span class="op">]</span>, border <span class="op">=</span> <span class="st">"#333"</span>, lwd <span class="op">=</span> <span class="fl">0.6</span>,</span>
 <span>     main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Grid prescription - %d cells, 24 m x 50 m"</span>,</span>
 <span>                    <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rx_grid</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -284,7 +258,7 @@ tramline.</p>
 <span>     xlab <span class="op">=</span> <span class="st">"dose (kg N/ha)"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">N_target</span>, col <span class="op">=</span> <span class="st">"#C0392B"</span>, lwd <span class="op">=</span> <span class="fl">2</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">N_target</span>, <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="st">"usr"</span><span class="op">)</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">*</span><span class="fl">0.9</span>,</span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"target %d"</span>, <span class="va">N_target</span><span class="op">)</span>, pos <span class="op">=</span> <span class="fl">4</span>, col <span class="op">=</span> <span class="st">"#C0392B"</span><span class="op">)</span></span></code></pre></div>
+<span>     <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"target %g"</span>, <span class="va">N_target</span><span class="op">)</span>, pos <span class="op">=</span> <span class="fl">4</span>, col <span class="op">=</span> <span class="st">"#C0392B"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="prescription-map-example_files/figure-html/grid-hist-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 </div>
@@ -305,7 +279,7 @@ tramline.</p>
 <span>                      unit      <span class="op">=</span> <span class="st">"kg/ha"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Or every format in one zip-ready folder:</span></span>
-<span><span class="fu"><a href="../reference/export_prescription_all.html">export_prescription_all</a></span><span class="op">(</span><span class="va">rx_grid</span>, <span class="st">"rx_bundle"</span>, <span class="st">"campo_grande"</span>,</span>
+<span><span class="fu"><a href="../reference/export_prescription_all.html">export_prescription_all</a></span><span class="op">(</span><span class="va">rx_grid</span>, <span class="st">"rx_bundle"</span>, <span class="st">"P01_2024"</span>,</span>
 <span>  formats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shp"</span>, <span class="st">"geojson"</span>, <span class="st">"gpkg"</span>, <span class="st">"isoxml"</span>,</span>
 <span>              <span class="st">"johndeere"</span>, <span class="st">"trimble"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>

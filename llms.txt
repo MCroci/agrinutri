@@ -370,6 +370,9 @@ MIT. See `LICENSE`.
 - [`organic_previous_years_N()`](https://mcroci.github.io/agrinutri/reference/organic_previous_years_N.md)
   : N from previous years' organic fertilization (term F in DPI balance)
 
+- [`piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md)
+  : Piacenza plain example datasets (four fields, 2019-2026)
+
 - [`plan_distribution()`](https://mcroci.github.io/agrinutri/reference/plan_distribution.md)
   : Fertilization distribution plan
 

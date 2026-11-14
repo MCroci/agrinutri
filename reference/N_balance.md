@@ -60,7 +60,8 @@ N_balance(
 
 - Ntot:
 
-  Total nitrogen content in the soil (%).
+  Total nitrogen content in the soil (g/kg, per mille; 1.5 g/kg = 0.15
+  percent).
 
 - SOM:
 

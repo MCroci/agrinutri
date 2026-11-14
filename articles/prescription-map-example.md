@@ -3,8 +3,8 @@
 This vignette shows the **full workflow** from an NDVI raster to a
 machine-width grid prescription map, in six steps:
 
-1.  Load the field polygon (bundled demo farm).
-2.  Synthesise or load an NDVI raster on that field.
+1.  Load a field polygon (plot P01 of the bundled Piacenza farm).
+2.  Compute its NDVI from the bundled Sentinel-2 scene.
 3.  Define the **calibration curve** (VI -\> N rate) from two anchor
     points.
 4.  Generate **Option A** - a pixel-by-pixel VRT raster with
@@ -15,7 +15,9 @@ machine-width grid prescription map, in six steps:
     the same calibration.
 6.  Export both as GeoTIFF / Shapefile / ISOXML.
 
-All of this runs on the demo data that ships with agrinutri.
+All of this runs on the Piacenza example data that ships with agrinutri
+(see
+[`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md)).
 
 ## 1. Load a field polygon
 
@@ -24,74 +26,47 @@ All of this runs on the demo data that ships with agrinutri.
 library(agrinutri)
 library(sf)
 
-ex   <- system.file("extdata/example_farm.geojson", package = "agrinutri")
-farm <- sf::st_read(ex, quiet = TRUE)
-
-# Pick plot P03 - "Lower Ditch", 7.8 ha grain maize, loamy soil
-field <- farm[3, ]
-field[, c("plot_id", "plot_name", "crop", "area_ha")]
-#> Simple feature collection with 1 feature and 4 fields
-#> Geometry type: POLYGON
-#> Dimension:     XY
-#> Bounding box:  xmin: 9.7215 ymin: 45.048 xmax: 9.7257 ymax: 45.0508
-#> Geodetic CRS:  WGS 84
-#>   plot_id   plot_name                        crop area_ha
-#> 3     P03 Lower Ditch Grain maize 500-700 (grain)     7.8
-#>                         geometry
-#> 3 POLYGON ((9.7215 45.048, 9....
+farm  <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"),
+                     quiet = TRUE)
+field <- farm[farm$plot == "P01", ]      # grain maize in 2024, 8.6 ha
+sf::st_drop_geometry(field)[, c("plot", "crop", "area_ha")]
+#>   plot                        crop area_ha
+#> 1  P01 Grain maize 500-700 (grain)   8.612
 plot(sf::st_geometry(field), col = "#D5E4F0", border = "#1F4E79",
-     main = sprintf("Field: %s (%.1f ha)",
-                    field$plot_name, field$area_ha))
+     main = sprintf("Field: %s (%.1f ha)", field$plot, field$area_ha))
 ```
 
 ![](prescription-map-example_files/figure-html/field-1.png)
 
-## 2. Synthesise (or load) an NDVI raster
+## 2. NDVI from Sentinel-2
 
-In a real workflow you would read a GeoTIFF from UAV or Sentinel-2. Here
-we build a plausible NDVI in one line using the internal demo helper
-(same synthesiser used by the Shiny “Load demo NDVI” button):
+The bundled scene is the Sentinel-2 Level-2A acquisition of 13 August
+2024 over P01, with reflectance scaled by 10000:
 
 ``` r
 
 library(terra)
 
-# Two-patch NDVI with smooth base + noise
-set.seed(7)
-fp <- sf::st_transform(field, 3857)
-bb <- sf::st_bbox(fp)
-
-nx <- 150
-ny <- 110
-r  <- terra::rast(xmin = bb$xmin, xmax = bb$xmax,
-                  ymin = bb$ymin, ymax = bb$ymax,
-                  ncols = nx, nrows = ny, crs = "EPSG:3857")
-
-x  <- seq(0, 1, length.out = nx); y <- seq(0, 1, length.out = ny)
-gx <- matrix(x, nrow = ny, ncol = nx, byrow = TRUE)
-gy <- matrix(y, nrow = ny, ncol = nx)
-base   <- 0.72 + 0.05 * sin(4 * gx) + 0.04 * cos(5 * gy)
-patch1 <- 0.22 * exp(-(((gx - 0.30)^2 + (gy - 0.35)^2) / 0.010))
-patch2 <- 0.26 * exp(-(((gx - 0.70)^2 + (gy - 0.55)^2) / 0.008))
-ndvi_vals <- base - patch1 - patch2 + 0.03 * rnorm(nx * ny)
-ndvi_vals <- pmin(pmax(ndvi_vals, 0.30), 0.92)
-terra::values(r) <- ndvi_vals
-r <- terra::mask(r, terra::vect(fp))
-
+s2 <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif",
+                              package = "agrinutri"))
+fv <- terra::project(terra::vect(field), terra::crs(s2))
+r  <- terra::mask(compute_vi(s2, "NDVI", scale_factor = 10000), fv)
 names(r) <- "NDVI"
 r
 #> class       : SpatRaster
-#> size        : 110, 150, 1  (nrow, ncol, nlyr)
-#> resolution  : 3.116946, 4.010757  (x, y)
-#> extent      : 1082192, 1082660, 5629081, 5629522  (xmin, xmax, ymin, ymax)
-#> coord. ref. : WGS 84 / Pseudo-Mercator (EPSG:3857)
+#> size        : 42, 39, 1  (nrow, ncol, nlyr)
+#> resolution  : 10, 10  (x, y)
+#> extent      : 552350, 552740, 4977010, 4977430  (xmin, xmax, ymin, ymax)
+#> coord. ref. : WGS 84 / UTM zone 32N (EPSG:32632)
 #> source(s)   : memory
+#> varname     : S2_piacenza_P01_20240813
 #> name        :     NDVI
-#> min value   : 0.383404
-#> max value   : 0.901509
+#> min value   :  0.32309
+#> max value   : 0.897106
 
-terra::plot(r, main = "Input NDVI (synthetic)",
-            col = hcl.colors(30, "YlGn"))
+terra::plot(r, main = "Input NDVI (Sentinel-2, 13 August 2024)",
+            col = hcl.colors(30, "YlGn", rev = TRUE))
+terra::lines(fv)
 ```
 
 ![](prescription-map-example_files/figure-html/ndvi-1.png)
@@ -104,14 +79,15 @@ NDVI to `min_dose` (canopy already lush, less N needed):
 
 ``` r
 
-# Agronomic N target from the field-scale balance (example: 220 kg N/ha
-# for an 11 t/ha grain maize in Pianura Padana)
-N_target <- 220
-min_dose <- 60
-max_dose <- 260
+# N target from the field-scale balance of P01 (2024), bounds 80-120 percent
+N_target <- farm_balance(farm)$N_target[farm$plot == "P01"]
+min_dose <- 0.8 * N_target
+max_dose <- 1.2 * N_target
 
-vi_low  <- 0.35    # anchor for max_dose
-vi_high <- 0.80    # anchor for min_dose
+# Anchors from the field NDVI: 5th percentile -> max_dose, 95th -> min_dose
+q <- terra::global(r, function(v) quantile(v, c(0.05, 0.95), na.rm = TRUE))
+vi_low  <- round(q[1, 1], 2)
+vi_high <- round(q[1, 2], 2)
 
 # Plot the calibration
 vi  <- seq(0.20, 0.95, length.out = 200)
@@ -126,9 +102,9 @@ abline(v = c(vi_low, vi_high), lty = 3, col = "#888")
 abline(h = c(min_dose, max_dose), lty = 3, col = "#888")
 points(c(vi_low, vi_high), c(max_dose, min_dose),
        pch = 19, col = "#C0392B")
-text(vi_low,  max_dose, sprintf("(NDVI=%.2f, N=%d)", vi_low, max_dose),
+text(vi_low,  max_dose, sprintf("(NDVI=%.2f, N=%g)", vi_low, max_dose),
      pos = 4, cex = 0.9, col = "#C0392B")
-text(vi_high, min_dose, sprintf("(NDVI=%.2f, N=%d)", vi_high, min_dose),
+text(vi_high, min_dose, sprintf("(NDVI=%.2f, N=%g)", vi_high, min_dose),
      pos = 2, cex = 0.9, col = "#C0392B")
 ```
 
@@ -143,7 +119,7 @@ With `method = "calibration"` the two anchor points are taken
 automatically from the **empirical `min` / `max` of the NDVI raster**
 mapped to (`maxN`, `minN`) — i.e. the lowest-vigour pixels get the
 highest dose and vice-versa. If you need to fix the anchors yourself
-(e.g. force them to `vi_low = 0.35` and `vi_high = 0.80` from your local
+(e.g. the field percentiles above, or values from your local
 calibration), use Option B with
 [`build_strip_prescription()`](https://mcroci.github.io/agrinutri/reference/build_strip_prescription.md)
 below, which exposes them as arguments.
@@ -170,10 +146,10 @@ terra::plot(rx_raster,
 
 cat("Mean applied N:  ", round(terra::global(rx_raster, "mean", na.rm = TRUE)[1, 1], 1),
     "kg N/ha\n")
-#> Mean applied N:   220 kg N/ha
+#> Mean applied N:   175 kg N/ha
 cat("Range:           ", round(terra::global(rx_raster, "min", na.rm = TRUE)[1, 1], 1),
     "-", round(terra::global(rx_raster, "max", na.rm = TRUE)[1, 1], 1), "kg N/ha\n")
-#> Range:            103.9 - 260 kg N/ha
+#> Range:            159.9 - 210 kg N/ha
 ```
 
 `%||%` is just defensive code (some versions of
@@ -211,7 +187,7 @@ pal <- colorRampPalette(c("#2F7A44", "#F6E7C7", "#C0392B"))(100)
 col_idx <- as.integer(round(
   (rx_grid$dose - min(rx_grid$dose, na.rm = TRUE)) /
     diff(range(rx_grid$dose, na.rm = TRUE)) * 99)) + 1
-plot(sf::st_geometry(sf::st_transform(rx_grid, 3857)),
+plot(sf::st_geometry(rx_grid),
      col = pal[col_idx], border = "#333", lwd = 0.6,
      main = sprintf("Grid prescription - %d cells, 24 m x 50 m",
                     nrow(rx_grid)))
@@ -233,7 +209,7 @@ hist(rx_grid$dose, breaks = 20, col = "#D5E4F0",
      xlab = "dose (kg N/ha)")
 abline(v = N_target, col = "#C0392B", lwd = 2, lty = 2)
 text(N_target, par("usr")[4]*0.9,
-     sprintf("target %d", N_target), pos = 4, col = "#C0392B")
+     sprintf("target %g", N_target), pos = 4, col = "#C0392B")
 ```
 
 ![](prescription-map-example_files/figure-html/grid-hist-1.png)
@@ -255,7 +231,7 @@ export_prescription(rx_grid, "TASKDATA",             format = "isoxml",
                       unit      = "kg/ha"))
 
 # Or every format in one zip-ready folder:
-export_prescription_all(rx_grid, "rx_bundle", "campo_grande",
+export_prescription_all(rx_grid, "rx_bundle", "P01_2024",
   formats = c("shp", "geojson", "gpkg", "isoxml",
               "johndeere", "trimble"))
 ```

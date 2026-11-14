@@ -4,15 +4,18 @@
 
 The vignettes (`vignettes/*.Rmd`) currently illustrate the package with
 small examples (one field at CERZOO, the bundled demonstration farm, the
-Cremonesi soil rasters). Rework their figures to show what the package
-does at regional scale:
+Cremonesi soil rasters); now done with the bundled Piacenza data
+([`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md)),
+except the province figure. Rework their figures to show what the
+package does at regional scale:
 
 `spatial-balance.Rmd`: replace the Cremonesi rasters with a clip of the
 regional Emilia-Romagna soil maps 0-30 cm (clay, sand, organic carbon,
 total N; Servizio Geologico, Sismico e dei Suoli) and map the
 pixel-level N dose over a plain area, not a single field.
 
-`farm-and-prescription-map.Rmd`: add a farm-to-province figure from the
+`farm-and-prescription-map.Rmd` (real farm, rotation and S2 strips done;
+province figure still to add): add a farm-to-province figure from the
 Piacenza plain application (`paper/softwarex/piacenza/`): N requirement
 by crop and year 2019-2026 and the field dose map (aggregated outputs
 only, no field identifiers).
