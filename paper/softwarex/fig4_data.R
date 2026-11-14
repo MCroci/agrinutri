@@ -1,19 +1,34 @@
 # Data for Figs. 4-5: a satellite-delineated maize field of the Piacenza plain (Fields of The World
 # boundary, data/rs_field.geojson) and the Sentinel-2 L2A scene of 13 August 2024, clipped to it.
-# Run from paper/softwarex/:  Rscript fig4_data.R
-# Environment: PRESTO_DEPLOY (folder of the Sentinel-2 archive).
+# Run from paper/softwarex/ after fig2_farm.R:  Rscript fig4_data.R
+# The scene is read from the public Microsoft Planetary Computer STAC catalogue (anonymous SAS token),
+# windowed to the field, 20 m bands resampled to the 10 m grid (nearest), offset of processing
+# baseline >= 04.00 removed (reflectance x 10000, harmonised).
 suppressMessages(pkgload::load_all("../..", quiet = TRUE))
-S2 <- file.path(Sys.getenv("PRESTO_DEPLOY", "C:/Users/michele.croci/Desktop/presto-deploy"),
-                "data/rasters/downloads_sentinelhub_2019_2026/S2_20240813_B02_B03_B04_B05_B06_B07_B08_B8A_B11_B12_SCL_10m.tif")
 field <- sf::st_read("data/rs_field.geojson", quiet = TRUE)
-r <- terra::rast(S2)
-fv <- terra::vect(sf::st_transform(field, terra::crs(r)))
-x <- terra::crop(r, terra::ext(fv) + 30)
-scl <- round(x[[11]] / 10000)
-x <- terra::mask(x[[1:10]], scl >= 4 & scl <= 5, maskvalues = FALSE)   # SCL 4-5: vegetation, bare soil
-names(x) <- c("B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12")
+PC <- "https://planetarycomputer.microsoft.com/api"
+bb <- sf::st_bbox(sf::st_transform(field, 4326))
+hit <- jsonlite::fromJSON(sprintf("%s/stac/v1/search?collections=sentinel-2-l2a&bbox=%s&datetime=2024-08-13T00:00:00Z/2024-08-13T23:59:59Z",
+                                  PC, paste(round(bb, 5), collapse = ",")), simplifyVector = FALSE)$features
+stopifnot(length(hit) >= 1); it <- hit[[1]]
+tok <- jsonlite::fromJSON(paste0(PC, "/sas/v1/token/sentinel-2-l2a"))$token
+B <- c("B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12", "SCL")
+cog <- function(b) terra::rast(paste0("/vsicurl/", it$assets[[b]]$href, "?", tok))
+ref <- cog("B02")
+fv <- terra::vect(sf::st_transform(field, terra::crs(ref)))
+win <- terra::crop(ref, terra::ext(fv) + 30, snap = "out")
+x <- terra::rast(lapply(B, function(b) { r <- terra::crop(cog(b), terra::ext(win) + 20, snap = "out")
+  if (!isTRUE(all.equal(terra::res(r), terra::res(win)))) r <- terra::resample(r, win, method = "near") else r <- terra::crop(r, win)
+  r }))
+names(x) <- B
+off <- if (as.numeric(it$properties$`s2:processing_baseline`) >= 4) 1000 else 0
+scl <- x[["SCL"]]
+x <- terra::clamp(x[[1:10]] - off, lower = 0, values = TRUE)
+x <- terra::mask(x, scl >= 4 & scl <= 5, maskvalues = FALSE)   # SCL 4-5: vegetation, bare soil
+cat(it$id, "| cloud", round(it$properties$`eo:cloud_cover`, 1), "% | offset", off, "
+")
 s2 <- "data/rs_s2_20240813.tif"
-terra::writeRaster(x, s2, overwrite = TRUE, NAflag = 0)
+terra::writeRaster(x, s2, overwrite = TRUE, NAflag = 0, datatype = "INT2U")
 
 bio <- estimate_biophysical(s2, output_dir = tempdir(), variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
 nni <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",

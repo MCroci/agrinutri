@@ -7,7 +7,7 @@
 suppressMessages({ library(sf); library(terra); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
-P <- "paper/softwarex/piacenza"; D <- "paper/softwarex/data"; FOCUS <- 7064; YEARS <- 2019:2026
+P <- "paper/softwarex/piacenza"; D <- "paper/softwarex/data"; FOCUS <- 5336; YEARS <- 2019:2026
 SOIL <- Sys.getenv("RER_SOIL", file.path("C:/Users/michele.croci/OneDrive - Università Cattolica del Sacro Cuore",
                    "rds/research/8. db-and-layer-soil-meteo-limits/soil-properties/rer"))
 fld  <- readRDS(file.path(P, "data/fields.rds")); s <- fld[fld$id == FOCUS, ]
@@ -61,7 +61,7 @@ print(table(P = pcl)); print(table(K = kcl))
 EN <- c("mais" = "Maize", "cereali vernini" = "Winter cereals", "prato e medica" = "Alfalfa",
         "pomodoro" = "Processing tomato", "altre estive" = "Other summer crops")   # 2026: 9-class names
 yr$name <- ifelse(yr$class %in% names(EN), EN[yr$class], yr$class)
-yr$lab <- ifelse(is.na(yr$crop), paste0(yr$year, "\n(no estimate)"), paste0(yr$year, "\n", yr$name))
+yr$lab <- ifelse(is.na(yr$crop), paste0(yr$year, "\n(no estimate)"), paste0(yr$year, "\n", sub(" ", "\n", yr$name)))  # long names on two lines
 yr$lab <- factor(yr$lab, levels = yr$lab)
 tl <- reshape(yr[!is.na(yr$crop), c("lab", "A", "C", "D", "B", "E", "F", "G")], direction = "long",
               varying = c("A", "C", "D", "B", "E", "F", "G"), v.names = "kg",
@@ -83,8 +83,6 @@ pb <- ggplot(pkd, aes(lab, kg, fill = nutrient)) +
   geom_col(position = position_dodge(width = 0.75), width = 0.7, colour = "grey20", linewidth = 0.15) +
   scale_fill_manual(values = c("P[2]*O[5]" = OKABE[[7]], "K[2]*O" = OKABE[[1]]), labels = scales::parse_format(), name = NULL) +
   scale_x_discrete(drop = FALSE, limits = levels(yr$lab)) + scale_y_continuous(expand = expansion(c(0, 0.05))) +
-  annotate("text", x = 1, y = max(pkd$kg) * 1.04, hjust = 0, vjust = 0, size = (BASE - 1) / .pt, family = FONT,
-           label = "K[2]*O~dose~0~every~year:~high~exchangeable~K~(reduction)", parse = TRUE) +
   labs(x = NULL, y = expression("Dose (kg ha"^-1*")")) +
   theme_sat() + theme(legend.position = "top", axis.text.x = element_text(size = BASE - 1.5, lineheight = 0.9))
 fr <- list(geom_sf(data = st_transform(field, crs(pk)), fill = NA, colour = "grey20", linewidth = 0.4),

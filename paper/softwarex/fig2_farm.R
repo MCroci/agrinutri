@@ -1,5 +1,5 @@
 # Fig. 2: farm balance with farm_balance() (diamonds: balance dose; crosses: dose_standard_N()) on a farm of satellite-delineated fields of the
-# Piacenza plain (the eight mapped fields nearest to the maize field of Fig. 3), crop year 2024.
+# Piacenza plain (the nearest field of each crop around plot P01), crop year 2024.
 # Inputs per field as in Section 3.4: crop class 2024 (previous crop: class 2023), regional soil
 # maps 0-30 cm, ERA5 rainfall, ISTAT yields 2024. Run from the package root after
 # piacenza/a01_inputs.R:  Rscript paper/softwarex/fig2_farm.R
@@ -8,17 +8,17 @@ pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
 P <- "paper/softwarex/piacenza"
 KW <- Sys.getenv("KWASI_DATA", "C:/Users/michele.croci/Desktop/kwasi-data")
-Y <- 2024; FOCUS <- 7064                                    # the field of Fig. 3
+Y <- 2024; FOCUS <- 5336    # plot P01: crop known in every year 2019-2026 (Figs. 3-5)
 
 fld  <- readRDS(file.path(P, "data/fields.rds"))
 cmap <- read.csv(file.path(P, "crop_map.csv"), stringsAsFactors = FALSE)
 geo  <- st_read(file.path(KW, "uscita/consegna/crop_maps_shapefiles/crops_15classes.shp"), quiet = TRUE)
 geo  <- st_make_valid(geo)                                  # rings with inverted winding in the shapefile
 geo  <- cbind(geo[, "id"], fld[match(geo$id, fld$id), setdiff(names(fld), "id")])
-ok   <- geo$c2024 %in% cmap$class & geo$c2024 != "Maize (silage)"
+ok   <- geo$c2024 %in% cmap$class & geo$c2023 %in% cmap$class & geo$c2024 != "Maize (silage)"
 ctr  <- suppressWarnings(st_point_on_surface(st_geometry(geo)))
 d    <- as.numeric(st_distance(ctr, ctr[geo$id == FOCUS]))
-farm <- geo[ok, ][order(d[ok])[1:8], ]
+farm <- geo[ok, ][order(d[ok])[1:20], ]
 farm$plot <- sprintf("P%02d", seq_len(nrow(farm)))
 
 ist <- read.csv(file.path(P, "data/istat_piacenza_raw.csv"), stringsAsFactors = FALSE)
@@ -40,8 +40,8 @@ farm$source <- "None"; farm$fertorg_frequency <- "every year"; farm$location <- 
 farm$forg_quantity <- 0; farm$area_ha <- farm$ha
 out <- farm_balance(farm)
 stopifnot(all(is.na(out$balance_error)))
-# keep one field per crop and previous crop (the other three maize fields repeat the first)
-out <- out[!duplicated(paste(out$c2024, out$c2023)) & !(out$c2024 == "Maize" & out$plot != "P01"), ]
+# keep the nearest field of each crop, at most five (fields of the same crop repeat the same balance)
+out <- head(out[!duplicated(out$c2024), ], 5)
 out$plot <- sprintf("P%02d", seq_len(nrow(out)))
 stopifnot(out$id[1] == FOCUS)
 
@@ -56,7 +56,9 @@ write.csv(cbind(st_drop_geometry(out)[, c("plot", "c2024", "c2023", "area_ha", "
                                           "N_target", "MAS_cap", "MAS_ok", "N_total_kg")], terms[, -1]),
           "paper/softwarex/data/farm_2024.csv", row.names = FALSE)
 write.csv(data.frame(id = out$id), "paper/softwarex/data/farm_2024_ids.csv", row.names = FALSE)
-saveRDS(as.list(st_drop_geometry(out)[out$plot == "P01", args]), "paper/softwarex/data/p01_inputs.rds")  # for Figs. 3-4
+saveRDS(as.list(st_drop_geometry(out)[out$plot == "P01", args]), "paper/softwarex/data/p01_inputs.rds")  # for Figs. 4-5
+st_write(out[out$plot == "P01", c("ha", "c2024")], "paper/softwarex/data/rs_field.geojson",   # boundary of P01 for Figs. 3-5
+         delete_dsn = TRUE, quiet = TRUE)
 cat("farm ha", round(sum(out$area_ha), 1), "| N total kg", round(sum(out$N_total_kg)),
     "| over MAS:", paste(out$plot[!out$MAS_ok], collapse = ", "), "\n")
 
