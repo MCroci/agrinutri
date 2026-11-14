@@ -1,4 +1,4 @@
-# Fig. 2: farm balance with farm_balance() on a farm of satellite-delineated fields of the
+# Fig. 2: farm balance with farm_balance() (diamonds: balance dose; crosses: dose_standard_N()) on a farm of satellite-delineated fields of the
 # Piacenza plain (the eight mapped fields nearest to the maize field of Fig. 3), crop year 2024.
 # Inputs per field as in Section 3.4: crop class 2024 (previous crop: class 2023), regional soil
 # maps 0-30 cm, ERA5 rainfall, ISTAT yields 2024. Run from the package root after
@@ -75,10 +75,12 @@ tl <- reshape(terms, direction = "long", varying = c("A", "C", "D", "B", "E", "F
               timevar = "term", times = c("A", "C", "D", "B", "E", "F", "G"), idvar = "plot")
 tl$term <- factor(tl$term, levels = c("A", "C", "D", "B", "E", "F", "G"))
 tl$plot <- factor(tl$plot, levels = rev(lab$plot)); lab$plot <- factor(lab$plot, levels = rev(lab$plot))
-dose <- data.frame(plot = factor(out$plot, levels = levels(tl$plot)), N = out$N_target)
+dose <- data.frame(plot = factor(out$plot, levels = levels(tl$plot)), N = out$N_target,
+                   std = vapply(out$crop, function(cr) dose_standard_N(cr)$dose_final, numeric(1)))
 pb <- ggplot(tl, aes(kg, plot, fill = term)) + geom_col(width = 0.65, colour = "grey20", linewidth = 0.15) +
   geom_vline(xintercept = 0, linewidth = 0.3) +
   geom_point(data = dose, aes(N, plot), inherit.aes = FALSE, shape = 23, fill = "white", size = 1.6) +
+  geom_point(data = dose, aes(std, plot), inherit.aes = FALSE, shape = 4, size = 1.4, stroke = 0.6, colour = OKABE[[6]]) +
   scale_fill_manual(values = c(A = OKABE[[5]], C = OKABE[[3]], D = OKABE[[2]], B = OKABE[[4]],
                                E = OKABE[[7]], F = OKABE[[8]], G = "grey60"), name = NULL) +
   scale_y_discrete(labels = setNames(paste0(lab$plot, "  ", lab$c2024, "

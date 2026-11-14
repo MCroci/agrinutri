@@ -1,37 +1,15 @@
-# Fig. 4: every rate-setting method of the package on the same farm and field.
-# (a) Field level, the eight plots of Fig. 2 (2024): regulatory balance dose (calculate_N_fertilization),
-#     standard dose (dose_standard_N) and crop maximum (MAS).
-# (b-h) Within field, plot P01 (Fig. 3), all redistributing the balance dose N* of P01 on the same
-#     24 m x 30 m cells: uniform, calibration ramp (inverse, direct), NDVI quantile classes, NNI zones,
+# Fig. 5: within-field strategies on plot P01 (Figs. 2-4), all redistributing the balance dose N*
+#     of P01 on the same 24 m x 30 m cells: uniform, calibration ramp (inverse, direct), NDVI quantile classes, NNI zones,
 #     Holland-Schepers sufficiency index (variable_rate_N).
-# Run from the package root after fig2_farm.R and fig3_data.R:  Rscript paper/softwarex/fig4_methods.R
+# Run from the package root after fig2_farm.R and fig4_data.R:  Rscript paper/softwarex/fig5_strategies.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
 D <- "paper/softwarex/data"
-cmap <- read.csv("paper/softwarex/piacenza/crop_map.csv", stringsAsFactors = FALSE)
 
-# ---- (a) field level -------------------------------------------------------------------
 fm <- read.csv(file.path(D, "farm_2024.csv"), stringsAsFactors = FALSE)
-fm$dpi <- cmap$dpi_crop[match(fm$c2024, cmap$class)]
-fm$standard <- vapply(fm$dpi, function(cr) dose_standard_N(cr)$dose_final, numeric(1))
-fl <- rbind(data.frame(plot = fm$plot, method = "DPI balance", N = fm$N_target),
-            data.frame(plot = fm$plot, method = "Standard dose", N = fm$standard))
-fm$lab <- factor(paste0(fm$plot, "  ", fm$c2024), levels = rev(paste0(fm$plot, "  ", fm$c2024)))
-fm$name <- paste0(fm$plot, "  ", fm$c2024, "
-after ", tolower(fm$c2023))
-fm$plot_lab <- factor(fm$name, levels = rev(fm$name))
-fl$plot_lab <- fm$plot_lab[match(fl$plot, fm$plot)]
-pa <- ggplot(fl, aes(plot_lab, N, fill = method)) +
-  geom_col(position = position_dodge2(width = 0.75, reverse = TRUE), width = 0.7, colour = "grey20", linewidth = 0.15) +
-  geom_errorbar(data = fm, aes(plot_lab, ymin = MAS_cap, ymax = MAS_cap), inherit.aes = FALSE,
-                width = 0.8, linewidth = 0.6, colour = OKABE[[6]]) +
-  scale_fill_manual(values = c("DPI balance" = OKABE[[5]], "Standard dose" = OKABE[[2]]), name = NULL) +
-  scale_y_continuous(expand = expansion(c(0, 0.05))) +
-  labs(x = NULL, y = expression("Field dose (kg N ha"^-1*"); orange: MAS")) + coord_flip() +
-  theme_sat() + theme(legend.position = "top")
 
-# ---- (b, c) within field P01 ---------------------------------------------------------------------
+# ---- within field P01 ---------------------------------------------------------------------
 field <- st_read(file.path(D, "rs_field.geojson"), quiet = TRUE)
 inp   <- readRDS(file.path(D, "p01_inputs.rds"))
 Nstar <- fm$N_target[fm$plot == "P01"]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
@@ -66,7 +44,6 @@ summ <- aggregate(dose ~ method, cbind(st_drop_geometry(mm), a = as.numeric(st_a
 cat("N* P01:", Nstar, "\n"); print(summ)
 write.csv(data.frame(method = names(M), t(sapply(M, function(x) c(min = min(x), max = max(x),
           mean = weighted.mean(x, as.numeric(st_area(cells))))))), file.path(D, "methods_p01.csv"), row.names = FALSE)
-write.csv(fm[, c("plot", "c2024", "N_target", "standard", "MAS_cap")], file.path(D, "methods_farm.csv"), row.names = FALSE)
 
 mm$diff <- mm$dose - Nstar
 pb <- ggplot(mm) + geom_sf(aes(fill = diff), colour = "white", linewidth = 0.1) +
@@ -84,4 +61,4 @@ pc <- ggplot(st_drop_geometry(mm), aes(dose, m0, weight = area)) +
   geom_boxplot(width = 0.55, outlier.size = 0.4, linewidth = 0.3, fill = "grey92") +
   scale_y_discrete(limits = rev(names(M))) +
   labs(x = expression("Cell dose (kg N ha"^-1*"); dotted: balance dose"), y = NULL) + theme_sat()
-save_fig(add_tags((pa | pc) / pb + plot_layout(heights = c(1, 1.5))), "fig4_methods", "double", 160)
+save_fig(add_tags(pc / pb + plot_layout(heights = c(0.55, 1.5))), "fig5_strategies", "double", 140)

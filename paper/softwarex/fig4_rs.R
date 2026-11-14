@@ -1,6 +1,6 @@
-# Fig. 3: from a Sentinel-2 scene to a prescription on field P01 of the Fig. 2 farm (13 August
-# 2024), house style of theme_swx.R. Run from the package root after fig3_data.R:
-#   Rscript paper/softwarex/fig3_rs.R
+# Fig. 4: from a Sentinel-2 scene to a prescription on field P01 of the Fig. 2 farm (13 August
+# 2024), house style of theme_swx.R. Run from the package root after fig4_data.R:
+#   Rscript paper/softwarex/fig4_rs.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork); library(tidyterra) })
 source("paper/softwarex/theme_swx.R")
 D <- "paper/softwarex/data"
@@ -18,4 +18,4 @@ pa <- ggplot() + geom_spatraster(data = lai) + fr + map_furniture(bb, len = 100)
 pb <- ggplot() + geom_spatraster(data = nni) + fr + fill_NNI(breaks = c(0.6, 0.9, 1, 1.1, 1.4))
 pc <- ggplot(rx) + geom_sf(aes(fill = dose), colour = "white", linewidth = 0.15) + fr +
   fill_N(name = expression("N dose (kg N ha"^-1*")"), limits = c(150, 230))
-save_fig(add_tags(pa + pb + pc), "fig3_rs_prescription", "double", 75)
+save_fig(add_tags(pa + pb + pc), "fig4_rs_prescription", "double", 75)

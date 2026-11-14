@@ -1,8 +1,8 @@
 # Backgrounds of the pkgdown banner (1920 x 600 px): real outputs of the package, no text.
-#  bg_province.png : 2024 field N dose of the Piacenza plain (Fig. 5b data), light
+#  bg_province.png : 2024 field N dose of the Piacenza plain (piacenza/a03_figure.R data), light
 #  bg_dark.png     : the same map on the dark end of the mako palette
 #  bg_field.png    : NNI-zone prescription of plot P01 tiled with the farm fields (Figs. 2-3)
-# Run from the package root after paper/softwarex/piacenza/a02_balance.R and fig2/fig3 scripts.
+# Run from the package root after paper/softwarex/piacenza/a02_balance.R and fig2_farm.R, fig4_data.R.
 suppressMessages({ library(sf); library(ggplot2); library(terra) })
 OUT <- "assets/banners/agrinutri"
 KW <- Sys.getenv("KWASI_DATA", "C:/Users/michele.croci/Desktop/kwasi-data")

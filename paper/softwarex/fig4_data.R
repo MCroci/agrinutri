@@ -1,6 +1,6 @@
-# Data for Fig. 3: a satellite-delineated maize field of the Piacenza plain (Fields of The World
+# Data for Figs. 4-5: a satellite-delineated maize field of the Piacenza plain (Fields of The World
 # boundary, data/rs_field.geojson) and the Sentinel-2 L2A scene of 13 August 2024, clipped to it.
-# Run from paper/softwarex/:  Rscript fig3_data.R
+# Run from paper/softwarex/:  Rscript fig4_data.R
 # Environment: PRESTO_DEPLOY (folder of the Sentinel-2 archive).
 suppressMessages(pkgload::load_all("../..", quiet = TRUE))
 S2 <- file.path(Sys.getenv("PRESTO_DEPLOY", "C:/Users/michele.croci/Desktop/presto-deploy"),
