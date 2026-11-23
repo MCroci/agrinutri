@@ -1,6 +1,6 @@
 # agrinutri News
 
-## Development version
+## Version 1.1.0 (2026-11-23)
 
 * `plan_distribution()`: the organic N efficiency now follows Fert_Office
   (foglio `Efficienza`). The lookup used the matrix type (`type_id`) instead

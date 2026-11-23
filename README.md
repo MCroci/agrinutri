@@ -2,7 +2,7 @@
 
 ![agrinutri: nutrient balances and variable-rate fertilisation planning at field scale](man/figures/agrinutri-banner.png)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202414.svg)](https://doi.org/10.5281/zenodo.24202414)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202413.svg)](https://doi.org/10.5281/zenodo.24202413)
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/mcroci/agrinutri/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mcroci/agrinutri/actions/workflows/R-CMD-check.yaml)
