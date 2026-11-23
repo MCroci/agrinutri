@@ -21,7 +21,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/mcroci/agrinutri/blob/v1.1.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/mcroci/agrinutri/blob/master/inst/CITATION)
 
 Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N,
 Tabaglio V, Amaducci S (2026). agrinutri: Nutrient Balances and
