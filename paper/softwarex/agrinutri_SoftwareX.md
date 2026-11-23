@@ -26,9 +26,9 @@ R package; Nutrient balance; Fertilisation planning; Regulatory compliance; Prec
 
 | Nr | Code metadata description | Metadata |
 |----|-----------------------|--------------------------------------|
-| C1 | Current code version | v1.0.1 |
+| C1 | Current code version | v1.1.0 |
 | C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/agrinutri |
-| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24202414 |
+| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24467354 |
 | C4 | Legal code license | MIT License |
 | C5 | Code versioning system used | git |
 | C6 | Software code languages, tools and services used | R |
@@ -60,7 +60,7 @@ The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop d
 
 The main functionalities are grouped in Table 1.
 
-Table: Table 1. Main functionalities of agrinutri 1.0.1.
+Table: Table 1. Main functionalities of agrinutri 1.1.0.
 
 | Area | Functions |
 |------------|------------------------------------|
