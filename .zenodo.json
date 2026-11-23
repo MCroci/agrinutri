@@ -2,5 +2,15 @@
   "title": "agrinutri: Nutrient Balances and Variable-Rate Fertilisation Planning",
   "upload_type": "software",
   "license": "MIT",
+  "creators": [
+    {"name": "Croci, Michele", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Impollonia, Giorgio", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Ferrarini, Andrea", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Fiorini, Andrea", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Ragazzi, Manuele", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Franceschi, Nicolaj", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Tabaglio, Vincenzo", "affiliation": "Università Cattolica del Sacro Cuore"},
+    {"name": "Amaducci, Stefano", "affiliation": "Università Cattolica del Sacro Cuore"}
+  ],
   "keywords": ["R package", "nutrient balance", "fertilisation planning", "variable-rate nitrogen", "precision agriculture", "Sentinel-2"]
 }
