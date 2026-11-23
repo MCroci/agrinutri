@@ -2,6 +2,14 @@
 
 ## Development version
 
+* `plan_distribution()`: the organic N efficiency now follows Fert_Office
+  (foglio `Efficienza`). The lookup used the matrix type (`type_id`) instead
+  of the sector code (`sector_id`), so it never matched and every organic
+  fertilizer got the 50% fallback. The N dose class (< 125, 125-249,
+  >= 250 kg N/ha) now selects `ID_N_org`, and `level` (default `"media"`)
+  is the efficiency level of the distribution (`ID_Liv`); manures, composts
+  and solid digestate (types 2-3) take the fixed 40%; "fan" maps to
+  "fanghi". Results of organic plans change.
 * `variable_rate_N()`: explicit `minN` / `maxN` now also bound the
   Holland-Schepers rates (they were applied to the calibration method only),
   while the field mean is still preserved.

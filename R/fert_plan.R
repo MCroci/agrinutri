@@ -4,8 +4,9 @@
 #' Emilia-Romagna 2026 (Fert_Office v1.26 foglio `Distribuz`). Combines:
 #'
 #' - Organic applications (one or more matrices from `organic_fertilizers.table`, with
-#'   efficiency selected from `efficiency.table` by soil group, dose level,
-#'   and sector of matrix).
+#'   efficiency selected from `efficiency.table` by soil group, efficiency
+#'   level of the distribution, sector of the matrix and N dose class; manures,
+#'   composts and solid digestate (types 2-3) take a fixed 40% as in Fert_Office).
 #' - Mineral / synthesis fertilisers (from `mineral_fertilizers.table` or user-specified
 #'   triplets of N, P2O5, K2O titres).
 #'
@@ -23,8 +24,11 @@
 #'   - `quantity_t_ha`: amount in t/ha (fresh matter)
 #'   - `year`: application year (e.g. 2024, 2025)
 #'   - `modality_epoch`: ID or label from `distribution_modalities.table`
-#'   - `level` (optional): efficiency level `"bassa"/"media"/"alta"` if you
-#'     want to override the default selection.
+#'   - `level` (optional): efficiency level of the distribution
+#'     `"bassa"/"media"/"alta"`, which in Fert_Office depends on modality,
+#'     epoch and crop cycle (foglio `Ciclo_Modalita`); default `"media"`.
+#'     The N dose class (< 125, 125-249, >= 250 kg N/ha) is computed from the
+#'     quantity and selects the efficiency as in Fert_Office.
 #'   - Optional `N_pct`, `P2O5_pct`, `K2O_pct`, `dry_matter_pct` override the table.
 #' @param mineral_rows A list of lists, each with:
 #'   - `fertilizer`: matching `mineral_fertilizers.table$fertilizer`, or custom
@@ -92,7 +96,11 @@ plan_distribution <- function(soil_group,
     P_pct   <- if (!is.null(r$P2O5_pct)) r$P2O5_pct else as.numeric(row_fo$avg_P2O5[1])
     K_pct   <- if (!is.null(r$K2O_pct))  r$K2O_pct  else as.numeric(row_fo$avg_K2O[1])
     dry_matter_pct  <- if (!is.null(r$dry_matter_pct))   r$dry_matter_pct   else as.numeric(row_fo$avg_dm[1])
-    sector  <- if (nrow(row_fo) > 0) as.character(row_fo$type_id[1]) else NA
+    # Fert_Office: the efficiency table is keyed by the sector code (ID_Sett,
+    # e.g. "bov"), not by the matrix type; "fan" in Fert_org is "fanghi" there.
+    sector  <- if (nrow(row_fo) > 0) as.character(row_fo$sector_id[1]) else NA
+    if (identical(sector, "fan")) sector <- "fanghi"
+    type_id <- if (nrow(row_fo) > 0) suppressWarnings(as.integer(row_fo$type_id[1])) else NA_integer_
     zootec  <- if (nrow(row_fo) > 0) isTRUE(as.logical(row_fo$fully_zootec[1])) else FALSE
 
     # Kg delivered (fresh): titres are kg/t of fresh matter
@@ -100,21 +108,34 @@ plan_distribution <- function(soil_group,
     P_kg  <- q * P_pct
     K_kg  <- q * K_pct
 
-    # Dose level for efficiency (based on N kg)
-    level <- if (!is.null(r$level)) r$level else dose_level_from_kg(N_kg)
+    # Fert_Office (foglio Efficienza, DGET on ID_Rag, ID_Liv, ID_Sett, ID_N_org):
+    # - ID_Liv is the efficiency level of the distribution (modality, epoch and
+    #   crop cycle, foglio Ciclo_Modalita): given by `level`, default "media";
+    # - ID_N_org is the class of the organic N dose of the application
+    #   (Mod_distribuz: < 125, 125-249, >= 250 kg N/ha).
+    level <- if (!is.null(r$level)) r$level else "media"
     ID_Liv <- level_map[[level]]
+    ID_N_org <- level_map[[dose_level_from_kg(N_kg)]]
 
-    # Efficiency lookup: (ID_Rag, ID_Liv, sector, N_org_id)
+    # Fert_Office foglio Apporti al terreno: type 1 (none) -> 0; types 2-3
+    # (manures, composts, solid digestate) -> fixed 40%; others -> table.
     eff <- NA_real_
-    if (!is.na(sector)) {
+    if (!is.na(type_id) && type_id == 1) {
+      eff <- 0
+    } else if (!is.na(type_id) && type_id < 4) {
+      eff <- 40
+    } else if (!is.na(sector)) {
       e <- efficiency.table[
         efficiency.table$ID_Rag == ID_Rag &
           efficiency.table$ID_Liv == ID_Liv &
-          efficiency.table$sector_id == sector, , drop = FALSE]
+          efficiency.table$sector_id == sector &
+          efficiency.table$ID_N_org == ID_N_org, , drop = FALSE]
       if (nrow(e) > 0) eff <- as.numeric(e$efficiency_pct[1])
     }
-    # Fallback: medium-medium-60%
-    if (is.na(eff)) eff <- 50
+    if (is.na(eff)) {
+      warning(sprintf("No efficiency found for organic fertilizer '%s' (sector %s); using 50%%.", fert, sector))
+      eff <- 50
+    }
 
     rows[[length(rows) + 1]] <- data.frame(
       source = "organic",

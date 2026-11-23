@@ -31,8 +31,11 @@ name plus explicit titres)
 \item \code{quantity_t_ha}: amount in t/ha (fresh matter)
 \item \code{year}: application year (e.g. 2024, 2025)
 \item \code{modality_epoch}: ID or label from \code{distribution_modalities.table}
-\item \code{level} (optional): efficiency level \code{"bassa"/"media"/"alta"} if you
-want to override the default selection.
+\item \code{level} (optional): efficiency level of the distribution
+\code{"bassa"/"media"/"alta"}, which in Fert_Office depends on modality,
+epoch and crop cycle (foglio \code{Ciclo_Modalita}); default \code{"media"}.
+The N dose class (< 125, 125-249, >= 250 kg N/ha) is computed from the
+quantity and selects the efficiency as in Fert_Office.
 \item Optional \code{N_pct}, \code{P2O5_pct}, \code{K2O_pct}, \code{dry_matter_pct} override the table.
 }}
 
@@ -64,8 +67,9 @@ Emilia-Romagna 2026 (Fert_Office v1.26 foglio \code{Distribuz}). Combines:
 \details{
 \itemize{
 \item Organic applications (one or more matrices from \code{organic_fertilizers.table}, with
-efficiency selected from \code{efficiency.table} by soil group, dose level,
-and sector of matrix).
+efficiency selected from \code{efficiency.table} by soil group, efficiency
+level of the distribution, sector of the matrix and N dose class; manures,
+composts and solid digestate (types 2-3) take a fixed 40\% as in Fert_Office).
 \item Mineral / synthesis fertilisers (from \code{mineral_fertilizers.table} or user-specified
 triplets of N, P2O5, K2O titres).
 }

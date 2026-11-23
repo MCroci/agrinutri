@@ -160,6 +160,27 @@ test_that("plan_distribution aggregates organic + mineral and checks excess", {
   expect_true(out$rows$N_useful[out$rows$source == "mineral"][1] > 130)
 })
 
+test_that("plan_distribution takes organic N efficiency as Fert_Office does", {
+  skip_if_not_installed("agrinutri")
+  eff_of <- function(fert, q, N_pct, level, soil = "Sabbioso") {
+    suppressWarnings(plan_distribution(
+      soil_group = soil,
+      organic_rows = list(list(fertilizer = fert, quantity_t_ha = q,
+                               N_pct = N_pct, level = level))))$rows$efficiency_pct[1]
+  }
+  # Fert_Office v1.26, foglio Efficienza, sandy soil (ID_Rag 1), sector "bov":
+  # level alta (ID_Liv 3), dose < 125 kg N (ID_N_org 1) -> 67.15
+  expect_equal(eff_of("liquame bovini da latte", 25, 4, "alta"), 67.15)
+  # same level, dose 125-249 kg N (ID_N_org 2) -> 62.05
+  expect_equal(eff_of("liquame bovini da latte", 50, 4, "alta"), 62.05)
+  # level bassa (ID_Liv 1), dose >= 250 kg N (ID_N_org 3) -> 24.65
+  expect_equal(eff_of("liquame bovini da latte", 70, 4, "bassa"), 24.65)
+  # pig slurry, level media, dose < 125: sector "sui" -> 57
+  expect_equal(eff_of("liquami suini", 25, 4, "media"), 57)
+  # manure (type 2) takes the fixed 40% (foglio Apporti al terreno)
+  expect_equal(eff_of("letame bovino", 20, 5, "media"), 40)
+})
+
 test_that("end-of-cycle soil P estimation returns consistent ppm", {
   skip_if_not_installed("agrinutri")
   end <- estimate_soil_P_end_of_cycle(
