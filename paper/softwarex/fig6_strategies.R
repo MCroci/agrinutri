@@ -1,6 +1,6 @@
-# Fig. 6: within-field strategies on plot P01 (Figs. 2-5), all redistributing the balance dose N*
-#     of P01 on the same 24 m x 30 m cells: uniform, calibration ramp (inverse, direct), NDVI quantile classes, NNI zones,
-#     Holland-Schepers sufficiency index (variable_rate_N).
+# Fig. 6: precision-agriculture methods on plot P01 (Figs. 2-5): for each method the rule (cell dose against the
+#     driving layer) and the prescription map; all redistribute the balance dose N* on the same 24 m x 30 m cells.
+#     (a) input layers NDVI and NNI and the dose scale; (b-g) uniform, calibration ramps, NDVI classes, NNI zones, sufficiency index.
 # Run from the package root after fig2_farm.R and fig5_data.R:  Rscript paper/softwarex/fig6_strategies.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
@@ -45,40 +45,57 @@ cat("N* P01:", Nstar, "\n"); print(summ)
 write.csv(data.frame(method = names(M), t(sapply(M, function(x) c(min = min(x), max = max(x),
           mean = weighted.mean(x, as.numeric(st_area(cells))))))), file.path(D, "methods_p01.csv"), row.names = FALSE)
 
-# ---- figure: inputs, the six prescription maps on one dose scale, distributions -------------------
-SHORT <- c("Uniform" = "Uniform", "Calibration (inverse)" = "Calibration ramp, inverse",
+# ---- figure: precision-agriculture methods, the rule of each method and the map it produces ------------
+SHORT <- c("Uniform" = "Uniform rate", "Calibration (inverse)" = "Calibration ramp, inverse",
            "Calibration (direct)" = "Calibration ramp, direct", "NDVI quantile classes" = "Quantile classes",
-           "NNI zones" = "NNI zones", "Holland-Schepers" = "Sufficiency index")
-DRV <- c("Uniform" = "no input layer", "Calibration (inverse)" = "NDVI, more N on low vigour",
-         "Calibration (direct)" = "NDVI, more N on high vigour", "NDVI quantile classes" = "NDVI, five classes",
-         "NNI zones" = "deficient, optimal, luxury", "Holland-Schepers" = "NDVI, Holland-Schepers")
-mm$m0 <- factor(sub(" [(]mean.*", "", mm$method), levels = names(M))
-LAB <- setNames(sprintf("%s
-%s
-mean %.0f", SHORT, DRV, mu[names(SHORT)]), names(SHORT))
-mm$lab <- factor(LAB[as.character(mm$m0)], levels = LAB)
-means <- data.frame(m0 = factor(names(M), levels = names(M)), dose = mu[names(M)])
-mm$area <- as.numeric(st_area(mm))
+           "NNI zones" = "NNI management zones", "Holland-Schepers" = "Sufficiency index")
+DRV <- c("Uniform" = "one dose, no sensing", "Calibration (inverse)" = "more N where NDVI is low",
+         "Calibration (direct)" = "more N where NDVI is high", "NDVI quantile classes" = "five NDVI classes",
+         "NNI zones" = "deficient / optimal / luxury", "Holland-Schepers" = "Holland-Schepers curve on NDVI")
+XV <- c("Uniform" = "NDVI", "Calibration (inverse)" = "NDVI", "Calibration (direct)" = "NDVI",
+        "NDVI quantile classes" = "NDVI", "NNI zones" = "NNI", "Holland-Schepers" = "NDVI")
+cellmean <- function(r) terra::extract(r, vect(st_transform(cells, crs(r))), fun = mean, na.rm = TRUE, ID = FALSE)[, 1]
+idx <- list(NDVI = cellmean(ndvi), NNI = cellmean(nni))
+area <- as.numeric(st_area(cells))
+DOSE <- fill_N(name = NULL, limits = c(lo, hi))
+COL  <- scale_colour_viridis_c(option = "mako", direction = -1, limits = c(lo, hi), guide = "none")
+block <- function(k) {
+  d <- data.frame(x = idx[[XV[[k]]]], dose = M[[k]], area = area)
+  rule <- ggplot(d[is.finite(d$x), ], aes(x, dose)) +
+    geom_hline(yintercept = Nstar, linetype = "dotted", linewidth = 0.35) +
+    { if (XV[[k]] == "NNI") geom_vline(xintercept = c(0.9, 1.1), linewidth = 0.25, colour = "grey55") } +
+    geom_point(aes(fill = dose, size = area), shape = 21, colour = "grey35", stroke = 0.15) + DOSE +
+    guides(fill = "none") +
+    scale_size_area(max_size = 1.3, guide = "none") +
+    scale_y_continuous(limits = c(lo - 3, hi + 3), breaks = c(140, 175, 210)) +
+    labs(title = SHORT[[k]], subtitle = DRV[[k]], x = paste("Cell", XV[[k]]), y = expression("N (kg ha"^-1*")")) +
+    theme_sat() + theme(plot.title = element_text(face = "bold", size = BASE, margin = margin(b = 0.5)),
+                        plot.subtitle = element_text(size = BASE - 1, colour = "grey30", margin = margin(b = 1.5)),
+                        axis.title = element_text(size = BASE - 1))
+  g <- cells[, "geometry"]; g$dose <- M[[k]]
+  map <- ggplot(g) + geom_sf(aes(fill = dose), colour = "white", linewidth = 0.08) +
+    geom_sf(data = field, fill = NA, colour = "grey20", linewidth = 0.25) + DOSE +
+    annotate("label", x = Inf, y = Inf, hjust = 1.05, vjust = 1.2, size = (BASE - 1) / .pt, family = FONT,
+             label = sprintf("mean %.0f", mu[[k]]), linewidth = 0, fill = alpha("white", 0.85)) +
+    coord_sf(datum = NA) + theme_map() + theme(legend.position = "none")
+  wrap_elements(full = rule / map + plot_layout(heights = c(0.75, 1)))
+}
 fv <- vect(st_transform(field, crs(ndvi)))
 fr <- list(geom_sf(data = st_transform(field, crs(ndvi)), fill = NA, colour = "grey20", linewidth = 0.3),
            coord_sf(datum = NA, expand = FALSE), theme_map(), cbar(),
-           theme(legend.key.width = unit(5.5, "mm")))
+           theme(legend.key.width = unit(6, "mm"), legend.margin = margin(0, 0, 0, 0), legend.box.spacing = unit(1, "mm")))
 pi1 <- ggplot() + tidyterra::geom_spatraster(data = mask(ndvi, fv)) + fr +
-  scale_fill_distiller(palette = "YlGn", direction = 1, na.value = "transparent", name = "NDVI (input)")
+  scale_fill_distiller(palette = "YlGn", direction = 1, na.value = "transparent", name = "NDVI", breaks = c(0.4, 0.6, 0.8))
 pi2 <- ggplot() + tidyterra::geom_spatraster(data = mask(crop(nni, fv), fv)) + fr +
-  fill_NNI(name = "NNI (input)", breaks = c(0.6, 1, 1.4))
-pd <- ggplot(st_drop_geometry(mm), aes(dose, m0)) +
-  geom_vline(xintercept = Nstar, linetype = "dotted", linewidth = 0.4) +
-  geom_jitter(aes(size = area), height = 0.18, width = 0, alpha = 0.35, colour = OKABE[[5]], stroke = 0) +
-  geom_point(data = means, shape = 23, fill = "white", size = 1.8) +
-  scale_size_area(max_size = 1.2, guide = "none") +
-  scale_y_discrete(limits = rev(names(M)), labels = SHORT) +
-  labs(x = expression("Cell dose (kg N ha"^-1*")"), y = NULL) + theme_sat()
-pm <- ggplot(mm) + geom_sf(aes(fill = dose), colour = "white", linewidth = 0.08) +
-  geom_sf(data = field, fill = NA, colour = "grey20", linewidth = 0.25) +
-  facet_wrap(~lab, ncol = 3) +
-  fill_N(name = expression("Prescribed N dose (kg N ha"^-1*")"), limits = c(lo, hi)) +
-  coord_sf(datum = NA) + theme_map() + cbar() +
-  theme(strip.text = element_text(size = BASE - 1, lineheight = 0.95, margin = margin(b = 1.5)))
-left <- (pi1 | pi2) / pd + plot_layout(heights = c(1, 1.25))
-save_fig(add_tags(left | pm) + plot_layout(widths = c(1, 1.75)), "fig6_strategies", "double", 120)
+  fill_NNI(name = "NNI", breaks = c(0.6, 1, 1.4))
+key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)) + geom_raster() + DOSE +
+  annotate("segment", x = Nstar, xend = Nstar, y = 0.5, yend = 1.5, linetype = "dotted", linewidth = 0.4) +
+  annotate("text", x = Nstar, y = 1.8, label = sprintf("balance dose N* = %.0f", Nstar), size = (BASE - 1) / .pt,
+           family = FONT) +
+  scale_x_continuous(breaks = c(lo, 160, Nstar, 190, hi), expand = c(0, 0)) + scale_y_continuous(limits = c(0.5, 2)) +
+  labs(x = expression("Prescribed N dose (kg N ha"^-1*")"), y = NULL) +
+  theme_sat() + theme(legend.position = "none", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+                      panel.grid = element_blank(), panel.border = element_blank(), aspect.ratio = 0.18)
+top <- wrap_elements(full = (pi1 | pi2 | key) + plot_layout(widths = c(1, 1, 1.5)))
+blocks <- wrap_plots(lapply(names(M), block), ncol = 3)
+save_fig(add_tags(top / blocks + plot_layout(heights = c(0.45, 2))), "fig6_strategies", "double", 215)
