@@ -1,9 +1,8 @@
 # Calculate soil fertility parameters (B = B1 + B2 in DPI).
 
 Estimates readily available and mineralized nitrogen in the soil as in
-Fert_Office v1.26 (foglio `B`). DPI naming: b1 = readily available N
-from soil total N ("N pronto", DPI B2); b2 = mineralized N from SOM (DPI
-B1).
+Fert_Office v1.26 (sheet B). DPI naming: b1 = readily available N from
+soil total N (DPI B2); b2 = mineralized N from SOM (DPI B1).
 
 ## Usage
 
@@ -67,8 +66,8 @@ A named list containing:
 
 - b2: Mineralized nitrogen from SOM (kg/ha), DPI B1.
 
-- b1_potential: N pronto before the perennial rule (used by the leaching
-  term).
+- b1_potential: readily available N before the perennial rule (used by
+  the leaching term).
 
 - no_till_reduction: Reduction for no-till seeding (kg/ha).
 
@@ -87,8 +86,8 @@ A named list containing:
 - b2 = `coef.N.mineralised` x min(SOM, 3) x `C_tempo`; the DPI keeps the
   mineralised N constant above 3 percent organic matter.
 
-- With `soil_seeding = "no-till"` (semina su sodo) the soil supply is
-  reduced by 10 kg N/ha, for crops where the DPI allows it
+- With `soil_seeding = "no-till"` the soil supply is reduced by 10 kg
+  N/ha, for crops where the DPI allows it
   (`crops.table$no_till_reduction`) and only when b1 is counted.
 
 Total B = b1 + b2 - `no_till_reduction`.

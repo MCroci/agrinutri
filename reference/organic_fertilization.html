@@ -4,16 +4,16 @@ fertilization. Optionally applies DPI efficiency by material type, soil
 distribution_efficiency are both given). If either is NULL, falls back to
 f.table: value * quantity / 100. Function N_balance() passes
 computed soil texture and defaults distribution to &quot;medium&quot; so Forg matches
-the DPI path used by Fert_Office (Apporti al terreno). In the balance formula the term
-to subtract is the efficient N (N utile) available to the crop in the
-year of application, not total N (DPI Guida / FertDPI)."><meta property="og:description" content="Calculates the amount of nitrogen (N) supplied to the soil through organic
+the DPI path used by Fert_Office (soil inputs sheet). In the balance formula the term
+to subtract is the efficient N available to the crop in the
+year of application, not total N (DPI guide / FertDPI)."><meta property="og:description" content="Calculates the amount of nitrogen (N) supplied to the soil through organic
 fertilization. Optionally applies DPI efficiency by material type, soil
 distribution_efficiency are both given). If either is NULL, falls back to
 f.table: value * quantity / 100. Function N_balance() passes
 computed soil texture and defaults distribution to &quot;medium&quot; so Forg matches
-the DPI path used by Fert_Office (Apporti al terreno). In the balance formula the term
-to subtract is the efficient N (N utile) available to the crop in the
-year of application, not total N (DPI Guida / FertDPI)."></head><body>
+the DPI path used by Fert_Office (soil inputs sheet). In the balance formula the term
+to subtract is the efficient N available to the crop in the
+year of application, not total N (DPI guide / FertDPI)."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -62,9 +62,9 @@ fertilization. Optionally applies <strong>DPI efficiency</strong> by material ty
 <code>distribution_efficiency</code> are both given). If either is <code>NULL</code>, falls back to
 <code>f.table</code>: <code>value * quantity / 100</code>. Function <code><a href="N_balance.html">N_balance()</a></code> passes
 computed soil texture and defaults distribution to <code>"medium"</code> so <code>Forg</code> matches
-the DPI path used by Fert_Office (<em>Apporti al terreno</em>). In the balance formula the term
-to subtract is the <strong>efficient N</strong> (N utile) available to the crop in the
-year of application, not total N (DPI Guida / FertDPI).</p>
+the DPI path used by Fert_Office (soil inputs sheet). In the balance formula the term
+to subtract is the <strong>efficient N</strong> available to the crop in the
+year of application, not total N (DPI guide / FertDPI).</p>
     </div>
 
     <div class="section level2">
@@ -98,13 +98,13 @@ Use <code>0</code> for no organic application (returns 0 kg N/ha).</p></dd>
 
 <dt id="arg-soil-group">soil_group<a class="anchor" aria-label="anchor" href="#arg-soil-group"></a></dt>
 <dd><p>Optional. Soil group from <code><a href="calc_soil_group_and_id_rag.html">calc_soil_group_and_id_rag()</a></code>
-(e.g. "Sandy textures", "Franco") to use DPI efficiency by texture. If <code>NULL</code>,
+(e.g. "Sandy textures", "Loamy textures") to use DPI efficiency by texture. If <code>NULL</code>,
 efficiency is taken from <code>f.table</code> (no texture/distribution).</p></dd>
 
 
 <dt id="arg-distribution-efficiency">distribution_efficiency<a class="anchor" aria-label="anchor" href="#arg-distribution-efficiency"></a></dt>
 <dd><p>Optional. <code>"efficient"</code>, <code>"medium"</code>, or <code>"low"</code>
-(DPI: Alta/Media/Bassa). Required together with <code>soil_group</code> for the DPI efficiency path.</p></dd>
+(DPI high/medium/low efficiency). Required together with <code>soil_group</code> for the DPI efficiency path.</p></dd>
 
 
 <dt id="arg-f-table">f.table<a class="anchor" aria-label="anchor" href="#arg-f-table"></a></dt>
@@ -119,8 +119,8 @@ Used when <code>soil_group</code> is <code>NULL</code>. Default is <code><a href
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>DPI Emilia-Romagna, Guida alla fertilizzazione; efficienza in funzione di
-tipologia di effluente, tessitura e modalita di distribuzione (Tabella 7 Norme Generali).</p>
+    <p>DPI Emilia-Romagna, fertilisation guide; efficiency by type of effluent,
+soil texture and distribution technique (Table 7 of the DPI General Rules).</p>
     </div>
 
     <div class="section level2">

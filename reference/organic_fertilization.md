@@ -6,10 +6,10 @@ type, soil `distribution_efficiency` are both given). If either is
 `NULL`, falls back to `f.table`: `value * quantity / 100`. Function
 [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md)
 passes computed soil texture and defaults distribution to `"medium"` so
-`Forg` matches the DPI path used by Fert_Office (*Apporti al terreno*).
-In the balance formula the term to subtract is the **efficient N** (N
-utile) available to the crop in the year of application, not total N
-(DPI Guida / FertDPI).
+`Forg` matches the DPI path used by Fert_Office (soil inputs sheet). In
+the balance formula the term to subtract is the **efficient N**
+available to the crop in the year of application, not total N (DPI guide
+/ FertDPI).
 
 ## Usage
 
@@ -45,13 +45,14 @@ organic_fertilization(
 
   Optional. Soil group from
   [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md)
-  (e.g. "Sandy textures", "Franco") to use DPI efficiency by texture. If
-  `NULL`, efficiency is taken from `f.table` (no texture/distribution).
+  (e.g. "Sandy textures", "Loamy textures") to use DPI efficiency by
+  texture. If `NULL`, efficiency is taken from `f.table` (no
+  texture/distribution).
 
 - distribution_efficiency:
 
-  Optional. `"efficient"`, `"medium"`, or `"low"` (DPI:
-  Alta/Media/Bassa). Required together with `soil_group` for the DPI
+  Optional. `"efficient"`, `"medium"`, or `"low"` (DPI high/medium/low
+  efficiency). Required together with `soil_group` for the DPI
   efficiency path.
 
 - f.table:
@@ -67,9 +68,9 @@ The estimated amount of nitrogen (N) in kg/ha available to the crop
 
 ## References
 
-DPI Emilia-Romagna, Guida alla fertilizzazione; efficienza in funzione
-di tipologia di effluente, tessitura e modalita di distribuzione
-(Tabella 7 Norme Generali).
+DPI Emilia-Romagna, fertilisation guide; efficiency by type of effluent,
+soil texture and distribution technique (Table 7 of the DPI General
+Rules).
 
 ## Examples
 

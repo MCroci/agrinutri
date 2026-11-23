@@ -35,13 +35,14 @@ calc_N_immobilization_loss(
 - greenhouse:
 
   Logical. If `TRUE`, adds 2 kg/ha of nitrogen immobilization as per DPI
-  2026 foglio C&D (cella D23 "In serra = 2"). Default `FALSE`.
+  2026 (Fert_Office sheet C&D, cell D23, greenhouse = 2). Default
+  `FALSE`.
 
 - E_residual:
 
   Optional numeric. When the previous crop has negative residual N (e.g.
   maize stalks buried, sorghum) the DPI 2026 sums `-E` into D (see
-  foglio C&D, cella I21 "E da conteggiare"). If provided and negative,
+  Fert_Office sheet C&D, cell I21). If provided and negative,
   `-E_residual` is added to D. Default `0` (no adjustment; E is handled
   separately in `calculate_N_fertilization`).
 

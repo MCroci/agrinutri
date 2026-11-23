@@ -68,7 +68,7 @@ Every feature must carry at least:
 |  |  |  |
 |----|----|----|
 | **Column** | **Example** | **Notes** |
-| `crop` | "Mais da insilato (classe 700)" | DPI 2026 name |
+| `crop` | "Silage maize (class 700)" | DPI 2026 name |
 | `expected_yield_tons_ha` | 60 | target yield |
 | `ccp` | "Spring-summer crop 100-130 days" | climate period |
 | `sand`, `clay` | 50, 35 | pct of texture |
@@ -82,10 +82,6 @@ Every feature must carry at least:
 | `forg_quantity` | 100 | organic dose this year (m\\^3\\/ha or t/ha, see [`N_balance`](https://mcroci.github.io/agrinutri/reference/N_balance.md)) |
 | `organic_previous_year_N` | 50 | optional; kg N ha\\^{-1}\\ from organic applied last year (term `F`) |
 | `area_ha` | 5.2 | used to derive `N_total_kg` |
-
-Italian aliases (Frumento tenero, Liquame bovino, Cereali vernini -
-paglia asportata, ...) are accepted because the underlying agrinutri
-functions carry the translation layer.
 
 ## Output columns added to the layer
 

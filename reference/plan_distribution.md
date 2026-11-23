@@ -1,7 +1,7 @@
 # Fertilization distribution plan
 
 Builds the fertilisation distribution plan for a crop according to DPI
-Emilia-Romagna 2026 (Fert_Office v1.26 foglio `Distribuz`). Combines:
+Emilia-Romagna 2026 (Fert_Office v1.26 distribution sheet). Combines:
 
 ## Usage
 
@@ -26,7 +26,8 @@ plan_distribution(
 
 - soil_group:
 
-  Italian DPI texture group.
+  DPI texture group (see
+  [`normalise_soil_group()`](https://mcroci.github.io/agrinutri/reference/normalise_soil_group.md)).
 
 - n_balance, p_balance, k_balance:
 
@@ -45,11 +46,12 @@ plan_distribution(
 
   - `modality_epoch`: ID or label from `distribution_modalities.table`
 
-  - `level` (optional): efficiency level of the distribution
-    `"bassa"/"media"/"alta"`, which in Fert_Office depends on modality,
-    epoch and crop cycle (foglio `Ciclo_Modalita`); default `"media"`.
-    The N dose class (\< 125, 125-249, \>= 250 kg N/ha) is computed from
-    the quantity and selects the efficiency as in Fert_Office.
+  - `level` (optional): efficiency level of the distribution (low,
+    medium, high), given as `"bassa"`, `"media"` or `"alta"`; in
+    Fert_Office it depends on modality, epoch and crop cycle
+    (cycle-modality sheet); default `"media"` (medium). The N dose class
+    (\< 125, 125-249, \>= 250 kg N/ha) is computed from the quantity and
+    selects the efficiency as in Fert_Office.
 
   - Optional `N_pct`, `P2O5_pct`, `K2O_pct`, `dry_matter_pct` override
     the table.
@@ -85,7 +87,8 @@ A list with:
 
 - `totals`: totals of useful N, P2O5, K2O delivered
 
-- `alerts`: if balances provided, OK/Eccesso/Deficit for each nutrient
+- `alerts`: if balances provided, `"OK"`/`"Eccesso"`
+  (excess)/`"Deficit"` for each nutrient
 
 - `zvn_zoot_N`: total zootec N delivered (useful for ZVN check)
 
@@ -104,4 +107,4 @@ For each input row the function computes the "useful" contribution to
 the crop for N (via efficiency), P2O5 and K2O (assumed 100%), and
 aggregates the totals. If `n_balance`, `p_balance`, `k_balance` are
 provided the function also checks the totals against the required doses
-and returns alerts (`OK` / `Eccesso` / `Deficit`).
+and returns alerts (`"OK"`, `"Eccesso"` for excess, `"Deficit"`).

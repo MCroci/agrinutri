@@ -30,7 +30,7 @@ List with `K2O_requirement`, `unit_coef`.
 
 ``` r
 calc_crop_K_demand(expected_yield_tons_ha = 6,
-                   crop = "Grano duro (pianta intera)")
+                   crop = "Durum wheat (whole plant)")
 #> $K2O_requirement
 #> [1] 119.4
 #> 

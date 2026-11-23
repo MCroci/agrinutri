@@ -37,7 +37,7 @@ A list: `P2O5_requirement` (kg/ha), `unit_coef` (kg P2O5 / t yield),
 
 ``` r
 calc_crop_P_demand(expected_yield_tons_ha = 6,
-                   crop = "Grano duro (pianta intera)")
+                   crop = "Durum wheat (whole plant)")
 #> $P2O5_requirement
 #> [1] 63.6
 #> 

@@ -1,11 +1,11 @@
-# Scheda a dose Standard - Phosphorus and Potassium (DPI 2026)
+# Standard-dose scheme - Phosphorus and Potassium (DPI 2026)
 
-Implements the DPI 2026 simplified "Scheda a dose Standard" method for
-P2O5 and K2O, matching Fert_Office v1.26 foglio `Scheda_PK`. The base
-dose for phosphorus is selected from `standard_pk_doses.table` according
-to soil P class; potassium base dose depends on soil K class. Then
-user-selected decrements and increments are applied. No MAS cap exists
-for P/K in DPI 2026 (the MAS applies to N only).
+Implements the DPI 2026 simplified standard-dose method for P2O5 and
+K2O, matching the Fert_Office v1.26 standard-dose sheet for P and K. The
+base dose for phosphorus is selected from `standard_pk_doses.table`
+according to soil P class; potassium base dose depends on soil K class.
+Then user-selected decrements and increments are applied. No MAS cap
+exists for P/K in DPI 2026 (the MAS applies to N only).
 
 ## Usage
 
@@ -68,7 +68,7 @@ A named list with `dose_base_P2O5`, `dose_base_K2O`, `dose_final_P2O5`,
 
 ``` r
 scheda_PK(
-  crop = "Grano duro (pianta intera)",
+  crop = "Durum wheat (whole plant)",
   soil_P_class = "normal",
   soil_K_class = "normal"
 )

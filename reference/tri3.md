@@ -38,7 +38,7 @@ not fall within the defined classes in `tri3.table`, returns NA.
   [`tri2()`](https://mcroci.github.io/agrinutri/reference/tri2.md)
   function.
 
-- As in Fert_Office (foglio `Suolo`), `clay` and `sand` are truncated to
+- As in Fert_Office (soil sheet), `clay` and `sand` are truncated to
   whole percentages (`INT`) before the triangle lookup, so 40.6 % clay
   is read as 40 %.
 

@@ -72,9 +72,9 @@ texture grouping:</p>
 
 <ul><li><p>English (legacy agrinutri 0.1.0): "Sandy textures",
 "Loamy textures", "Clay textures".</p></li>
-<li><p>Italian plural (canonical DPI; foglio B, SO, Gri_K):
+<li><p>Italian plural (DPI labels):
 "Sabbiosi", "Medio impasto", "Argillosi e limosi".</p></li>
-<li><p>Italian singular adjective (foglio Ragg_Tes):
+<li><p>Italian singular adjective:
 "Sabbioso", "Franco", "Argilloso".</p></li>
 </ul><p>This helper accepts any of these forms (case-insensitive) and returns the
 canonical English form (used by agrinutri &gt;= 0.4.0 lookup tables) plus the
@@ -96,20 +96,7 @@ universal <code>ID_Rag</code> integer key used internally to join the lookup tab
 <span class="r-out co"><span class="r-pr">#&gt;</span> $en</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Loamy textures"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="fu">normalise_soil_group</span><span class="op">(</span><span class="st">"Medio impasto"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $id_rag</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $it_plural</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Medio impasto"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $it_singular</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Franco"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $en</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Loamy textures"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="fu">normalise_soil_group</span><span class="op">(</span><span class="st">"Franco"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">normalise_soil_group</span><span class="op">(</span><span class="st">"loamy"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $id_rag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

@@ -64,8 +64,8 @@ spatial_N_balance(
 
 - crop:
 
-  Character. Crop name (Italian or English, see
-  [`resolve_crop()`](https://mcroci.github.io/agrinutri/reference/resolve_crop.md)).
+  Character. Crop name (see
+  [`list_crops()`](https://mcroci.github.io/agrinutri/reference/list_crops.md)).
 
 - ccp:
 
@@ -145,7 +145,7 @@ soil[["TN"]] <- soil[["TN"]] * 10   # the Cremonesi TN raster is in percent; Nto
 n_map <- spatial_N_balance(
   soil_stack = soil,
   expected_yield_tons_ha = 60,
-  crop = "Mais trinciato (classe 700)",
+  crop = "Silage maize (class 700)",
   ccp  = "Spring-summer crop 100-130 days",
   oxygen_availability = "Normal",
   winter_rain = 160, start_spring_rain = 40,

@@ -5,7 +5,7 @@ Simplified relationship:
 
       K2O_end_ppm = K2O_start_ppm + (K2O_applied - K2O_removed - K2O_leaching) / (soil_weight_30cm/1000)
 
-The lisciviazione (H) is taken from `K_leaching_by_clay(clay_pct)`.
+The leaching term (H) is taken from `K_leaching_by_clay(clay_pct)`.
 
 ## Usage
 
@@ -56,6 +56,6 @@ Numeric ppm K2O at end of cycle.
 ``` r
 estimate_soil_K_end_of_cycle(K2O_start_ppm = 150, K2O_applied = 230,
                              K2O_removed = 119.4, clay_pct = 18.5,
-                             soil_group = "Medio impasto")
+                             soil_group = "Loamy textures")
 #> [1] 173.2308
 ```

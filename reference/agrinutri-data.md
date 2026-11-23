@@ -2,37 +2,37 @@
 
 Internal datasets used by the agrinutri package for nitrogen (and, from
 v0.2.0, phosphorus and potassium) balance calculations following the
-Disciplinari di Produzione Integrata (DPI) Emilia-Romagna (Allegato 2 -
-metodo del bilancio, Allegati 3, 4, 6, 7, 9) and the FertDPI /
-Fert_Office reference tool (v1.26, Febbraio 2026).
+Emilia-Romagna Integrated Production Guidelines (DPI) (Annex 2 - balance
+method, Annexes 3, 4, 6, 7, 9) and the FertDPI / Fert_Office reference
+tool (v1.26, February 2026).
 
 ## Details
 
 These datasets are loaded automatically with the package using
 `LazyData: true` in the DESCRIPTION file. Soil texture is grouped in
-three DPI classes: (1) Tendenzialmente sabbioso (S, SF, FS), (2) Franco
-/ Medio impasto (L, F, FL, FSA, FA), (3) Tendenzialmente argilloso (FLA,
-AS, AL, A). Tables with character keys retain the original Italian
-naming used in Fert_Office; English aliases (`*_it` columns, or English
-primary values) are provided where backward compatibility with earlier
-agrinutri versions is required.
+three DPI classes: (1) sandy textures (S, SF, FS), (2) loamy textures
+(L, F, FL, FSA, FA), (3) clay textures (FLA, AS, AL, A). Most tables
+with character keys use English names, with the Fert_Office labels in
+`*_it` columns; `standard_pk_doses.table$crop` keeps the Fert_Office
+labels (English names in `crop_en`) and `mineral_fertilizers.table`
+lists commercial product names.
 
 ## Core N datasets
 
 - uptake_table:
 
   Crop unit absorption/asportation coefficients for N, P2O5 and K2O
-  (from foglio `A`). 247 crops in v0.2.0.
+  (from Fert_Office sheet A). 247 crops in v0.2.0.
 
 - e.table:
 
-  Precessione: N kg/ha from previous crop residues, with legume flag and
-  Italian alias.
+  Previous crop: N kg/ha from previous crop residues, with legume flag
+  and Fert_Office label.
 
 - f.table:
 
   Coefficients of recovery for organic fertilisation applied in previous
-  years (4 matrici x 4 frequenze = 16 rows).
+  years (4 sources x 4 frequencies = 16 rows).
 
 - g.table:
 
@@ -82,18 +82,18 @@ agrinutri versions is required.
 
 - mas.table:
 
-  Maximum allowed doses (MAS) per crop (DPI 2026, RR 2/2024); includes
-  standard N dose, MAS_N, max_increment, max_N_dose.
+  Maximum allowed doses (MAS) per crop (DPI 2026, Regional Regulation
+  2/2024); includes standard N dose, MAS_N, max_increment, max_N_dose.
 
 - crops.table:
 
   Crop master list with genus/species, N fixation % and
-  `no_till_reduction` flag (from foglio `Coltura`).
+  `no_till_reduction` flag (from the Fert_Office crop sheet).
 
 - crop_groups.table:
 
-  6 crop macro-groups: arboree, erbacee, foraggere, orticole, da_seme,
-  baby_life.
+  6 crop macro-groups: tree crops and small fruits, field crops, forage
+  crops, vegetables, seed crops, baby leaf.
 
 - texture_groups.table:
 
@@ -102,7 +102,8 @@ agrinutri versions is required.
 
 - so.table, so_max_input:
 
-  SOM class (12) and maximum annual SO input (t ss/ha) per class.
+  SOM class (12) and maximum annual SOM input (t dry matter/ha) per
+  class.
 
 - ph.table:
 
@@ -127,8 +128,8 @@ agrinutri versions is required.
 
 - organic_fertilizers.table:
 
-  21 organic matrices with ss, N, P2O5, K2O (min/avg/max), zootec flag,
-  SO increment.
+  21 organic matrices with dry matter, N, P2O5, K2O (min/avg/max),
+  livestock flag, SOM increment.
 
 - efficiency.table:
 
@@ -150,39 +151,37 @@ agrinutri versions is required.
 
 - c_d.table:
 
-  Combined C (leaching) and fc_D (immobilisation) lookup (foglio C&D of
+  Combined C (leaching) and fc_D (immobilisation) lookup (sheet C&D of
   Fert_Office v1.26).
 
-## DPI 2026 Scheda-standard datasets (v0.3.0)
+## DPI 2026 standard-dose datasets (v0.3.0)
 
 - standard_pk_doses.table:
 
-  Base N, P2O5 and K2O standard doses per crop, with 4 dotation classes
-  (Molto_Bassa, Bassa, Normale, Elevata) for P and K (239 rows, 14
-  cols).
+  Base N, P2O5 and K2O standard doses per crop, with 4 soil availability
+  classes (very low, low, normal, high) for P and K (239 rows, 14 cols).
 
 - standard_decrements.table:
 
-  Crop-level catalogue of reduction factors (Rid_N_Resa, Ammendante
-  precedente, SO elevato, Dopo medica/leguminosa, ecc.) for the scheda
-  method.
+  Crop-level catalogue of reduction factors (yield, previous soil
+  amendment, high SOM, after alfalfa or legume, etc.) for the
+  standard-dose method.
 
 - standard_increments.table:
 
-  Crop-level catalogue of increment factors (Resa alta, SO basso,
-  Ristoppio paglie, Surplus pluvio, Terreno compattato, ecc.) for the
-  scheda method; includes inc_N_max, Inc_P2O5_Max, Inc_K2O_Max DPI 2026
-  caps.
+  Crop-level catalogue of increment factors (high yield, low SOM, straw
+  burial, rainfall surplus, compacted soil, etc.) for the standard-dose
+  method; includes inc_N_max, Inc_P2O5_Max, Inc_K2O_Max DPI 2026 caps.
 
 - standard_multicycle.table:
 
-  Pluriennali and multi-cut specific data (I/II anno husbandry, inizio
-  produzione, incremento per taglio by K dotation class).
+  Perennial and multi-cut specific data (1st/2nd husbandry year, start
+  of production, increment per cut by soil K class).
 
 - mineral_fertilizers.table:
 
-  146 mineral / organo-mineral fertilisers from Fert_Office v1.26 foglio
-  Concimi with N, P2O5, K2O titres (kg/q).
+  146 mineral / organo-mineral fertilisers from the Fert_Office v1.26
+  fertiliser sheet with N, P2O5, K2O titres (kg/q).
 
 ## Examples
 

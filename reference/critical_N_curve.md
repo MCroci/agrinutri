@@ -17,9 +17,7 @@ critical_N_curve(crop)
 
 - crop:
 
-  Character. Crop identifier (see list above). Case-insensitive; Italian
-  synonyms (`"frumento"`, `"mais"`, `"colza"`, `"riso"`, `"girasole"`,
-  `"sorgo"`) are accepted.
+  Character. Crop identifier (see list above). Case-insensitive.
 
 ## Value
 

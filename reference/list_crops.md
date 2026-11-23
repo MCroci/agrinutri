@@ -1,6 +1,6 @@
-# List all crops with both Italian and English names
+# List all crops
 
-List all crops with both Italian and English names
+List all crops
 
 ## Usage
 
@@ -10,8 +10,8 @@ list_crops()
 
 ## Value
 
-A data frame with columns `crop` (Italian, canonical) and `crop_en`
-(English).
+A data frame with columns `crop` (canonical name) and `crop_en` (English
+name).
 
 ## Examples
 

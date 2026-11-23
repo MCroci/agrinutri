@@ -1,8 +1,8 @@
 # Maximum annual organic matter input (t dry matter / ha)
 
-Returns the DPI 2026 maximum annual input of soil organic matter (SO) as
-dry matter t/ha, based on the classification of initial SO in soil:
-"Poor" = 13, "Normal" = 11, "Rich" = 9 (Fert_Office v1.26 foglio SO).
+Returns the DPI 2026 maximum annual input of soil organic matter (SOM)
+as dry matter t/ha, based on the classification of initial SOM in soil:
+"Poor" = 13, "Normal" = 11, "Rich" = 9 (Fert_Office v1.26 SOM sheet).
 
 ## Usage
 

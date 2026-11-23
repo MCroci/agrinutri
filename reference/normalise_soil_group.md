@@ -25,11 +25,10 @@ English), `it_plural`, `it_singular`.
 - English (legacy agrinutri 0.1.0): "Sandy textures", "Loamy textures",
   "Clay textures".
 
-- Italian plural (canonical DPI; foglio B, SO, Gri_K): "Sabbiosi",
-  "Medio impasto", "Argillosi e limosi".
+- Italian plural (DPI labels): "Sabbiosi", "Medio impasto", "Argillosi e
+  limosi".
 
-- Italian singular adjective (foglio Ragg_Tes): "Sabbioso", "Franco",
-  "Argilloso".
+- Italian singular adjective: "Sabbioso", "Franco", "Argilloso".
 
 This helper accepts any of these forms (case-insensitive) and returns
 the canonical English form (used by agrinutri \>= 0.4.0 lookup tables)
@@ -52,20 +51,7 @@ normalise_soil_group("Loamy textures")
 #> $en
 #> [1] "Loamy textures"
 #> 
-normalise_soil_group("Medio impasto")
-#> $id_rag
-#> [1] 2
-#> 
-#> $it_plural
-#> [1] "Medio impasto"
-#> 
-#> $it_singular
-#> [1] "Franco"
-#> 
-#> $en
-#> [1] "Loamy textures"
-#> 
-normalise_soil_group("Franco")
+normalise_soil_group("loamy")
 #> $id_rag
 #> [1] 2
 #> 

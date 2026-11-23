@@ -1,9 +1,9 @@
 # Classify Olsen phosphorus availability
 
 Classifies soil phosphorus availability using the Olsen method,
-following DPI Emilia-Romagna 2026 (Fert_Office v1.26 foglio `Gri_P`).
-The input may be expressed either as elemental P or as P2O5 equivalent;
-the conversion factor is P2O5 = P / 0.436681.
+following DPI Emilia-Romagna 2026 (Fert_Office v1.26 P sheet). The input
+may be expressed either as elemental P or as P2O5 equivalent; the
+conversion factor is P2O5 = P / 0.436681.
 
 ## Usage
 
@@ -42,14 +42,15 @@ A list with:
 
 - `value_ppm_P`, `value_ppm_P2O5`: input converted to both units.
 
-- `ID_Gri_P`: class id (1 molto bassa ... 5 molto elevata).
+- `ID_Gri_P`: class id (1 very low ... 5 very high).
 
 - `rating`: human-readable class.
 
-- `soil_class`: DPI "Classe dotaz." (`molto scarso`, `scarso`,
-  `normale`, `molto alto`).
+- `soil_class`: DPI availability class, returned as the Italian DPI
+  label (`"molto scarso"`, `"scarso"`, `"normale"`, `"molto alto"`).
 
-- `strategy`: one of `"Arricchimento"`, `"Mantenimento"`, `"Riduzione"`.
+- `strategy`: one of `"Arricchimento"` (enrichment), `"Mantenimento"`
+  (maintenance), `"Riduzione"` (reduction).
 
 ## Examples
 

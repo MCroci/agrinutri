@@ -1,8 +1,8 @@
 # Organic nitrogen efficiency by material, soil texture and distribution (DPI)
 
 Returns the fraction of total organic N that is available to the crop in
-the year of application, according to DPI (tipo di effluente, tessitura,
-modalita di distribuzione). Used when `soil_group` and
+the year of application, according to DPI (type of effluent, soil
+texture and distribution technique). Used when `soil_group` and
 `distribution_efficiency` are passed to
 [`organic_fertilization()`](https://mcroci.github.io/agrinutri/reference/organic_fertilization.md).
 
@@ -22,33 +22,30 @@ organic_N_efficiency(source, soil_group, distribution_efficiency)
 
   Character. Soil group from
   [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md)
-  (e.g. "Sandy textures", "Franco", "Clayey") or DPI class: "sabbioso",
-  "franco", "argilloso".
+  (e.g. "Sandy textures", "Loamy textures", "Clay textures").
 
 - distribution_efficiency:
 
-  Character. "efficient" (Alta), "medium" (Media), or "low" (Bassa).
-  Alta = iniezione, fertirrigazione, interramento entro 4 h; Media =
-  rasoterra con interramento; Bassa = spandimento superficiale senza
-  incorporazione.
+  Character. "efficient", "medium", or "low". Efficient = injection,
+  fertigation, incorporation within 4 h; medium = band spreading with
+  incorporation; low = surface spreading without incorporation.
 
 ## Value
 
 Numeric. Efficiency as a fraction between 0 and 1, or `NA` if not found.
-For ammendanti (compost, letame maturo, digestato palabile) returns 0.40
-(40%).
+For soil amendments (compost, mature manure, solid digestate) returns
+0.40 (40%).
 
 ## References
 
-DPI Emilia-Romagna, Guida alla fertilizzazione; FertDPI foglio
-Efficienza. Terreno sabbioso/franco/argilloso x distribuzione
-efficiente/media/poco efficiente.
+DPI Emilia-Romagna, fertilisation guide; FertDPI efficiency sheet.
+Sandy/loamy/clay soil x efficient/medium/low-efficiency distribution.
 
 ## Examples
 
 ``` r
 organic_N_efficiency("Cattle slurry", "Sandy textures", "efficient")
 #> [1] 0.671
-organic_N_efficiency("Composted manure", "Franco", "medium")  # 0.40
+organic_N_efficiency("Composted manure", "Loamy textures", "medium")  # 0.40
 #> [1] 0.4
 ```

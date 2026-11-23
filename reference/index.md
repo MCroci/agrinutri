@@ -3,7 +3,7 @@
 ## All functions
 
 - [`K_balance()`](https://mcroci.github.io/agrinutri/reference/K_balance.md)
-  : Potassium balance (DPI Emilia-Romagna 2026 metodo del bilancio)
+  : Potassium balance (DPI Emilia-Romagna 2026 balance method)
 
 - [`K_leaching_by_clay()`](https://mcroci.github.io/agrinutri/reference/K_leaching_by_clay.md)
   : K leaching by clay content
@@ -12,7 +12,7 @@
   : Nitrogen Balance Calculation
 
 - [`P_balance()`](https://mcroci.github.io/agrinutri/reference/P_balance.md)
-  : Phosphorus balance (DPI Emilia-Romagna 2026 metodo del bilancio)
+  : Phosphorus balance (DPI Emilia-Romagna 2026 balance method)
 
 - [`agrinutri_crop_pars_quefts()`](https://mcroci.github.io/agrinutri/reference/agrinutri_crop_pars_quefts.md)
   : Map agrinutri crop label to QUEFTS crop parameters
@@ -64,8 +64,11 @@
   : Check planned N against MAS
 
 - [`classify_CEC()`](https://mcroci.github.io/agrinutri/reference/classify_CEC.md)
-  : Classify cation exchange capacity (CSC, meq/100 g) From Fert_Office
-  v1.26 foglio Gri_K: \< 10 = bassa, 10-20 = media, \> 20 = alta.
+  :
+
+  Classify cation exchange capacity (CEC, meq/100 g) From the
+  Fert_Office v1.26 K sheet: \< 10 low, 10-20 medium, \> 20 high,
+  returned as the Italian labels `"bassa"`, `"media"`, `"alta"`.
 
 - [`classify_K()`](https://mcroci.github.io/agrinutri/reference/classify_K.md)
   : Classify exchangeable potassium availability
@@ -74,7 +77,7 @@
   : Classify Olsen phosphorus availability
 
 - [`classify_SOM()`](https://mcroci.github.io/agrinutri/reference/classify_SOM.md)
-  : Classify SO (soil organic matter) initial content by texture group
+  : Classify SOM (soil organic matter) initial content by texture group
 
 - [`classify_carbonate_att()`](https://mcroci.github.io/agrinutri/reference/classify_carbonate_att.md)
   : Classify active carbonate
@@ -105,11 +108,11 @@
 
 - [`dose_standard_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md)
   [`scheda_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md)
-  : Scheda a dose Standard - Nitrogen (DPI Emilia-Romagna 2026)
+  : Standard-dose scheme - Nitrogen (DPI Emilia-Romagna 2026)
 
 - [`dose_standard_PK()`](https://mcroci.github.io/agrinutri/reference/dose_standard_PK.md)
   [`scheda_PK()`](https://mcroci.github.io/agrinutri/reference/dose_standard_PK.md)
-  : Scheda a dose Standard - Phosphorus and Potassium (DPI 2026)
+  : Standard-dose scheme - Phosphorus and Potassium (DPI 2026)
 
 - [`estimate_N_rate_from_calibration_curve()`](https://mcroci.github.io/agrinutri/reference/estimate_N_rate_from_calibration_curve.md)
   : Nitrogen Rate Estimation from NDVI using Calibration
@@ -150,7 +153,7 @@
   : Leaching Loss of Nitrogen
 
 - [`list_crops()`](https://mcroci.github.io/agrinutri/reference/list_crops.md)
-  : List all crops with both Italian and English names
+  : List all crops
 
 - [`max_SO_input()`](https://mcroci.github.io/agrinutri/reference/max_SO_input.md)
   : Maximum annual organic matter input (t dry matter / ha)
@@ -187,12 +190,18 @@
   : Fertilization distribution plan
 
 - [`ratio_K_CEC()`](https://mcroci.github.io/agrinutri/reference/ratio_K_CEC.md)
-  : K/CSC ratio assessment (Fert_Office foglio Gri_K) \<0.1% basso;
-  0.1-2.1 ottimale; 2.1-5.1 alto; ... (percentage of CSC)
+  :
+
+  K/CEC ratio assessment (Fert_Office K sheet) \<0.1% low; 0.1-2.1
+  optimal; 2.1-5.1 high (percentage of CEC), returned as the Italian
+  labels `"basso"`, `"ottimale"`, `"alto"`.
 
 - [`ratio_Mg_K()`](https://mcroci.github.io/agrinutri/reference/ratio_Mg_K.md)
-  : Mg/K ratio assessment (Fert_Office foglio Gri_K) 0-0.1 basso;
-  0.1-2.1 equilibrato; 2.1-5.1 alto; \>5.1 molto alto.
+  :
+
+  Mg/K ratio assessment (Fert_Office K sheet) 0-0.1 low; 0.1-2.1
+  balanced; 2.1-5.1 high; \>5.1 very high, returned as the Italian
+  labels `"basso"`, `"equilibrato"`, `"alto"`, `"molto alto"`.
 
 - [`resolve_ccp()`](https://mcroci.github.io/agrinutri/reference/resolve_ccp.md)
   :
@@ -201,7 +210,7 @@
   normalisation
 
 - [`resolve_crop()`](https://mcroci.github.io/agrinutri/reference/resolve_crop.md)
-  : Resolve a crop name (Italian or English) to its canonical entry
+  : Resolve a crop name to its canonical entry
 
 - [`resolve_id_rag()`](https://mcroci.github.io/agrinutri/reference/resolve_id_rag.md)
   : Resolve a numeric ID_Rag from any soil-group label or clay/sand %
@@ -213,7 +222,7 @@
   : Compute soil K availability terms for the K balance
 
 - [`soil_P_availability()`](https://mcroci.github.io/agrinutri/reference/soil_P_availability.md)
-  : Compute soil P availability terms (B1 / A mantenimento / B2) for the
+  : Compute soil P availability terms (B1 / A maintenance / B2) for the
   P balance
 
 - [`soil_fertility()`](https://mcroci.github.io/agrinutri/reference/soil_fertility.md)

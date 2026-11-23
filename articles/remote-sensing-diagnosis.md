@@ -92,7 +92,7 @@ GS30+ / V8+.
 
 [`critical_N_curve()`](https://mcroci.github.io/agrinutri/reference/critical_N_curve.md)
 returns the (a, b, W_min) coefficients of the species-specific critical
-nitrogen dilution curve. Italian synonyms are accepted.
+nitrogen dilution curve.
 
 ``` r
 
@@ -108,7 +108,7 @@ critical_N_curve("wheat")
 #> 
 #> $reference
 #> [1] "Justes et al. 1994"
-critical_N_curve("mais")   # italian
+critical_N_curve("maize")
 #> $a
 #> [1] 3.4
 #> 

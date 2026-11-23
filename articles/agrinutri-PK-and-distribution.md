@@ -4,21 +4,20 @@
 
 This vignette shows how to use **agrinutri 0.6.0** to compute a full
 nitrogen, phosphorus and potassium fertilisation plan following the
-*Disciplinari di Produzione Integrata* (DPI) Emilia-Romagna 2026. The
-package reproduces the logic of the official regional tool **Fert_Office
-v1.26** (Febbraio 2026, Regione Emilia-Romagna) and makes it scriptable
-in R.
+Emilia-Romagna Integrated Production Guidelines (DPI) 2026. The package
+reproduces the logic of the official regional tool **Fert_Office v1.26**
+(February 2026, Emilia-Romagna Region) and makes it scriptable in R.
 
 The package implements **two complementary methods**:
 
-1.  **Metodo del bilancio (Allegato 2)**: full nutrient mass balance
-    with crop demand, soil supply, losses, previous-crop effects and
-    organic contributions. Recommended when detailed soil and climate
-    data are available.
-2.  **Scheda a dose Standard**: simplified per-crop dose with
-    user-selectable decrement and increment factors, capped by MAS
-    (Massimali Ammessi di Simulazione). Recommended when soil analyses
-    are limited.
+1.  **Balance method (Annex 2)**: full nutrient mass balance with crop
+    demand, soil supply, losses, previous-crop effects and organic
+    contributions. Recommended when detailed soil and climate data are
+    available.
+2.  **Standard-dose scheme**: simplified per-crop dose with
+    user-selectable decrement and increment factors, capped by the
+    maximum allowed dose (MAS). Recommended when soil analyses are
+    limited.
 
 The package also provides a **fertilisation distribution plan** and
 **end-of-cycle soil P and K estimation** to close the agronomic loop
@@ -26,50 +25,43 @@ between planning and recording.
 
 ### Normative reference
 
-- **DPI Emilia-Romagna 2026** — Norme Generali, Allegato 2 (metodo del
-  bilancio), Allegato 9 (massimali), *Guida alla Fertilizzazione
-  Minerale e Organica* (N, P, K).
-- **Reg. reg. 2/2024** — limiti MAS.
-- **Reg. reg. 3/2017** — utilizzazione agronomica degli effluenti e del
-  digestato.
-- **Direttiva Nitrati 91/676/CEE** — in ZVN limite di 170 kg N/ha/anno
-  da effluenti zootecnici.
-- **Reg. UE 2021/2115** — soglie minime di efficienza.
+- **DPI Emilia-Romagna 2026** — General Rules, Annex 2 (balance method),
+  Annex 9 (maximum allowed doses), and the guide to mineral and organic
+  fertilisation (N, P, K).
+- **Regional Regulation 2/2024** — MAS limits.
+- **Regional Regulation 3/2017** — agronomic use of livestock effluents
+  and digestate.
+- **Nitrates Directive 91/676/EEC** — in nitrate vulnerable zones (ZVN),
+  a limit of 170 kg N/ha/year from livestock effluents.
+- **Regulation (EU) 2021/2115** — minimum efficiency thresholds.
 
 ## Naming conventions
 
-agrinutri mixes English and Italian terminology by design:
-
-- **Function names**: English snake_case (e.g. `N_balance`, `P_balance`,
-  `plan_distribution`, `classify_pH`). Three exceptions retain the
-  Italian DPI canonical name: `scheda_N`, `scheda_PK`, `get_MAS` /
-  `check_MAS`.
-- **Parameters**: English snake_case throughout.
-- **Class strings** (e.g. “molto bassa”, “media”, “Sabbiosi”) are kept
-  in Italian because they are DPI canonical labels.
-- **Soil-group labels** are accepted in any of three conventions:
-  Italian plural (“Sabbiosi”, “Medio impasto”, “Argillosi e limosi”),
-  Italian singular (“Sabbioso”, “Franco”, “Argilloso”) or English
-  (“Sandy textures”, “Loamy textures”, “Clay textures”). The
+- **Function names**: snake_case (e.g. `N_balance`, `P_balance`,
+  `plan_distribution`, `classify_pH`). The standard-dose functions are
+  [`scheda_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md)
+  and
+  [`scheda_PK()`](https://mcroci.github.io/agrinutri/reference/dose_standard_PK.md)
+  (aliases
+  [`dose_standard_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md)
+  and
+  [`dose_standard_PK()`](https://mcroci.github.io/agrinutri/reference/dose_standard_PK.md));
+  the MAS functions are
+  [`get_MAS()`](https://mcroci.github.io/agrinutri/reference/get_MAS.md)
+  and
+  [`check_MAS()`](https://mcroci.github.io/agrinutri/reference/check_MAS.md).
+- **Parameters**: snake_case throughout.
+- **Availability ratings** are returned as “very low”, “low”, “medium”,
+  “high” and “very high”.
+- **Soil-group labels**: “Sandy textures”, “Loamy textures” and “Clay
+  textures”. The
   [`normalise_soil_group()`](https://mcroci.github.io/agrinutri/reference/normalise_soil_group.md)
-  helper canonicalises any of them.
+  helper returns the canonical label and the numeric texture-group id.
 
 ``` r
 
 library(agrinutri)
 normalise_soil_group("Loamy textures")
-#> $id_rag
-#> [1] 2
-#> 
-#> $it_plural
-#> [1] "Medio impasto"
-#> 
-#> $it_singular
-#> [1] "Franco"
-#> 
-#> $en
-#> [1] "Loamy textures"
-normalise_soil_group("Franco")
 #> $id_rag
 #> [1] 2
 #> 
@@ -93,7 +85,7 @@ resolve_id_rag(clay = 18.5, sand = 15.5)
 crop  <- "Durum wheat (whole plant)"
 yield <- 6   # t/ha
 
-# Soil (sample: Sabbia 15.5%, Argilla 18.5% -> FL, Medio impasto)
+# Soil (sample: sand 15.5%, clay 18.5% -> FL, loamy textures)
 clay   <- 18.5
 sand   <- 15.5
 Ntot   <- 1.5     # g/kg
@@ -111,22 +103,20 @@ start_spring_rain <- 0
 
 # Management
 prev_crop         <- "Maize stalks removed"
-location          <- "Isolated plain"   # "Pianura isolata" in Fert_Office
-oxygen            <- "Slow"             # "Imperfetta" in Fert_Office
+location          <- "Isolated plain"
+oxygen            <- "Slow"
 soil_seeding      <- "traditional"
 greenhouse        <- FALSE
 ```
 
-The scenario above reproduces the sample cell of
-`Fert_Office v1.26 ! Inserimento` and is used as the end-to-end
-benchmark of the package.
+The scenario above reproduces the sample field of Fert_Office v1.26 and
+is used as the end-to-end benchmark of the package.
 
 ## Soil characterisation
 
 agrinutri classifies the soil along the DPI 2026 dimensions. The 3-class
-texture grouping (Sabbiosi / Medio impasto / Argillosi e limosi) drives
-every subsequent coefficient choice (B, C, D, efficiency, soil weight,
-etc.).
+texture grouping (sandy / loamy / clay textures) drives every subsequent
+coefficient choice (B, C, D, efficiency, soil weight, etc.).
 
 ``` r
 
@@ -142,7 +132,7 @@ soil_props
 #> $TRI3
 #> [1] "FL"
 
-# pH, calcare, SO, CSC
+# pH, carbonates, soil organic matter, CEC
 classify_pH(pH)
 #> $ID_pH
 #> [1] 6
@@ -170,7 +160,7 @@ classify_carbonate_att(caco3_att)
 #> 
 #> $caco3_att
 #> [1] 6.8
-som_cls <- classify_SOM(SOM = SOM, soil_group = "Medio impasto")
+som_cls <- classify_SOM(SOM = SOM, soil_group = "Loamy textures")
 som_cls
 #> $rating
 #> [1] "medium"
@@ -187,12 +177,12 @@ som_cls
 #> $soil_group
 #> [1] "Loamy textures"
 
-# Maximum annual SO input (for ammendanti)
+# Maximum annual organic matter input (for soil amendments)
 max_SO_input(som_cls$class)
 #> [1] 11
 ```
 
-## Nitrogen balance (Allegato 2)
+## Nitrogen balance (Annex 2)
 
 The DPI 2026 formula is:
 
@@ -205,7 +195,7 @@ where each term is computed by a dedicated function:
 | Term | Function | Meaning |
 |----|----|----|
 | A | [`calc_crop_N_demand()`](https://mcroci.github.io/agrinutri/reference/calc_crop_N_demand.md) | Crop N demand (kg/ha) |
-| B = b1 + b2 | [`soil_fertility()`](https://mcroci.github.io/agrinutri/reference/soil_fertility.md) | b1 = N pronto from N total, b2 = N mineralised from SOM |
+| B = b1 + b2 | [`soil_fertility()`](https://mcroci.github.io/agrinutri/reference/soil_fertility.md) | b1 = readily available N from total N, b2 = N mineralised from SOM |
 | C1, C2 | [`leaching_loss()`](https://mcroci.github.io/agrinutri/reference/leaching_loss.md) | Autumn-winter and early-spring leaching |
 | D | [`calc_N_immobilization_loss()`](https://mcroci.github.io/agrinutri/reference/calc_N_immobilization_loss.md) | Microbial immobilisation |
 | E | [`nitrogen_from_previous_crop_residues()`](https://mcroci.github.io/agrinutri/reference/nitrogen_from_previous_crop_residues.md) | Previous-crop residual N |
@@ -233,7 +223,7 @@ n_bal <- N_balance(
   forg_quantity = 0,
   soil_seeding = soil_seeding,
   greenhouse = greenhouse,
-  E_to_D = TRUE        # fold negative E into D, as in foglio Bilancio
+  E_to_D = TRUE        # fold negative E into D, as in Fert_Office
 )
 
 n_bal
@@ -272,11 +262,11 @@ abline(h = 0, lty = 2, col = "gray40")
 par(op)
 ```
 
-The result matches the Fert_Office `Bilancio` sheet: A = 186.6, B =
-73.84, D = 39.536 (includes `|E|` = 10), G = 10.05, and **N required ≈
-142.25 kg/ha**.
+The result matches the Fert_Office balance sheet: A = 186.6, B = 73.84,
+D = 39.536 (includes `|E|` = 10), G = 10.05, and **N required ≈ 142.25
+kg/ha**.
 
-### MAS verification (Massimali Ammessi di Simulazione)
+### Maximum allowed dose (MAS) check
 
 ``` r
 
@@ -389,20 +379,22 @@ natural_contribution(location = location,
 
 ## Phosphorus balance
 
-The phosphorus balance follows the DPI Allegato 2 logic coded in foglio
-`Gri_P`:
+The phosphorus balance follows the DPI Annex 2 logic as coded in
+Fert_Office:
 
 ``` math
-P_2O_5 = A_{asp} + B_{1,arric} + A_2 - B_{2,rid}
+P_2O_5 = A_{rem} + B_{1,enr} + A_2 - B_{2,red}
 ```
 
-with the *strategia* depending on the soil Olsen class:
+with the strategy depending on the soil Olsen class (the `strategy`
+field holds the DPI labels `"Arricchimento"`, `"Mantenimento"` and
+`"Riduzione"`, that is enrichment, maintenance and reduction):
 
-- **Molto bassa / bassa**: `Arricchimento` — add $`B_1 = (22.9 -
+- **Very low / low**: enrichment — add $`B_1 = (22.9 -
   P_2O_5^{ppm}) \times w_{30cm}/1000 \times f_{imm}`$ where
   $`f_{imm}=1.6`$.
-- **Media / elevata**: `Mantenimento` — apply A = asportazione.
-- **Molto elevata**: `Riduzione` — A = 0.
+- **Medium / high**: maintenance — apply A = crop removal.
+- **Very high**: reduction — A = 0.
 
 ### Olsen classification
 
@@ -445,14 +437,14 @@ p_bal
 #> 1       112.896
 ```
 
-In the benchmark scenario (Olsen P = 15 ppm P2O5) the class is “bassa” →
-Arricchimento, so:
+In the benchmark scenario (Olsen P = 15 ppm P2O5) the class is “low” →
+enrichment, so:
 
-- $`A = 63.6`$ kg P2O5/ha (asportazione)
+- $`A = 63.6`$ kg P2O5/ha (crop removal)
 - $`B_1 = (22.9 - 15) \times 3900/1000 \times 1.6 = 49.3`$ kg P2O5/ha
 - Total **≈ 112.9 kg P2O5/ha**
 
-This matches cell `Bilancio!I33` of Fert_Office.
+This matches the P2O5 dose reported by Fert_Office.
 
 ## Potassium balance
 
@@ -460,17 +452,17 @@ The potassium balance extends the formula with a leaching term **H**
 that depends on clay content:
 
 ``` math
-K_2O = A_{asp} + H + B_{1,arric} + A_2 - B_{2,rid}
+K_2O = A_{rem} + H + B_{1,enr} + A_2 - B_{2,red}
 ```
 
-Classes for K are defined per DPI texture group (`Sabbiosi`,
-`Medio impasto`, `Argillosi e limosi`).
+Classes for K are defined per DPI texture group (sandy, loamy and clay
+textures).
 
 ### K classification and leaching
 
 ``` r
 
-k_cls <- classify_K(value = K, unit = "K2O", soil_group = "Medio impasto")
+k_cls <- classify_K(value = K, unit = "K2O", soil_group = "Loamy textures")
 k_cls
 #> $value_ppm_K
 #> [1] 124.9995
@@ -542,11 +534,11 @@ barplot(
 
 ![](agrinutri-PK-and-distribution_files/figure-html/fig-npk-1.png)
 
-Scenario: K = 150 ppm K2O is “media” in Medio impasto → Mantenimento. -
+Scenario: K = 150 ppm K2O is “medium” on loamy textures → maintenance. -
 $`A = 119.4`$ kg K2O/ha - $`H = 20`$ (clay 18.5% → step “15.1-25.1 →
 20”) - Total **= 139.4 kg K2O/ha**
 
-This matches cell `Gri_K!F30` of Fert_Office (A + H).
+This matches the K2O dose reported by Fert_Office (A + H).
 
 ## P and K at scale: regional soil maps
 
@@ -605,13 +597,13 @@ terra::lines(fv)
 Where P is high the P₂O₅ dose stays at crop removal (maintenance); where
 K is low the K₂O dose adds an enrichment quota.
 
-## Scheda a dose Standard
+## Standard-dose scheme
 
 For contexts with limited soil analyses, DPI 2026 provides a
-standard-dose method. agrinutri mirrors the flag catalogue of
-`Fert_Office` `Scheda_N` and `Scheda_PK`.
+standard-dose method. agrinutri mirrors the decrement and increment
+catalogue of the Fert_Office standard-dose sheets for N and for P and K.
 
-### Scheda N
+### Standard dose for N
 
 The N standard dose is modified by five decrements and five increments,
 then capped by MAS.
@@ -742,9 +734,9 @@ scheda_N(
 #> [1] "DPI Emilia-Romagna 2026, Fert_Office v1.26 (Scheda_N)"
 ```
 
-### Scheda PK
+### Standard dose for P and K
 
-For P and K the base dose depends on the initial soil dotation class:
+For P and K the base dose depends on the initial soil P and K class:
 
 ``` r
 
@@ -795,12 +787,12 @@ scheda_PK(
 #> $reference
 #> [1] "DPI Emilia-Romagna 2026, Fert_Office v1.26 (Scheda_PK)"
 
-# Example: enrichment under low P dotation
+# Example: enrichment under low soil P
 scheda_PK(
   crop = crop,
   soil_P_class = "low",
   soil_K_class = "normal",
-  P_increments = c(ristoppio = 20)
+  P_increments = c(continuous_crop = 20)
 )
 #> $crop
 #> [1] "Grano duro (pianta intera)"
@@ -857,21 +849,22 @@ accepts:
   id, optional efficiency level).
 - A list of mineral applications (name from `mineral_fertilizers.table`,
   quantity in q/ha, modality-epoch).
-- Optional target doses (for Eccesso/Deficit alerts) and a ZVN flag.
+- Optional target doses (for excess/deficit alerts, returned as
+  `"Eccesso"` and `"Deficit"`) and a ZVN flag.
 
 ``` r
 
 plan <- plan_distribution(
-  soil_group = "Medio impasto",
+  soil_group = "Loamy textures",
   n_balance  = n_dose,
   p_balance  = p_bal$P2O5_required,
   k_balance  = k_bal$K2O_required,
   organic_rows = list(
-    list(fertilizer    = "letame bovino",
+    list(fertilizer    = "Cattle manure",
          quantity_t_ha = 20,
          year          = 2025,
          modality_epoch = 1,
-         level         = "media")
+         level         = "media")   # medium efficiency level
   ),
   mineral_rows = list(
     list(fertilizer       = "UREA AGRICOLA PRIL.46%",
@@ -884,7 +877,7 @@ plan <- plan_distribution(
 # Row-by-row plan
 plan$rows
 #>    source             fertilizer year modality_epoch ID_Mo quantity_t_ha N_kg
-#> 1 organic          letame bovino 2025              1     1          20.0  100
+#> 1 organic          Cattle manure 2025              1     1          20.0  100
 #> 2 mineral UREA AGRICOLA PRIL.46%   NA             11    11           0.3  138
 #>   P2O5_kg K2O_kg efficiency_pct N_useful P2O5_useful K2O_useful zootec
 #> 1      48    140             40       40          48        140   TRUE
@@ -994,13 +987,13 @@ head(mineral_fertilizers.table, 10)
 ### DPI 2026 organic N efficiency
 
 The N efficiency of organic fertilisers depends on the soil group (3
-classes), the dose level (bassa / media / alta), the sector (avi, bov,
+classes), the dose level (low / medium / high), the sector (avi, bov,
 sui, dig_tq, dig_sui, dig_avi, dig_chi, fanghi) and the modality level.
 The full matrix has 220 entries:
 
 ``` r
 
-# Medium impasto, dose media (125-249 kg N/ha), bovino:
+# Loamy textures, medium dose (125-249 kg N/ha), cattle:
 efficiency.table[
   efficiency.table$ID_Rag == 2 &
     efficiency.table$ID_Liv == 2 &
@@ -1012,7 +1005,7 @@ efficiency.table[
 #> 125      2      2       bov        3          36.55
 ```
 
-## End-of-cycle soil dotation
+## End-of-cycle soil P and K
 
 After the plan is executed, agrinutri estimates the residual soil P and
 K in ppm, usable as input for the following year’s calculation:
@@ -1023,7 +1016,7 @@ P_end <- estimate_soil_P_end_of_cycle(
   P2O5_start_ppm = olsen_P,
   P2O5_applied   = plan$totals["P2O5_useful"],
   P2O5_removed   = p_bal$A_fabbisogno,
-  soil_group     = "Medio impasto"
+  soil_group     = "Loamy textures"
 )
 P_end
 #> P2O5_useful 
@@ -1034,7 +1027,7 @@ K_end <- estimate_soil_K_end_of_cycle(
   K2O_applied   = plan$totals["K2O_useful"],
   K2O_removed   = k_bal$A_fabbisogno,
   clay_pct      = clay,
-  soil_group    = "Medio impasto"
+  soil_group    = "Loamy textures"
 )
 K_end
 #> K2O_useful 
@@ -1043,12 +1036,12 @@ K_end
 
 ## Alternative scenario: maize (forage, irrigated)
 
-A second scenario with different crop, cycle, irrigation and
-precessione.
+A second scenario with different crop, cycle, irrigation and previous
+crop.
 
 ``` r
 
-mais_bal <- N_balance(
+maize_bal <- N_balance(
   expected_yield_tons_ha = 15,
   crop = "Silage maize (class 700)",
   ccp  = "Spring-summer crop 100-130 days",
@@ -1063,22 +1056,22 @@ mais_bal <- N_balance(
   forg_quantity = 80,
   soil_seeding = "traditional"
 )
-mais_bal
+maize_bal
 #>      A       B   b1      b2   C1 C2       D E F   Forg     G G_deposition
 #> 1 58.5 56.9816 31.2 25.7816 31.2  5 24.2454 0 0 159.12 10.05        10.05
 #>   G_fixation no_till_reduction C_tempo N_pct N_limit surplus_pluviometrico
 #> 1          0                 0    0.67     1     340                  TRUE
-calculate_N_fertilization(mais_bal)
+calculate_N_fertilization(maize_bal)
 #> [1] 0
 ```
 
-## Alternative scenario: apple orchard in piena produzione
+## Alternative scenario: apple orchard in full production
 
 ``` r
 
 apple_n <- N_balance(
   expected_yield_tons_ha = 40,
-  crop = "Melo frutti, legno e foglie",
+  crop = "Apple - fruit, wood and leaves",
   ccp  = "In production",
   sand = 40, clay = 30,
   Ntot = 1.8, SOM = 2.5, CN = 9,
@@ -1098,7 +1091,7 @@ calculate_N_fertilization(apple_n)
 #> [1] 81.90625
 
 apple_p <- P_balance(expected_yield_tons_ha = 40,
-                     crop = "Melo frutti, legno e foglie",
+                     crop = "Apple - fruit, wood and leaves",
                      olsen_value = 25, olsen_unit = "P2O5",
                      clay = 30, sand = 40)
 apple_p
@@ -1106,7 +1099,7 @@ apple_p
 #> 1 32           32  0  0  0 Mantenimento        3             3900            32
 
 apple_k <- K_balance(expected_yield_tons_ha = 40,
-                     crop = "Melo frutti, legno e foglie",
+                     crop = "Apple - fruit, wood and leaves",
                      k_value = 180, k_unit = "K2O",
                      clay = 30, sand = 40)
 apple_k
@@ -1144,7 +1137,7 @@ The wrapper
 glues balance and NDVI in one call, preserves the field-average dose by
 rescaling and (optionally) caps each pixel at the MAS limit.
 
-### Example: variable-rate N for grano duro
+### Example: variable-rate N for durum wheat
 
 ``` r
 
@@ -1177,7 +1170,7 @@ vr_cal <- variable_rate_N(
   n_dose      = n_dose,
   method      = "calibration",
   envelope    = 0.25,
-  mas_cap     = 190     # MAS for grano duro (RR 2/2024)
+  mas_cap     = 190     # MAS for durum wheat (Regional Regulation 2/2024)
 )
 
 vr_cal$mean_kg_ha       # ~ n_dose
@@ -1242,7 +1235,7 @@ par(oldpar)
 ### Linking to the distribution plan
 
 The variable-rate raster can be coupled to a single fertiliser
-application (typically the **copertura**) inside
+application (typically the **top-dressing**) inside
 [`plan_distribution()`](https://mcroci.github.io/agrinutri/reference/plan_distribution.md):
 read the mean rate from the raster and pass it as the mineral row.
 
@@ -1253,13 +1246,13 @@ mean_rate <- vr_cal$mean_kg_ha
 q_urea_per_ha <- mean_rate / 46
 
 plan_vr <- plan_distribution(
-  soil_group = "Medio impasto",
+  soil_group = "Loamy textures",
   n_balance  = n_dose, p_balance = 0, k_balance = 0,
   organic_rows = list(),
   mineral_rows = list(
     list(fertilizer       = "UREA AGRICOLA PRIL.46%",
          quantity_q_ha = q_urea_per_ha,
-         modality_epoch = 11)            # In copertura - pieno accestimento
+         modality_epoch = 11)            # top-dressing at full tillering
   )
 )
 plan_vr$rows
@@ -1312,7 +1305,7 @@ head(uptake_table[, c("crop_id", "crop", "N", "P2O5", "K2O",
 #> 4 0.5000000              18
 #> 5 0.7411538              NA
 
-# MAS (massimali) 2026
+# MAS 2026
 head(mas.table[, c("crop_id", "crop", "MAS_N", "standard_N",
                            "max_N_dose")], 5)
 #>   crop_id                                              crop MAS_N standard_N
@@ -1328,7 +1321,7 @@ head(mas.table[, c("crop_id", "crop", "MAS_N", "standard_N",
 #> 4        150
 #> 5         NA
 
-# Gri_P and Gri_K classes
+# P and K availability classes
 p_availability.table
 #>   ID_Gri_P min_P_ppm max_P_ppm min_P2O5_ppm max_P2O5_ppm    rating
 #> 1        1         0         5         0.00        11.45  very low
@@ -1409,9 +1402,9 @@ texture_groups.table
   /
   [`estimate_N_rate_from_holland_schepers()`](https://mcroci.github.io/agrinutri/reference/estimate_N_rate_from_holland_schepers.md)
   directly.
-- For crops with multiple phases (e.g. grano duro with fase nd), the MAS
-  lookup uses the first matching row; pass `phase = ...` explicitly when
-  ambiguity matters.
+- For crops with multiple phases (e.g. durum wheat), the MAS lookup uses
+  the first matching row; pass `phase = ...` explicitly when ambiguity
+  matters.
 
 ## Agreement with Fert_Office and differences with the DPI text
 
@@ -1419,21 +1412,21 @@ agrinutri reproduces Fert_Office v1.26 term by term. The test suite
 (`tests/testthat/test-fertoffice-validation.R`) compares every balance
 term and the reported N, P2O5 and K2O doses with the values computed by
 the spreadsheet itself on 400 random field scenarios (13 crops, all
-texture groups, drainage classes, precessions, previous organic
+texture groups, drainage classes, previous crops, previous organic
 fertilisation and no-till); all agree to within 1e-6 kg/ha.
 
-In a few places the printed tables of the DPI Norme Generali (Allegato
-2, 2024/25 edition) and Fert_Office give different numbers. agrinutri
+In a few places the printed tables of the DPI General Rules (Annex 2,
+2024/25 edition) and Fert_Office give different numbers. agrinutri
 follows Fert_Office, which is the tool used to check DPI plans:
 
-| Item | Norme Generali text | Fert_Office v1.26 (used by agrinutri) |
+| Item | General Rules text | Fert_Office v1.26 (used by agrinutri) |
 |----|----|----|
 | Mineralised N, sandy soil, C/N 9-12 and \> 12 | 36 and 24 x SOM | 35 and 28 x SOM (the decomposition rates of the table footnote) |
 | Mineralised N, loamy soil, C/N \> 12 | 20 x SOM | 22.1 x SOM |
-| N pronto per g/kg total N (sandy / loamy / clay) | 28.4 / 26 / 24.3 | 28 / 26 / 24, total N capped at 2.1 g/kg |
+| Readily available N per g/kg total N (sandy / loamy / clay) | 28.4 / 26 / 24.3 | 28 / 26 / 24, total N capped at 2.1 g/kg |
 | D correction factor, impeded drainage (sandy / loamy / clay) | 0.30 / 0.35 / 0.40 | 0.35 / 0.40 / 0.45 |
-| Residual N of a soybean precession | 0 | 10 kg/ha |
-| End-of-winter loss (Cb) | 1 kg N per 10 mm once winter + February rain exceeds 250 mm | the same, plus the loss of the N pronto not yet leached |
+| Residual N of soybean as previous crop | 0 | 10 kg/ha |
+| End-of-winter loss (Cb) | 1 kg N per 10 mm once winter + February rain exceeds 250 mm | the same, plus the loss of the readily available N not yet leached |
 
 Where the text and the tool agree, agrinutri follows both: organic
 matter above 3 % adds no mineralised N, perennial crops in production

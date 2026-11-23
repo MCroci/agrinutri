@@ -1,7 +1,8 @@
-# K/CSC ratio assessment (Fert_Office foglio Gri_K) \<0.1% basso; 0.1-2.1 ottimale; 2.1-5.1 alto; ... (percentage of CSC)
+# K/CEC ratio assessment (Fert_Office K sheet) \<0.1% low; 0.1-2.1 optimal; 2.1-5.1 high (percentage of CEC), returned as the Italian labels `"basso"`, `"ottimale"`, `"alto"`.
 
-K/CSC ratio assessment (Fert_Office foglio Gri_K) \<0.1% basso; 0.1-2.1
-ottimale; 2.1-5.1 alto; ... (percentage of CSC)
+K/CEC ratio assessment (Fert_Office K sheet) \<0.1% low; 0.1-2.1
+optimal; 2.1-5.1 high (percentage of CEC), returned as the Italian
+labels `"basso"`, `"ottimale"`, `"alto"`.
 
 ## Usage
 
@@ -17,7 +18,7 @@ ratio_K_CEC(k_meq_per_100g, csc_meq)
 
 - csc_meq:
 
-  CSC in meq/100g.
+  CEC in meq/100g.
 
 ## Value
 

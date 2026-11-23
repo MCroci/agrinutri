@@ -77,30 +77,30 @@
 
 
 <dt id="arg-include-leaching">include_leaching<a class="anchor" aria-label="anchor" href="#arg-include-leaching"></a></dt>
-<dd><p>Logical, add K leaching to mantenimento term. Default TRUE.</p></dd>
+<dd><p>Logical, add K leaching to the maintenance term. Default TRUE.</p></dd>
 
 
 <dt id="arg-k-availability-table-texture-groups-table">k_availability.table, texture_groups.table<a class="anchor" aria-label="anchor" href="#arg-k-availability-table-texture-groups-table"></a></dt>
 <dd><p>Lookup tables.</p>
-<p>As in Fert_Office v1.26 (foglio <code>Gri_K</code>), with K2O the analytical value and
-W the soil weight of the 30 cm layer (t/ha):</p><ul><li><p>Arricchimento (low / very low): B1 = (lower bound of the "media"
+<p>As in Fert_Office v1.26 (K sheet), with K2O the analytical value and
+W the soil weight of the 30 cm layer (t/ha):</p><ul><li><p>enrichment (low / very low): B1 = (lower bound of the medium
 class - K2O) x W / 1000 x (1 + 0.018 x clay);</p></li>
-<li><p>Mantenimento: A + H;</p></li>
-<li><p>Riduzione (high): B2 = (K2O - upper bound of the "media" class) x
+<li><p>maintenance: A + H;</p></li>
+<li><p>reduction (high): B2 = (K2O - upper bound of the medium class) x
 W / 1000, subtracted from A + H.</p></li>
 </ul></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with <code>strategy</code>, <code>ID_Gri_K</code>, <code>B1</code>, <code>A_mantenimento</code> (asportazione + H),
+    <p>A list with <code>strategy</code>, <code>ID_Gri_K</code>, <code>B1</code>, <code>A_mantenimento</code> (crop removal + H),
 <code>B2</code>, <code>H</code> (leaching).</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">soil_K_availability</span><span class="op">(</span>k_value <span class="op">=</span> <span class="fl">150</span>, unit <span class="op">=</span> <span class="st">"K2O"</span>,</span></span>
-<span class="r-in"><span>                    soil_group <span class="op">=</span> <span class="st">"Medio impasto"</span>,</span></span>
+<span class="r-in"><span>                    soil_group <span class="op">=</span> <span class="st">"Loamy textures"</span>,</span></span>
 <span class="r-in"><span>                    A_demand_K2O <span class="op">=</span> <span class="fl">119.4</span>, clay_pct <span class="op">=</span> <span class="fl">18.5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $strategy</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Mantenimento"</span>

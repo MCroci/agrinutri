@@ -154,7 +154,7 @@ rescaling within ), so the agronomic constraint (MAS, ZVN) is kept.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 1) Compute agronomic dose with the balance</span></span></span>
 <span class="r-in"><span><span class="va">bal</span> <span class="op">&lt;-</span> <span class="fu"><a href="N_balance.html">N_balance</a></span><span class="op">(</span>expected_yield_tons_ha <span class="op">=</span> <span class="fl">6</span>,</span></span>
-<span class="r-in"><span>                 crop <span class="op">=</span> <span class="st">"Grano duro (pianta intera)"</span>,</span></span>
+<span class="r-in"><span>                 crop <span class="op">=</span> <span class="st">"Durum wheat (whole plant)"</span>,</span></span>
 <span class="r-in"><span>                 ccp  <span class="op">=</span> <span class="st">"Spring-summer crop 100-130 days"</span>,</span></span>
 <span class="r-in"><span>                 sand <span class="op">=</span> <span class="fl">15.5</span>, clay <span class="op">=</span> <span class="fl">18.5</span>,</span></span>
 <span class="r-in"><span>                 Ntot <span class="op">=</span> <span class="fl">1.5</span>, SOM <span class="op">=</span> <span class="fl">2</span>, CN <span class="op">=</span> <span class="fl">7.73</span>,</span></span>
@@ -168,7 +168,7 @@ rescaling within ), so the agronomic constraint (MAS, ZVN) is kept.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 2) Spatialise via NDVI calibration</span></span></span>
 <span class="r-in"><span><span class="va">vr</span> <span class="op">&lt;-</span> <span class="fu">variable_rate_N</span><span class="op">(</span><span class="va">ndvi</span>, n_dose <span class="op">=</span> <span class="va">n_dose</span>, method <span class="op">=</span> <span class="st">"calibration"</span>,</span></span>
-<span class="r-in"><span>                      mas_cap <span class="op">=</span> <span class="fu"><a href="get_MAS.html">get_MAS</a></span><span class="op">(</span><span class="st">"Grano duro (pianta intera)"</span><span class="op">)</span><span class="op">$</span><span class="va">mas_N</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                      mas_cap <span class="op">=</span> <span class="fu"><a href="get_MAS.html">get_MAS</a></span><span class="op">(</span><span class="st">"Durum wheat (whole plant)"</span><span class="op">)</span><span class="op">$</span><span class="va">mas_N</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">rate_raster</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">vr</span><span class="op">$</span><span class="va">mean_kg_ha</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>

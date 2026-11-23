@@ -41,8 +41,7 @@ nni_from_vi_empirical(
 - crop:
 
   Character. One of `"wheat"`, `"maize"`, `"rice"`, `"barley"`.
-  Case-insensitive; Italian aliases ("frumento", "mais", "orzo") are
-  accepted.
+  Case-insensitive.
 
 - slope, intercept:
 

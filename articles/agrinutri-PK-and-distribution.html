@@ -77,23 +77,22 @@ Manuele Ragazzi, Giorgio Impollonia, Stefano Amaducci</h4>
 </h2>
 <p>This vignette shows how to use <strong>agrinutri 0.6.0</strong> to
 compute a full nitrogen, phosphorus and potassium fertilisation plan
-following the <em>Disciplinari di Produzione Integrata</em> (DPI)
-Emilia-Romagna 2026. The package reproduces the logic of the official
-regional tool <strong>Fert_Office v1.26</strong> (Febbraio 2026, Regione
-Emilia-Romagna) and makes it scriptable in R.</p>
+following the Emilia-Romagna Integrated Production Guidelines (DPI)
+2026. The package reproduces the logic of the official regional tool
+<strong>Fert_Office v1.26</strong> (February 2026, Emilia-Romagna
+Region) and makes it scriptable in R.</p>
 <p>The package implements <strong>two complementary
 methods</strong>:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Metodo del bilancio (Allegato 2)</strong>: full nutrient
-mass balance with crop demand, soil supply, losses, previous-crop
-effects and organic contributions. Recommended when detailed soil and
-climate data are available.</li>
+<strong>Balance method (Annex 2)</strong>: full nutrient mass
+balance with crop demand, soil supply, losses, previous-crop effects and
+organic contributions. Recommended when detailed soil and climate data
+are available.</li>
 <li>
-<strong>Scheda a dose Standard</strong>: simplified per-crop dose
-with user-selectable decrement and increment factors, capped by MAS
-(Massimali Ammessi di Simulazione). Recommended when soil analyses are
-limited.</li>
+<strong>Standard-dose scheme</strong>: simplified per-crop dose with
+user-selectable decrement and increment factors, capped by the maximum
+allowed dose (MAS). Recommended when soil analyses are limited.</li>
 </ol>
 <p>The package also provides a <strong>fertilisation distribution
 plan</strong> and <strong>end-of-cycle soil P and K estimation</strong>
@@ -103,64 +102,50 @@ to close the agronomic loop between planning and recording.</p>
 </h3>
 <ul>
 <li>
-<strong>DPI Emilia-Romagna 2026</strong> — Norme Generali, Allegato
-2 (metodo del bilancio), Allegato 9 (massimali), <em>Guida alla
-Fertilizzazione Minerale e Organica</em> (N, P, K).</li>
+<strong>DPI Emilia-Romagna 2026</strong> — General Rules, Annex 2
+(balance method), Annex 9 (maximum allowed doses), and the guide to
+mineral and organic fertilisation (N, P, K).</li>
 <li>
-<strong>Reg. reg. 2/2024</strong> — limiti MAS.</li>
+<strong>Regional Regulation 2/2024</strong> — MAS limits.</li>
 <li>
-<strong>Reg. reg. 3/2017</strong> — utilizzazione agronomica degli
-effluenti e del digestato.</li>
+<strong>Regional Regulation 3/2017</strong> — agronomic use of
+livestock effluents and digestate.</li>
 <li>
-<strong>Direttiva Nitrati 91/676/CEE</strong> — in ZVN limite di 170
-kg N/ha/anno da effluenti zootecnici.</li>
+<strong>Nitrates Directive 91/676/EEC</strong> — in nitrate
+vulnerable zones (ZVN), a limit of 170 kg N/ha/year from livestock
+effluents.</li>
 <li>
-<strong>Reg. UE 2021/2115</strong> — soglie minime di
-efficienza.</li>
+<strong>Regulation (EU) 2021/2115</strong> — minimum efficiency
+thresholds.</li>
 </ul>
 </div>
 </div>
 <div class="section level2">
 <h2 id="naming-conventions">Naming conventions<a class="anchor" aria-label="anchor" href="#naming-conventions"></a>
 </h2>
-<p>agrinutri mixes English and Italian terminology by design:</p>
 <ul>
 <li>
-<strong>Function names</strong>: English snake_case
+<strong>Function names</strong>: snake_case
 (e.g. <code>N_balance</code>, <code>P_balance</code>,
-<code>plan_distribution</code>, <code>classify_pH</code>). Three
-exceptions retain the Italian DPI canonical name: <code>scheda_N</code>,
-<code>scheda_PK</code>, <code>get_MAS</code> /
-<code>check_MAS</code>.</li>
+<code>plan_distribution</code>, <code>classify_pH</code>). The
+standard-dose functions are <code><a href="../reference/dose_standard_N.html">scheda_N()</a></code> and
+<code><a href="../reference/dose_standard_PK.html">scheda_PK()</a></code> (aliases <code><a href="../reference/dose_standard_N.html">dose_standard_N()</a></code> and
+<code><a href="../reference/dose_standard_PK.html">dose_standard_PK()</a></code>); the MAS functions are
+<code><a href="../reference/get_MAS.html">get_MAS()</a></code> and <code><a href="../reference/check_MAS.html">check_MAS()</a></code>.</li>
 <li>
-<strong>Parameters</strong>: English snake_case throughout.</li>
+<strong>Parameters</strong>: snake_case throughout.</li>
 <li>
-<strong>Class strings</strong> (e.g. “molto bassa”, “media”,
-“Sabbiosi”) are kept in Italian because they are DPI canonical
-labels.</li>
+<strong>Availability ratings</strong> are returned as “very low”,
+“low”, “medium”, “high” and “very high”.</li>
 <li>
-<strong>Soil-group labels</strong> are accepted in any of three
-conventions: Italian plural (“Sabbiosi”, “Medio impasto”, “Argillosi e
-limosi”), Italian singular (“Sabbioso”, “Franco”, “Argilloso”) or
-English (“Sandy textures”, “Loamy textures”, “Clay textures”). The
-<code><a href="../reference/normalise_soil_group.html">normalise_soil_group()</a></code> helper canonicalises any of
-them.</li>
+<strong>Soil-group labels</strong>: “Sandy textures”, “Loamy
+textures” and “Clay textures”. The <code><a href="../reference/normalise_soil_group.html">normalise_soil_group()</a></code>
+helper returns the canonical label and the numeric texture-group
+id.</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mcroci/agrinutri" class="external-link">agrinutri</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/normalise_soil_group.html">normalise_soil_group</a></span><span class="op">(</span><span class="st">"Loamy textures"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $id_rag</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $it_plural</span></span>
-<span><span class="co">#&gt; [1] "Medio impasto"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $it_singular</span></span>
-<span><span class="co">#&gt; [1] "Franco"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $en</span></span>
-<span><span class="co">#&gt; [1] "Loamy textures"</span></span>
-<span><span class="fu"><a href="../reference/normalise_soil_group.html">normalise_soil_group</a></span><span class="op">(</span><span class="st">"Franco"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $id_rag</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -183,7 +168,7 @@ them.</li>
 <span><span class="va">crop</span>  <span class="op">&lt;-</span> <span class="st">"Durum wheat (whole plant)"</span></span>
 <span><span class="va">yield</span> <span class="op">&lt;-</span> <span class="fl">6</span>   <span class="co"># t/ha</span></span>
 <span></span>
-<span><span class="co"># Soil (sample: Sabbia 15.5%, Argilla 18.5% -&gt; FL, Medio impasto)</span></span>
+<span><span class="co"># Soil (sample: sand 15.5%, clay 18.5% -&gt; FL, loamy textures)</span></span>
 <span><span class="va">clay</span>   <span class="op">&lt;-</span> <span class="fl">18.5</span></span>
 <span><span class="va">sand</span>   <span class="op">&lt;-</span> <span class="fl">15.5</span></span>
 <span><span class="va">Ntot</span>   <span class="op">&lt;-</span> <span class="fl">1.5</span>     <span class="co"># g/kg</span></span>
@@ -201,21 +186,20 @@ them.</li>
 <span></span>
 <span><span class="co"># Management</span></span>
 <span><span class="va">prev_crop</span>         <span class="op">&lt;-</span> <span class="st">"Maize stalks removed"</span></span>
-<span><span class="va">location</span>          <span class="op">&lt;-</span> <span class="st">"Isolated plain"</span>   <span class="co"># "Pianura isolata" in Fert_Office</span></span>
-<span><span class="va">oxygen</span>            <span class="op">&lt;-</span> <span class="st">"Slow"</span>             <span class="co"># "Imperfetta" in Fert_Office</span></span>
+<span><span class="va">location</span>          <span class="op">&lt;-</span> <span class="st">"Isolated plain"</span></span>
+<span><span class="va">oxygen</span>            <span class="op">&lt;-</span> <span class="st">"Slow"</span></span>
 <span><span class="va">soil_seeding</span>      <span class="op">&lt;-</span> <span class="st">"traditional"</span></span>
 <span><span class="va">greenhouse</span>        <span class="op">&lt;-</span> <span class="cn">FALSE</span></span></code></pre></div>
-<p>The scenario above reproduces the sample cell of
-<code>Fert_Office v1.26 ! Inserimento</code> and is used as the
-end-to-end benchmark of the package.</p>
+<p>The scenario above reproduces the sample field of Fert_Office v1.26
+and is used as the end-to-end benchmark of the package.</p>
 </div>
 <div class="section level2">
 <h2 id="soil-characterisation">Soil characterisation<a class="anchor" aria-label="anchor" href="#soil-characterisation"></a>
 </h2>
 <p>agrinutri classifies the soil along the DPI 2026 dimensions. The
-3-class texture grouping (Sabbiosi / Medio impasto / Argillosi e limosi)
-drives every subsequent coefficient choice (B, C, D, efficiency, soil
-weight, etc.).</p>
+3-class texture grouping (sandy / loamy / clay textures) drives every
+subsequent coefficient choice (B, C, D, efficiency, soil weight,
+etc.).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># USDA class + DPI 3-group</span></span>
 <span><span class="va">soil_props</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calc_soil_group_and_id_rag.html">calc_soil_group_and_id_rag</a></span><span class="op">(</span>clay <span class="op">=</span> <span class="va">clay</span>, sand <span class="op">=</span> <span class="va">sand</span><span class="op">)</span></span>
@@ -229,7 +213,7 @@ weight, etc.).</p>
 <span><span class="co">#&gt; $TRI3</span></span>
 <span><span class="co">#&gt; [1] "FL"</span></span>
 <span></span>
-<span><span class="co"># pH, calcare, SO, CSC</span></span>
+<span><span class="co"># pH, carbonates, soil organic matter, CEC</span></span>
 <span><span class="fu"><a href="../reference/classify_pH.html">classify_pH</a></span><span class="op">(</span><span class="va">pH</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $ID_pH</span></span>
 <span><span class="co">#&gt; [1] 6</span></span>
@@ -257,7 +241,7 @@ weight, etc.).</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $caco3_att</span></span>
 <span><span class="co">#&gt; [1] 6.8</span></span>
-<span><span class="va">som_cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_SOM.html">classify_SOM</a></span><span class="op">(</span>SOM <span class="op">=</span> <span class="va">SOM</span>, soil_group <span class="op">=</span> <span class="st">"Medio impasto"</span><span class="op">)</span></span>
+<span><span class="va">som_cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_SOM.html">classify_SOM</a></span><span class="op">(</span>SOM <span class="op">=</span> <span class="va">SOM</span>, soil_group <span class="op">=</span> <span class="st">"Loamy textures"</span><span class="op">)</span></span>
 <span><span class="va">som_cls</span></span>
 <span><span class="co">#&gt; $rating</span></span>
 <span><span class="co">#&gt; [1] "medium"</span></span>
@@ -274,12 +258,12 @@ weight, etc.).</p>
 <span><span class="co">#&gt; $soil_group</span></span>
 <span><span class="co">#&gt; [1] "Loamy textures"</span></span>
 <span></span>
-<span><span class="co"># Maximum annual SO input (for ammendanti)</span></span>
+<span><span class="co"># Maximum annual organic matter input (for soil amendments)</span></span>
 <span><span class="fu"><a href="../reference/max_SO_input.html">max_SO_input</a></span><span class="op">(</span><span class="va">som_cls</span><span class="op">$</span><span class="va">class</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 11</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="nitrogen-balance-allegato-2">Nitrogen balance (Allegato 2)<a class="anchor" aria-label="anchor" href="#nitrogen-balance-allegato-2"></a>
+<h2 id="nitrogen-balance-annex-2">Nitrogen balance (Annex 2)<a class="anchor" aria-label="anchor" href="#nitrogen-balance-annex-2"></a>
 </h2>
 <p>The DPI 2026 formula is:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>f</mi><mi>e</mi><mi>r</mi><mi>t</mi></mrow></msub><mo>=</mo><mi>A</mi><mo>−</mo><mi>B</mi><mo>+</mo><msub><mi>C</mi><mn>1</mn></msub><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><mo>+</mo><mi>D</mi><mo>−</mo><mi>E</mi><mo>−</mo><mi>F</mi><mo>−</mo><msub><mi>F</mi><mrow><mi>o</mi><mi>r</mi><mi>g</mi></mrow></msub><mo>−</mo><mi>G</mi></mrow><annotation encoding="application/x-tex">
@@ -306,7 +290,8 @@ N_{fert} = A - B + C_1 + C_2 + D - E - F - F_{org} - G
 <tr class="even">
 <td>B = b1 + b2</td>
 <td><code><a href="../reference/soil_fertility.html">soil_fertility()</a></code></td>
-<td>b1 = N pronto from N total, b2 = N mineralised from SOM</td>
+<td>b1 = readily available N from total N, b2 = N mineralised from
+SOM</td>
 </tr>
 <tr class="odd">
 <td>C1, C2</td>
@@ -360,7 +345,7 @@ N_{fert} = A - B + C_1 + C_2 + D - E - F - F_{org} - G
 <span>  forg_quantity <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  soil_seeding <span class="op">=</span> <span class="va">soil_seeding</span>,</span>
 <span>  greenhouse <span class="op">=</span> <span class="va">greenhouse</span>,</span>
-<span>  E_to_D <span class="op">=</span> <span class="cn">TRUE</span>        <span class="co"># fold negative E into D, as in foglio Bilancio</span></span>
+<span>  E_to_D <span class="op">=</span> <span class="cn">TRUE</span>        <span class="co"># fold negative E into D, as in Fert_Office</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n_bal</span></span>
@@ -390,12 +375,12 @@ N_{fert} = A - B + C_1 + C_2 + D - E - F - F_{org} - G
 <p><img src="agrinutri-PK-and-distribution_files/figure-html/fig-n-balance-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
-<p>The result matches the Fert_Office <code>Bilancio</code> sheet: A =
-186.6, B = 73.84, D = 39.536 (includes <code>|E|</code> = 10), G =
-10.05, and <strong>N required ≈ 142.25 kg/ha</strong>.</p>
+<p>The result matches the Fert_Office balance sheet: A = 186.6, B =
+73.84, D = 39.536 (includes <code>|E|</code> = 10), G = 10.05, and
+<strong>N required ≈ 142.25 kg/ha</strong>.</p>
 </div>
 <div class="section level3">
-<h3 id="mas-verification-massimali-ammessi-di-simulazione">MAS verification (Massimali Ammessi di Simulazione)<a class="anchor" aria-label="anchor" href="#mas-verification-massimali-ammessi-di-simulazione"></a>
+<h3 id="maximum-allowed-dose-mas-check">Maximum allowed dose (MAS) check<a class="anchor" aria-label="anchor" href="#maximum-allowed-dose-mas-check"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_MAS.html">get_MAS</a></span><span class="op">(</span>crop <span class="op">=</span> <span class="va">crop</span><span class="op">)</span></span>
@@ -502,25 +487,28 @@ teaching or advanced scenario analysis:</p>
 <div class="section level2">
 <h2 id="phosphorus-balance">Phosphorus balance<a class="anchor" aria-label="anchor" href="#phosphorus-balance"></a>
 </h2>
-<p>The phosphorus balance follows the DPI Allegato 2 logic coded in
-foglio <code>Gri_P</code>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mn>2</mn></msub><msub><mi>O</mi><mn>5</mn></msub><mo>=</mo><msub><mi>A</mi><mrow><mi>a</mi><mi>s</mi><mi>p</mi></mrow></msub><mo>+</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>,</mo><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>c</mi></mrow></msub><mo>+</mo><msub><mi>A</mi><mn>2</mn></msub><mo>−</mo><msub><mi>B</mi><mrow><mn>2</mn><mo>,</mo><mi>r</mi><mi>i</mi><mi>d</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
-P_2O_5 = A_{asp} + B_{1,arric} + A_2 - B_{2,rid}
+<p>The phosphorus balance follows the DPI Annex 2 logic as coded in
+Fert_Office:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mn>2</mn></msub><msub><mi>O</mi><mn>5</mn></msub><mo>=</mo><msub><mi>A</mi><mrow><mi>r</mi><mi>e</mi><mi>m</mi></mrow></msub><mo>+</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>,</mo><mi>e</mi><mi>n</mi><mi>r</mi></mrow></msub><mo>+</mo><msub><mi>A</mi><mn>2</mn></msub><mo>−</mo><msub><mi>B</mi><mrow><mn>2</mn><mo>,</mo><mi>r</mi><mi>e</mi><mi>d</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
+P_2O_5 = A_{rem} + B_{1,enr} + A_2 - B_{2,red}
 </annotation></semantics></math></p>
-<p>with the <em>strategia</em> depending on the soil Olsen class:</p>
+<p>with the strategy depending on the soil Olsen class (the
+<code>strategy</code> field holds the DPI labels
+<code>"Arricchimento"</code>, <code>"Mantenimento"</code> and
+<code>"Riduzione"</code>, that is enrichment, maintenance and
+reduction):</p>
 <ul>
 <li>
-<strong>Molto bassa / bassa</strong>: <code>Arricchimento</code> —
-add
+<strong>Very low / low</strong>: enrichment — add
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>22.9</mn><mo>−</mo><msub><mi>P</mi><mn>2</mn></msub><msubsup><mi>O</mi><mn>5</mn><mrow><mi>p</mi><mi>p</mi><mi>m</mi></mrow></msubsup><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msub><mi>w</mi><mrow><mn>30</mn><mi>c</mi><mi>m</mi></mrow></msub><mi>/</mi><mn>1000</mn><mo>×</mo><msub><mi>f</mi><mrow><mi>i</mi><mi>m</mi><mi>m</mi></mrow></msub></mrow><annotation encoding="application/x-tex">B_1 = (22.9 -
 P_2O_5^{ppm}) \times w_{30cm}/1000 \times f_{imm}</annotation></semantics></math>
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mrow><mi>i</mi><mi>m</mi><mi>m</mi></mrow></msub><mo>=</mo><mn>1.6</mn></mrow><annotation encoding="application/x-tex">f_{imm}=1.6</annotation></semantics></math>.</li>
 <li>
-<strong>Media / elevata</strong>: <code>Mantenimento</code> — apply
-A = asportazione.</li>
+<strong>Medium / high</strong>: maintenance — apply A = crop
+removal.</li>
 <li>
-<strong>Molto elevata</strong>: <code>Riduzione</code> — A = 0.</li>
+<strong>Very high</strong>: reduction — A = 0.</li>
 </ul>
 <div class="section level3">
 <h3 id="olsen-classification">Olsen classification<a class="anchor" aria-label="anchor" href="#olsen-classification"></a>
@@ -560,19 +548,19 @@ A = asportazione.</li>
 <span><span class="co">#&gt; 1 63.6         63.6 49.29605  0  0 Arricchimento        2             3900</span></span>
 <span><span class="co">#&gt;   P2O5_required</span></span>
 <span><span class="co">#&gt; 1       112.896</span></span></code></pre></div>
-<p>In the benchmark scenario (Olsen P = 15 ppm P2O5) the class is
-“bassa” → Arricchimento, so:</p>
+<p>In the benchmark scenario (Olsen P = 15 ppm P2O5) the class is “low”
+→ enrichment, so:</p>
 <ul>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mn>63.6</mn></mrow><annotation encoding="application/x-tex">A = 63.6</annotation></semantics></math>
-kg P2O5/ha (asportazione)</li>
+kg P2O5/ha (crop removal)</li>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>22.9</mn><mo>−</mo><mn>15</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mn>3900</mn><mi>/</mi><mn>1000</mn><mo>×</mo><mn>1.6</mn><mo>=</mo><mn>49.3</mn></mrow><annotation encoding="application/x-tex">B_1 = (22.9 - 15) \times 3900/1000 \times 1.6 = 49.3</annotation></semantics></math>
 kg P2O5/ha</li>
 <li>Total <strong>≈ 112.9 kg P2O5/ha</strong>
 </li>
 </ul>
-<p>This matches cell <code>Bilancio!I33</code> of Fert_Office.</p>
+<p>This matches the P2O5 dose reported by Fert_Office.</p>
 </div>
 </div>
 <div class="section level2">
@@ -580,17 +568,16 @@ kg P2O5/ha</li>
 </h2>
 <p>The potassium balance extends the formula with a leaching term
 <strong>H</strong> that depends on clay content:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mn>2</mn></msub><mi>O</mi><mo>=</mo><msub><mi>A</mi><mrow><mi>a</mi><mi>s</mi><mi>p</mi></mrow></msub><mo>+</mo><mi>H</mi><mo>+</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>,</mo><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>c</mi></mrow></msub><mo>+</mo><msub><mi>A</mi><mn>2</mn></msub><mo>−</mo><msub><mi>B</mi><mrow><mn>2</mn><mo>,</mo><mi>r</mi><mi>i</mi><mi>d</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
-K_2O = A_{asp} + H + B_{1,arric} + A_2 - B_{2,rid}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mn>2</mn></msub><mi>O</mi><mo>=</mo><msub><mi>A</mi><mrow><mi>r</mi><mi>e</mi><mi>m</mi></mrow></msub><mo>+</mo><mi>H</mi><mo>+</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>,</mo><mi>e</mi><mi>n</mi><mi>r</mi></mrow></msub><mo>+</mo><msub><mi>A</mi><mn>2</mn></msub><mo>−</mo><msub><mi>B</mi><mrow><mn>2</mn><mo>,</mo><mi>r</mi><mi>e</mi><mi>d</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
+K_2O = A_{rem} + H + B_{1,enr} + A_2 - B_{2,red}
 </annotation></semantics></math></p>
-<p>Classes for K are defined per DPI texture group
-(<code>Sabbiosi</code>, <code>Medio impasto</code>,
-<code>Argillosi e limosi</code>).</p>
+<p>Classes for K are defined per DPI texture group (sandy, loamy and
+clay textures).</p>
 <div class="section level3">
 <h3 id="k-classification-and-leaching">K classification and leaching<a class="anchor" aria-label="anchor" href="#k-classification-and-leaching"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">k_cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_K.html">classify_K</a></span><span class="op">(</span>value <span class="op">=</span> <span class="va">K</span>, unit <span class="op">=</span> <span class="st">"K2O"</span>, soil_group <span class="op">=</span> <span class="st">"Medio impasto"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">k_cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_K.html">classify_K</a></span><span class="op">(</span>value <span class="op">=</span> <span class="va">K</span>, unit <span class="op">=</span> <span class="st">"K2O"</span>, soil_group <span class="op">=</span> <span class="st">"Loamy textures"</span><span class="op">)</span></span>
 <span><span class="va">k_cls</span></span>
 <span><span class="co">#&gt; $value_ppm_K</span></span>
 <span><span class="co">#&gt; [1] 124.9995</span></span>
@@ -651,14 +638,14 @@ K_2O = A_{asp} + H + B_{1,arric} + A_2 - B_{2,rid}
 <span>  main <span class="op">=</span> <span class="st">"Recommended N, P2O5 and K2O inputs (benchmark scenario)"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="agrinutri-PK-and-distribution_files/figure-html/fig-npk-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
-<p>Scenario: K = 150 ppm K2O is “media” in Medio impasto → Mantenimento.
--
+<p>Scenario: K = 150 ppm K2O is “medium” on loamy textures →
+maintenance. -
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mn>119.4</mn></mrow><annotation encoding="application/x-tex">A = 119.4</annotation></semantics></math>
 kg K2O/ha -
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo>=</mo><mn>20</mn></mrow><annotation encoding="application/x-tex">H = 20</annotation></semantics></math>
 (clay 18.5% → step “15.1-25.1 → 20”) - Total <strong>= 139.4 kg
 K2O/ha</strong></p>
-<p>This matches cell <code>Gri_K!F30</code> of Fert_Office (A + H).</p>
+<p>This matches the K2O dose reported by Fert_Office (A + H).</p>
 </div>
 </div>
 <div class="section level2">
@@ -716,14 +703,14 @@ removal (maintenance); where K is low the K<sub>2</sub>O dose adds an
 enrichment quota.</p>
 </div>
 <div class="section level2">
-<h2 id="scheda-a-dose-standard">Scheda a dose Standard<a class="anchor" aria-label="anchor" href="#scheda-a-dose-standard"></a>
+<h2 id="standard-dose-scheme">Standard-dose scheme<a class="anchor" aria-label="anchor" href="#standard-dose-scheme"></a>
 </h2>
 <p>For contexts with limited soil analyses, DPI 2026 provides a
-standard-dose method. agrinutri mirrors the flag catalogue of
-<code>Fert_Office</code> <code>Scheda_N</code> and
-<code>Scheda_PK</code>.</p>
+standard-dose method. agrinutri mirrors the decrement and increment
+catalogue of the Fert_Office standard-dose sheets for N and for P and
+K.</p>
 <div class="section level3">
-<h3 id="scheda-n">Scheda N<a class="anchor" aria-label="anchor" href="#scheda-n"></a>
+<h3 id="standard-dose-for-n">Standard dose for N<a class="anchor" aria-label="anchor" href="#standard-dose-for-n"></a>
 </h3>
 <p>The N standard dose is modified by five decrements and five
 increments, then capped by MAS.</p>
@@ -848,9 +835,9 @@ function caps it and flags <code>mas_exceeded = TRUE</code>:</p>
 <span><span class="co">#&gt; [1] "DPI Emilia-Romagna 2026, Fert_Office v1.26 (Scheda_N)"</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="scheda-pk">Scheda PK<a class="anchor" aria-label="anchor" href="#scheda-pk"></a>
+<h3 id="standard-dose-for-p-and-k">Standard dose for P and K<a class="anchor" aria-label="anchor" href="#standard-dose-for-p-and-k"></a>
 </h3>
-<p>For P and K the base dose depends on the initial soil dotation
+<p>For P and K the base dose depends on the initial soil P and K
 class:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dose_standard_PK.html">scheda_PK</a></span><span class="op">(</span></span>
@@ -900,12 +887,12 @@ class:</p>
 <span><span class="co">#&gt; $reference</span></span>
 <span><span class="co">#&gt; [1] "DPI Emilia-Romagna 2026, Fert_Office v1.26 (Scheda_PK)"</span></span>
 <span></span>
-<span><span class="co"># Example: enrichment under low P dotation</span></span>
+<span><span class="co"># Example: enrichment under low soil P</span></span>
 <span><span class="fu"><a href="../reference/dose_standard_PK.html">scheda_PK</a></span><span class="op">(</span></span>
 <span>  crop <span class="op">=</span> <span class="va">crop</span>,</span>
 <span>  soil_P_class <span class="op">=</span> <span class="st">"low"</span>,</span>
 <span>  soil_K_class <span class="op">=</span> <span class="st">"normal"</span>,</span>
-<span>  P_increments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ristoppio <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span>  P_increments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>continuous_crop <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $crop</span></span>
 <span><span class="co">#&gt; [1] "Grano duro (pianta intera)"</span></span>
@@ -962,21 +949,21 @@ modality-epoch id, optional efficiency level).</li>
 <li>A list of mineral applications (name from
 <code>mineral_fertilizers.table</code>, quantity in q/ha,
 modality-epoch).</li>
-<li>Optional target doses (for Eccesso/Deficit alerts) and a ZVN
-flag.</li>
+<li>Optional target doses (for excess/deficit alerts, returned as
+<code>"Eccesso"</code> and <code>"Deficit"</code>) and a ZVN flag.</li>
 </ul>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plan_distribution.html">plan_distribution</a></span><span class="op">(</span></span>
-<span>  soil_group <span class="op">=</span> <span class="st">"Medio impasto"</span>,</span>
+<span>  soil_group <span class="op">=</span> <span class="st">"Loamy textures"</span>,</span>
 <span>  n_balance  <span class="op">=</span> <span class="va">n_dose</span>,</span>
 <span>  p_balance  <span class="op">=</span> <span class="va">p_bal</span><span class="op">$</span><span class="va">P2O5_required</span>,</span>
 <span>  k_balance  <span class="op">=</span> <span class="va">k_bal</span><span class="op">$</span><span class="va">K2O_required</span>,</span>
 <span>  organic_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fertilizer    <span class="op">=</span> <span class="st">"letame bovino"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fertilizer    <span class="op">=</span> <span class="st">"Cattle manure"</span>,</span>
 <span>         quantity_t_ha <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>         year          <span class="op">=</span> <span class="fl">2025</span>,</span>
 <span>         modality_epoch <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>         level         <span class="op">=</span> <span class="st">"media"</span><span class="op">)</span></span>
+<span>         level         <span class="op">=</span> <span class="st">"media"</span><span class="op">)</span>   <span class="co"># medium efficiency level</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  mineral_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fertilizer       <span class="op">=</span> <span class="st">"UREA AGRICOLA PRIL.46%"</span>,</span>
@@ -989,7 +976,7 @@ flag.</li>
 <span><span class="co"># Row-by-row plan</span></span>
 <span><span class="va">plan</span><span class="op">$</span><span class="va">rows</span></span>
 <span><span class="co">#&gt;    source             fertilizer year modality_epoch ID_Mo quantity_t_ha N_kg</span></span>
-<span><span class="co">#&gt; 1 organic          letame bovino 2025              1     1          20.0  100</span></span>
+<span><span class="co">#&gt; 1 organic          Cattle manure 2025              1     1          20.0  100</span></span>
 <span><span class="co">#&gt; 2 mineral UREA AGRICOLA PRIL.46%   NA             11    11           0.3  138</span></span>
 <span><span class="co">#&gt;   P2O5_kg K2O_kg efficiency_pct N_useful P2O5_useful K2O_useful zootec</span></span>
 <span><span class="co">#&gt; 1      48    140             40       40          48        140   TRUE</span></span>
@@ -1095,11 +1082,11 @@ crop cycles in <code>cycle_modality.table</code>:</p>
 <h3 id="dpi-2026-organic-n-efficiency">DPI 2026 organic N efficiency<a class="anchor" aria-label="anchor" href="#dpi-2026-organic-n-efficiency"></a>
 </h3>
 <p>The N efficiency of organic fertilisers depends on the soil group (3
-classes), the dose level (bassa / media / alta), the sector (avi, bov,
+classes), the dose level (low / medium / high), the sector (avi, bov,
 sui, dig_tq, dig_sui, dig_avi, dig_chi, fanghi) and the modality level.
 The full matrix has 220 entries:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Medium impasto, dose media (125-249 kg N/ha), bovino:</span></span>
+<code class="sourceCode R"><span><span class="co"># Loamy textures, medium dose (125-249 kg N/ha), cattle:</span></span>
 <span><span class="va">efficiency.table</span><span class="op">[</span></span>
 <span>  <span class="va">efficiency.table</span><span class="op">$</span><span class="va">ID_Rag</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">&amp;</span></span>
 <span>    <span class="va">efficiency.table</span><span class="op">$</span><span class="va">ID_Liv</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">&amp;</span></span>
@@ -1112,7 +1099,7 @@ The full matrix has 220 entries:</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="end-of-cycle-soil-dotation">End-of-cycle soil dotation<a class="anchor" aria-label="anchor" href="#end-of-cycle-soil-dotation"></a>
+<h2 id="end-of-cycle-soil-p-and-k">End-of-cycle soil P and K<a class="anchor" aria-label="anchor" href="#end-of-cycle-soil-p-and-k"></a>
 </h2>
 <p>After the plan is executed, agrinutri estimates the residual soil P
 and K in ppm, usable as input for the following year’s calculation:</p>
@@ -1121,7 +1108,7 @@ and K in ppm, usable as input for the following year’s calculation:</p>
 <span>  P2O5_start_ppm <span class="op">=</span> <span class="va">olsen_P</span>,</span>
 <span>  P2O5_applied   <span class="op">=</span> <span class="va">plan</span><span class="op">$</span><span class="va">totals</span><span class="op">[</span><span class="st">"P2O5_useful"</span><span class="op">]</span>,</span>
 <span>  P2O5_removed   <span class="op">=</span> <span class="va">p_bal</span><span class="op">$</span><span class="va">A_fabbisogno</span>,</span>
-<span>  soil_group     <span class="op">=</span> <span class="st">"Medio impasto"</span></span>
+<span>  soil_group     <span class="op">=</span> <span class="st">"Loamy textures"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">P_end</span></span>
 <span><span class="co">#&gt; P2O5_useful </span></span>
@@ -1132,7 +1119,7 @@ and K in ppm, usable as input for the following year’s calculation:</p>
 <span>  K2O_applied   <span class="op">=</span> <span class="va">plan</span><span class="op">$</span><span class="va">totals</span><span class="op">[</span><span class="st">"K2O_useful"</span><span class="op">]</span>,</span>
 <span>  K2O_removed   <span class="op">=</span> <span class="va">k_bal</span><span class="op">$</span><span class="va">A_fabbisogno</span>,</span>
 <span>  clay_pct      <span class="op">=</span> <span class="va">clay</span>,</span>
-<span>  soil_group    <span class="op">=</span> <span class="st">"Medio impasto"</span></span>
+<span>  soil_group    <span class="op">=</span> <span class="st">"Loamy textures"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">K_end</span></span>
 <span><span class="co">#&gt; K2O_useful </span></span>
@@ -1141,10 +1128,10 @@ and K in ppm, usable as input for the following year’s calculation:</p>
 <div class="section level2">
 <h2 id="alternative-scenario-maize-forage-irrigated">Alternative scenario: maize (forage, irrigated)<a class="anchor" aria-label="anchor" href="#alternative-scenario-maize-forage-irrigated"></a>
 </h2>
-<p>A second scenario with different crop, cycle, irrigation and
-precessione.</p>
+<p>A second scenario with different crop, cycle, irrigation and previous
+crop.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mais_bal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">maize_bal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span></span>
 <span>  expected_yield_tons_ha <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  crop <span class="op">=</span> <span class="st">"Silage maize (class 700)"</span>,</span>
 <span>  ccp  <span class="op">=</span> <span class="st">"Spring-summer crop 100-130 days"</span>,</span>
@@ -1159,21 +1146,21 @@ precessione.</p>
 <span>  forg_quantity <span class="op">=</span> <span class="fl">80</span>,</span>
 <span>  soil_seeding <span class="op">=</span> <span class="st">"traditional"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">mais_bal</span></span>
+<span><span class="va">maize_bal</span></span>
 <span><span class="co">#&gt;      A       B   b1      b2   C1 C2       D E F   Forg     G G_deposition</span></span>
 <span><span class="co">#&gt; 1 58.5 56.9816 31.2 25.7816 31.2  5 24.2454 0 0 159.12 10.05        10.05</span></span>
 <span><span class="co">#&gt;   G_fixation no_till_reduction C_tempo N_pct N_limit surplus_pluviometrico</span></span>
 <span><span class="co">#&gt; 1          0                 0    0.67     1     340                  TRUE</span></span>
-<span><span class="fu"><a href="../reference/calculate_N_fertilization.html">calculate_N_fertilization</a></span><span class="op">(</span><span class="va">mais_bal</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/calculate_N_fertilization.html">calculate_N_fertilization</a></span><span class="op">(</span><span class="va">maize_bal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="alternative-scenario-apple-orchard-in-piena-produzione">Alternative scenario: apple orchard in piena produzione<a class="anchor" aria-label="anchor" href="#alternative-scenario-apple-orchard-in-piena-produzione"></a>
+<h2 id="alternative-scenario-apple-orchard-in-full-production">Alternative scenario: apple orchard in full production<a class="anchor" aria-label="anchor" href="#alternative-scenario-apple-orchard-in-full-production"></a>
 </h2>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">apple_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/N_balance.html">N_balance</a></span><span class="op">(</span></span>
 <span>  expected_yield_tons_ha <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>  crop <span class="op">=</span> <span class="st">"Melo frutti, legno e foglie"</span>,</span>
+<span>  crop <span class="op">=</span> <span class="st">"Apple - fruit, wood and leaves"</span>,</span>
 <span>  ccp  <span class="op">=</span> <span class="st">"In production"</span>,</span>
 <span>  sand <span class="op">=</span> <span class="fl">40</span>, clay <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  Ntot <span class="op">=</span> <span class="fl">1.8</span>, SOM <span class="op">=</span> <span class="fl">2.5</span>, CN <span class="op">=</span> <span class="fl">9</span>,</span>
@@ -1193,7 +1180,7 @@ precessione.</p>
 <span><span class="co">#&gt; [1] 81.90625</span></span>
 <span></span>
 <span><span class="va">apple_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/P_balance.html">P_balance</a></span><span class="op">(</span>expected_yield_tons_ha <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>                     crop <span class="op">=</span> <span class="st">"Melo frutti, legno e foglie"</span>,</span>
+<span>                     crop <span class="op">=</span> <span class="st">"Apple - fruit, wood and leaves"</span>,</span>
 <span>                     olsen_value <span class="op">=</span> <span class="fl">25</span>, olsen_unit <span class="op">=</span> <span class="st">"P2O5"</span>,</span>
 <span>                     clay <span class="op">=</span> <span class="fl">30</span>, sand <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span>
 <span><span class="va">apple_p</span></span>
@@ -1201,7 +1188,7 @@ precessione.</p>
 <span><span class="co">#&gt; 1 32           32  0  0  0 Mantenimento        3             3900            32</span></span>
 <span></span>
 <span><span class="va">apple_k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/K_balance.html">K_balance</a></span><span class="op">(</span>expected_yield_tons_ha <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>                     crop <span class="op">=</span> <span class="st">"Melo frutti, legno e foglie"</span>,</span>
+<span>                     crop <span class="op">=</span> <span class="st">"Apple - fruit, wood and leaves"</span>,</span>
 <span>                     k_value <span class="op">=</span> <span class="fl">180</span>, k_unit <span class="op">=</span> <span class="st">"K2O"</span>,</span>
 <span>                     clay <span class="op">=</span> <span class="fl">30</span>, sand <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span>
 <span><span class="va">apple_k</span></span>
@@ -1240,7 +1227,7 @@ rate.</li>
 one call, preserves the field-average dose by rescaling and (optionally)
 caps each pixel at the MAS limit.</p>
 <div class="section level3">
-<h3 id="example-variable-rate-n-for-grano-duro">Example: variable-rate N for grano duro<a class="anchor" aria-label="anchor" href="#example-variable-rate-n-for-grano-duro"></a>
+<h3 id="example-variable-rate-n-for-durum-wheat">Example: variable-rate N for durum wheat<a class="anchor" aria-label="anchor" href="#example-variable-rate-n-for-durum-wheat"></a>
 </h3>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
@@ -1269,7 +1256,7 @@ caps each pixel at the MAS limit.</p>
 <span>  n_dose      <span class="op">=</span> <span class="va">n_dose</span>,</span>
 <span>  method      <span class="op">=</span> <span class="st">"calibration"</span>,</span>
 <span>  envelope    <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  mas_cap     <span class="op">=</span> <span class="fl">190</span>     <span class="co"># MAS for grano duro (RR 2/2024)</span></span>
+<span>  mas_cap     <span class="op">=</span> <span class="fl">190</span>     <span class="co"># MAS for durum wheat (Regional Regulation 2/2024)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">vr_cal</span><span class="op">$</span><span class="va">mean_kg_ha</span>       <span class="co"># ~ n_dose</span></span>
@@ -1326,7 +1313,7 @@ caps each pixel at the MAS limit.</p>
 <h3 id="linking-to-the-distribution-plan">Linking to the distribution plan<a class="anchor" aria-label="anchor" href="#linking-to-the-distribution-plan"></a>
 </h3>
 <p>The variable-rate raster can be coupled to a single fertiliser
-application (typically the <strong>copertura</strong>) inside
+application (typically the <strong>top-dressing</strong>) inside
 <code><a href="../reference/plan_distribution.html">plan_distribution()</a></code>: read the mean rate from the raster and
 pass it as the mineral row.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
@@ -1335,13 +1322,13 @@ pass it as the mineral row.</p>
 <span><span class="va">q_urea_per_ha</span> <span class="op">&lt;-</span> <span class="va">mean_rate</span> <span class="op">/</span> <span class="fl">46</span></span>
 <span></span>
 <span><span class="va">plan_vr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plan_distribution.html">plan_distribution</a></span><span class="op">(</span></span>
-<span>  soil_group <span class="op">=</span> <span class="st">"Medio impasto"</span>,</span>
+<span>  soil_group <span class="op">=</span> <span class="st">"Loamy textures"</span>,</span>
 <span>  n_balance  <span class="op">=</span> <span class="va">n_dose</span>, p_balance <span class="op">=</span> <span class="fl">0</span>, k_balance <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  organic_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  mineral_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fertilizer       <span class="op">=</span> <span class="st">"UREA AGRICOLA PRIL.46%"</span>,</span>
 <span>         quantity_q_ha <span class="op">=</span> <span class="va">q_urea_per_ha</span>,</span>
-<span>         modality_epoch <span class="op">=</span> <span class="fl">11</span><span class="op">)</span>            <span class="co"># In copertura - pieno accestimento</span></span>
+<span>         modality_epoch <span class="op">=</span> <span class="fl">11</span><span class="op">)</span>            <span class="co"># top-dressing at full tillering</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">plan_vr</span><span class="op">$</span><span class="va">rows</span></span>
@@ -1392,7 +1379,7 @@ work:</p>
 <span><span class="co">#&gt; 4 0.5000000              18</span></span>
 <span><span class="co">#&gt; 5 0.7411538              NA</span></span>
 <span></span>
-<span><span class="co"># MAS (massimali) 2026</span></span>
+<span><span class="co"># MAS 2026</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mas.table</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"crop_id"</span>, <span class="st">"crop"</span>, <span class="st">"MAS_N"</span>, <span class="st">"standard_N"</span>,</span>
 <span>                           <span class="st">"max_N_dose"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   crop_id                                              crop MAS_N standard_N</span></span>
@@ -1408,7 +1395,7 @@ work:</p>
 <span><span class="co">#&gt; 4        150</span></span>
 <span><span class="co">#&gt; 5         NA</span></span>
 <span></span>
-<span><span class="co"># Gri_P and Gri_K classes</span></span>
+<span><span class="co"># P and K availability classes</span></span>
 <span><span class="va">p_availability.table</span></span>
 <span><span class="co">#&gt;   ID_Gri_P min_P_ppm max_P_ppm min_P2O5_ppm max_P2O5_ppm    rating</span></span>
 <span><span class="co">#&gt; 1        1         0         5         0.00        11.45  very low</span></span>
@@ -1488,9 +1475,9 @@ the mean to drift (e.g. when upper/lower envelopes are explicitly
 chosen), use the underlying
 <code><a href="../reference/estimate_N_rate_from_calibration_curve.html">estimate_N_rate_from_calibration_curve()</a></code> /
 <code><a href="../reference/estimate_N_rate_from_holland_schepers.html">estimate_N_rate_from_holland_schepers()</a></code> directly.</li>
-<li>For crops with multiple phases (e.g. grano duro with fase nd), the
-MAS lookup uses the first matching row; pass <code>phase = ...</code>
-explicitly when ambiguity matters.</li>
+<li>For crops with multiple phases (e.g. durum wheat), the MAS lookup
+uses the first matching row; pass <code>phase = ...</code> explicitly
+when ambiguity matters.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -1500,12 +1487,12 @@ explicitly when ambiguity matters.</li>
 (<code>tests/testthat/test-fertoffice-validation.R</code>) compares
 every balance term and the reported N, P2O5 and K2O doses with the
 values computed by the spreadsheet itself on 400 random field scenarios
-(13 crops, all texture groups, drainage classes, precessions, previous
-organic fertilisation and no-till); all agree to within 1e-6 kg/ha.</p>
-<p>In a few places the printed tables of the DPI Norme Generali
-(Allegato 2, 2024/25 edition) and Fert_Office give different numbers.
-agrinutri follows Fert_Office, which is the tool used to check DPI
-plans:</p>
+(13 crops, all texture groups, drainage classes, previous crops,
+previous organic fertilisation and no-till); all agree to within 1e-6
+kg/ha.</p>
+<p>In a few places the printed tables of the DPI General Rules (Annex 2,
+2024/25 edition) and Fert_Office give different numbers. agrinutri
+follows Fert_Office, which is the tool used to check DPI plans:</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -1514,7 +1501,7 @@ plans:</p>
 </colgroup>
 <thead><tr class="header">
 <th>Item</th>
-<th>Norme Generali text</th>
+<th>General Rules text</th>
 <th>Fert_Office v1.26 (used by agrinutri)</th>
 </tr></thead>
 <tbody>
@@ -1529,7 +1516,7 @@ plans:</p>
 <td>22.1 x SOM</td>
 </tr>
 <tr class="odd">
-<td>N pronto per g/kg total N (sandy / loamy / clay)</td>
+<td>Readily available N per g/kg total N (sandy / loamy / clay)</td>
 <td>28.4 / 26 / 24.3</td>
 <td>28 / 26 / 24, total N capped at 2.1 g/kg</td>
 </tr>
@@ -1539,14 +1526,15 @@ plans:</p>
 <td>0.35 / 0.40 / 0.45</td>
 </tr>
 <tr class="odd">
-<td>Residual N of a soybean precession</td>
+<td>Residual N of soybean as previous crop</td>
 <td>0</td>
 <td>10 kg/ha</td>
 </tr>
 <tr class="even">
 <td>End-of-winter loss (Cb)</td>
 <td>1 kg N per 10 mm once winter + February rain exceeds 250 mm</td>
-<td>the same, plus the loss of the N pronto not yet leached</td>
+<td>the same, plus the loss of the readily available N not yet
+leached</td>
 </tr>
 </tbody>
 </table>

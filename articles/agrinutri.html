@@ -115,66 +115,66 @@ equation used in agrinutri is:</p>
 <div class="section level3">
 <h3 id="normative-framework-dpi-20252026-and-fertdpi">Normative framework: DPI 2025–2026 and FertDPI<a class="anchor" aria-label="anchor" href="#normative-framework-dpi-20252026-and-fertdpi"></a>
 </h3>
-<p>agrinutri implements the <strong>method of the balance</strong>
-(Allegato 2) of the Disciplinari di Produzione Integrata (DPI)
-Emilia-Romagna, in line with the <em>Guida alla Fertilizzazione Minerale
-e Organica</em> (DPI 2025) and the regional tool <strong>FertDPI /
-Fert_Office</strong>. References: DPI Norme Generali (Allegato 2, 3, 4,
-6, 7, 9), Reg. reg. 2/2024 and 3/2017, Direttiva Nitrati (91/676/CEE).
-In <strong>Zone Vulnerabili ai Nitrati (ZVN)</strong> the MAS (limiti di
-massima applicazione standard) are binding and the 170 kg N/ha/year
-ceiling from livestock effluents applies at farm level.</p>
-<p><strong>Formula N (Guida DPI 2025):</strong><br>
-N da apportare = <strong>A</strong> − <strong>B</strong> +
+<p>agrinutri implements the <strong>balance method</strong> (Annex 2) of
+the Emilia-Romagna Integrated Production Guidelines (DPI), in line with
+the DPI 2025 guide to mineral and organic fertilisation and the regional
+tool <strong>FertDPI / Fert_Office</strong>. References: DPI General
+Rules (Annexes 2, 3, 4, 6, 7, 9), Regional Regulations 2/2024 and
+3/2017, Nitrates Directive (91/676/EEC). In <strong>nitrate vulnerable
+zones (ZVN)</strong> the maximum allowed doses (MAS) are binding and the
+170 kg N/ha/year ceiling from livestock effluents applies at farm
+level.</p>
+<p><strong>N formula (DPI 2025 guide):</strong><br>
+N to apply = <strong>A</strong> − <strong>B</strong> +
 <strong>C</strong> + <strong>D</strong> − <strong>E</strong> −
 <strong>F</strong> − <strong>G</strong></p>
 <ul>
 <li>
-<strong>A</strong> = Fabbisogni colturali (assorbimenti unitari ×
-produzione attesa).<br>
+<strong>A</strong> = Crop demand (unit uptake × expected
+yield).<br>
 </li>
 <li>
-<strong>B</strong> = Fertilità del suolo: <strong>B1</strong>
-(mineralizzazione S.O.: coefficiente × S.O. % × coefficiente tempo) +
-<strong>B2</strong> (azoto pronto: coefficiente × N totale ‰; solo
-colture con ciclo &lt; 1 anno). Per pluriennali B = B1 soltanto.<br>
+<strong>B</strong> = Soil supply: <strong>B1</strong>
+(mineralisation of soil organic matter: coefficient × SOM % × time
+coefficient) + <strong>B2</strong> (readily available N: coefficient ×
+total N ‰; only crops with a cycle &lt; 1 year). For perennial crops B =
+B1 only.<br>
 </li>
 <li>
-<strong>C</strong> = Perdite per lisciviazione: <strong>Ca</strong>
-(autunno-inverno: &lt;150 mm nessuna; 150–250 mm perdita progressiva;
-&gt;250 mm tutto l’N pronto) + <strong>Cb</strong> (febbraio: 1 kg N/ha
-ogni 10 mm oltre 250 mm cumulati).<br>
+<strong>C</strong> = Leaching losses: <strong>Ca</strong>
+(autumn–winter: &lt;150 mm none; 150–250 mm progressive loss; &gt;250 mm
+all the readily available N) + <strong>Cb</strong> (February: 1 kg N/ha
+every 10 mm above 250 mm cumulated).<br>
 </li>
 <li>
-<strong>D</strong> = Immobilizzazione e dispersione = B × fattore di
-correzione <em>fc</em> (in funzione di ossigeno e tessitura: es. buona
-0,15–0,25, moderata 0,20–0,30, impedita 0,30–0,40).<br>
+<strong>D</strong> = Immobilisation and dispersion = B × correction
+factor <em>fc</em> (by oxygen availability and texture: e.g. good
+0.15–0.25, moderate 0.20–0.30, impeded 0.30–0.40).<br>
 </li>
 <li>
-<strong>E</strong> = N da residui della precessione (tabella:
-cereali paglia asportata −10, interrata −30; medica +80; soia 0;
-leguminose da granella +40; ecc.).<br>
+<strong>E</strong> = N from previous crop residues (table: cereals
+with straw removed −10, straw buried −30; alfalfa +80; soybean 0; grain
+legumes +40; etc.).<br>
 </li>
 <li>
-<strong>F</strong> = N da fertilizzazioni organiche anni precedenti
-(ammendanti 50/30/20 %; Cattle slurry 30/15/10; suino/pollina
-15/10/5).<br>
+<strong>F</strong> = N from organic fertilisation in previous years
+(soil amendments 50/30/20 %; cattle slurry 30/15/10; pig slurry/poultry
+manure 15/10/5).<br>
 </li>
 <li>
-<strong>G</strong> = Apporti naturali (precipitazioni; fissazione
-per leguminose).</li>
+<strong>G</strong> = Natural inputs (rainfall; fixation by
+legumes).</li>
 </ul>
 <p>agrinutri computes the balance and subtracts the current-year organic
 N (Forg) to obtain the mineral N to apply. Fractioning rules (max 100
 kg/ha N per intervention for herbaceous crops, 60 kg/ha for tree crops;
-min 7 days between interventions) and presemina/autumn caps (e.g. max 30
-kg/ha presemina, max 40 kg/ha arboree before 15 Oct) are set by DPI and
-must be respected in the field plan.</p>
+min 7 days between interventions) and pre-sowing/autumn caps (e.g. max
+30 kg/ha before sowing, max 40 kg/ha for tree crops before 15 Oct) are
+set by DPI and must be respected in the field plan.</p>
 <p><strong>Soil texture (DPI groupings):</strong> The 12 USDA texture
 classes are grouped into three macro-categories used for efficiency and
-coefficients: (1) <em>Tendenzialmente sabbioso</em> (S, SF, FS), (2)
-<em>Franco / Medio impasto</em> (L, F, FL, FSA, FA), (3)
-<em>Tendenzialmente argilloso</em> (FLA, AS, AL, A). agrinutri’s
+coefficients: (1) sandy textures (S, SF, FS), (2) loamy textures (L, F,
+FL, FSA, FA), (3) clay textures (FLA, AS, AL, A). agrinutri’s
 <code><a href="../reference/tri3.html">tri3()</a></code> and <code><a href="../reference/calc_soil_group_and_id_rag.html">calc_soil_group_and_id_rag()</a></code>
 provide texture and soil group.</p>
 <p><strong>Maximum allowed doses (MAS):</strong> Each crop has a ceiling
@@ -187,10 +187,10 @@ type, <strong>distribution technique</strong> (efficient / medium /
 low), and <strong>soil texture</strong>. Efficient = injection,
 fertigation, incorporation within 4 h; medium = band spreading with
 quick incorporation; low = surface spreading without incorporation.
-Ammendanti compostati use a fixed 40% efficiency. agrinutri’s
+Composted soil amendments use a fixed 40% efficiency. agrinutri’s
 <code><a href="../reference/organic_fertilization.html">organic_fertilization()</a></code> uses factors by source and
 frequency; for DPI-specific efficiency by soil and distribution, refer
-to the FertDPI ‘Efficienza’ sheet or the regional guide.</p>
+to the FertDPI efficiency sheet or the regional guide.</p>
 </div>
 <div class="section level3">
 <h3 id="package-overview">Package Overview<a class="anchor" aria-label="anchor" href="#package-overview"></a>
@@ -575,7 +575,7 @@ own growth:</p>
 <code class="sourceCode R"><span><span class="co"># Step 1: Define field parameters</span></span>
 <span><span class="va">maize_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  expected_yield_tons_ha <span class="op">=</span> <span class="fl">12</span>,  <span class="co"># tons/ha</span></span>
-<span>  crop <span class="op">=</span> <span class="st">"Silage maize (class 700)"</span>,  <span class="co"># or "Silage maize (class 700)" (alias)</span></span>
+<span>  crop <span class="op">=</span> <span class="st">"Silage maize (class 700)"</span>,</span>
 <span>  ccp <span class="op">=</span> <span class="st">"Spring-summer crop 100–130 days"</span>,</span>
 <span>  clay <span class="op">=</span> <span class="fl">28</span>,</span>
 <span>  sand <span class="op">=</span> <span class="fl">32</span>,</span>
@@ -632,10 +632,11 @@ own growth:</p>
 <div class="section level2">
 <h2 id="checking-against-maximum-allowed-doses-mas">Checking against Maximum Allowed Doses (MAS)<a class="anchor" aria-label="anchor" href="#checking-against-maximum-allowed-doses-mas"></a>
 </h2>
-<p>DPI (Allegato 9, Reg. reg. 2/2024) sets <strong>maximum allowed doses
-(MAS)</strong> of N per crop; in ZVN they are binding. The planned dose
-must not exceed MAS. Use <code>get_MAS(crop, edition = "2025")</code>
-for the ZVN table from the <em>Guida alla Fertilizzazione</em> 2025, or
+<p>DPI (Annex 9, Regional Regulation 2/2024) sets <strong>maximum
+allowed doses (MAS)</strong> of N per crop; in ZVN they are binding. The
+planned dose must not exceed MAS. Use
+<code>get_MAS(crop, edition = "2025")</code> for the ZVN table of the
+DPI 2025 fertilisation guide, or
 <code>get_MAS(crop, edition = "2026")</code> (default) for the
 FertDPI-style table. Use <code><a href="../reference/check_MAS.html">check_MAS()</a></code> to verify a planned N
 dose.</p>
@@ -1813,7 +1814,7 @@ dose.</p>
 <span><span class="co">#&gt; 238         NA               kg/ha</span></span>
 <span><span class="co">#&gt; 239    142.246                 200</span></span>
 <span></span>
-<span><span class="co"># DPI 2025 Guida (ZVN table) – different values and crops</span></span>
+<span><span class="co"># DPI 2025 guide (ZVN table) – different values and crops</span></span>
 <span><span class="fu"><a href="../reference/get_MAS.html">get_MAS</a></span><span class="op">(</span>edition <span class="op">=</span> <span class="st">"2025"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          crop mas_N reference_yield     type</span></span>
 <span><span class="co">#&gt; 1  Frumento tenero (granella)   180             6.5  Erbacee</span></span>
@@ -1842,11 +1843,6 @@ dose.</p>
 <span><span class="co">#&gt; 55 Soft wheat FF - strong (grain)    nd   190               6               340</span></span>
 <span><span class="co">#&gt;    standard_N max_N_dose         note</span></span>
 <span><span class="co">#&gt; 55        160        200 RR n. 2/2024</span></span>
-<span><span class="fu"><a href="../reference/get_MAS.html">get_MAS</a></span><span class="op">(</span><span class="st">"Soft wheat FF - strong (grain)"</span>, edition <span class="op">=</span> <span class="st">"2025"</span><span class="op">)</span>  <span class="co"># 180 kg/ha</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="fu"><a href="../reference/get_MAS.html">get_MAS</a></span><span class="op">(</span><span class="st">"Grain maize 500-700 (grain)"</span>, edition <span class="op">=</span> <span class="st">"2025"</span><span class="op">)</span>            <span class="co"># 280 kg/ha (irriguo)</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span></span>
 <span><span class="co"># Check if a planned N dose is within MAS</span></span>
 <span><span class="fu"><a href="../reference/check_MAS.html">check_MAS</a></span><span class="op">(</span><span class="st">"Soft wheat FF - strong (grain)"</span>, <span class="fl">180</span><span class="op">)</span>   <span class="co"># OK</span></span>
 <span><span class="co">#&gt; $ok</span></span>
@@ -1872,7 +1868,7 @@ dose.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "Planned N (220 kg/ha) exceeds MAS (190 kg/ha)."</span></span>
-<span><span class="fu"><a href="../reference/check_MAS.html">check_MAS</a></span><span class="op">(</span><span class="st">"Grain maize 500-700 (grain)"</span>, <span class="fl">250</span><span class="op">)</span>             <span class="co"># OK (MAS 260 or 280 depending on edition)</span></span>
+<span><span class="fu"><a href="../reference/check_MAS.html">check_MAS</a></span><span class="op">(</span><span class="st">"Grain maize 500-700 (grain)"</span>, <span class="fl">250</span><span class="op">)</span>             <span class="co"># OK (MAS 280 kg/ha)</span></span>
 <span><span class="co">#&gt; $ok</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1899,11 +1895,12 @@ dose.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "Planned N is within MAS."</span></span></code></pre></div>
-<p>Soia: MAS N = 30 kg/ha (ZVN 2025); in case of failed rhizobium, up to
-120 kg/ha is allowed. Reductions: −40 kg/ha after prato ≥3 years; −60
-kg/ha after medicaio ≥3 years. In ZVN, respect the 170 kg N/ha/year
-limit from livestock effluents (farm average). All fertilizations must
-be recorded in field sheets within 7 days (DPI cap. 11).</p>
+<p>Soybean: MAS N = 30 kg/ha (ZVN 2025); in case of failed rhizobium
+nodulation, up to 120 kg/ha is allowed. Reductions: −40 kg/ha after a
+meadow ≥3 years; −60 kg/ha after an alfalfa stand ≥3 years. In ZVN,
+respect the 170 kg N/ha/year limit from livestock effluents (farm
+average). All fertilizations must be recorded in field sheets within 7
+days (DPI chapter 11).</p>
 </div>
 <div class="section level2">
 <h2 id="scenario-comparison">Scenario Comparison<a class="anchor" aria-label="anchor" href="#scenario-comparison"></a>
@@ -2521,19 +2518,19 @@ leaching)</li>
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li>Disciplinari di Produzione Integrata (DPI) 2025 – Regione
-Emilia-Romagna, Direzione Generale Agricoltura, Caccia e Pesca. Norme
-Generali, Allegati 2, 3, 4, 6, 7, 9.</li>
-<li>Guida alla Fertilizzazione Minerale e Organica – N, P, K per colture
-erbacee e arboree. DPI 2025, Emilia-Romagna.</li>
-<li>Regolamento regionale 2/2024 – Limiti MAS (Allegato 9). Regolamento
-regionale 3/2017 – Utilizzazione agronomica degli effluenti e del
-digestato.</li>
-<li>Direttiva Nitrati 91/676/CEE – Zone Vulnerabili ai Nitrati (170 kg
-N/ha/anno da effluenti zootecnici; soglie minime efficienza Reg. UE
-2021/2115).</li>
-<li>FertDPI / Fert_Office – strumento regionale per il piano di
-fertilizzazione (DPI 2026).</li>
+<li>Emilia-Romagna Region, Directorate-General for Agriculture, Hunting
+and Fishing. Integrated Production Guidelines (DPI) 2025: General Rules,
+Annexes 2, 3, 4, 6, 7, 9 (in Italian).</li>
+<li>Emilia-Romagna Region. Guide to mineral and organic fertilisation:
+N, P, K for field and tree crops. DPI 2025 (in Italian).</li>
+<li>Regional Regulation 2/2024: MAS limits (Annex 9). Regional
+Regulation 3/2017: agronomic use of livestock effluents and digestate
+(in Italian).</li>
+<li>Nitrates Directive 91/676/EEC: nitrate vulnerable zones (170 kg
+N/ha/year from livestock effluents); minimum efficiency thresholds,
+Regulation (EU) 2021/2115.</li>
+<li>FertDPI / Fert_Office: regional tool for the fertilisation plan (DPI
+2026).</li>
 <li>Precision Agriculture Best Practices (International Society of
 Precision Agriculture).</li>
 </ol>

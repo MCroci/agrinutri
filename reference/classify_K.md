@@ -1,9 +1,8 @@
 # Classify exchangeable potassium availability
 
 Classifies K (or K2O) availability by soil texture grouping, following
-DPI Emilia-Romagna 2026 (Fert_Office v1.26 foglio `Gri_K`). The
-threshold ranges depend on the DPI texture group (`Sabbiosi`,
-`Medio impasto`, `Argillosi e limosi`).
+DPI Emilia-Romagna 2026 (Fert_Office v1.26 K sheet). The threshold
+ranges depend on the DPI texture group (sandy, loamy or clay textures).
 
 ## Usage
 
@@ -38,12 +37,13 @@ classify_K(
 ## Value
 
 A list with `value_ppm_K`, `value_ppm_K2O`, `ID_Gri_K`, `rating`,
-`strategy` (`Arricchimento` / `Mantenimento` / `Riduzione`).
+`strategy` (`"Arricchimento"` / `"Mantenimento"` / `"Riduzione"`, that
+is enrichment / maintenance / reduction).
 
 ## Examples
 
 ``` r
-classify_K(value = 150, unit = "K2O", soil_group = "Medio impasto")
+classify_K(value = 150, unit = "K2O", soil_group = "Loamy textures")
 #> $value_ppm_K
 #> [1] 124.9995
 #> 

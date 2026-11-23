@@ -1,4 +1,4 @@
-# Resolve a crop name (Italian or English) to its canonical entry
+# Resolve a crop name to its canonical entry
 
 agrinutri reference tables (`uptake_table`, `mas.table`, `crops.table`,
 `standard_pk_doses.table`) carry the canonical English crop names in the
@@ -18,7 +18,7 @@ resolve_crop(x, table = agrinutri_data_get("uptake_table"))
 
 - x:
 
-  Character. Crop name in Italian or English.
+  Character. Crop name.
 
 - table:
 
@@ -39,8 +39,6 @@ unchanged together with a warning.
 ``` r
 resolve_crop("Durum wheat (grain)")
 #> [1] "Durum wheat (grain)"
-resolve_crop("Grano duro (granella)")
+resolve_crop("durum wheat (GRAIN)")
 #> [1] "Durum wheat (grain)"
-resolve_crop("Mais trinciato classe 700")
-#> [1] "Silage maize (class 700)"
 ```

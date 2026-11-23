@@ -1,10 +1,10 @@
 # Maximum Allowed Doses (MAS) per DPI Emilia-Romagna
 
-Returns or checks the Maximum Allowed Doses (Massimali Ammessi dal DPI,
-MAS) of nitrogen for a crop, as defined in the Disciplinari di
-Produzione Integrata (DPI) Emilia-Romagna (Allegato 9, Reg. reg.
-2/2024). In ZVN the values are binding; they can be exceeded if
-production over 3 years exceeds the reference yield.
+Returns or checks the Maximum Allowed Doses (MAS) of nitrogen for a
+crop, as defined in the Emilia-Romagna Integrated Production Guidelines
+(DPI) (Annex 9, Regional Regulation 2/2024). In ZVN the values are
+binding; they can be exceeded if production over 3 years exceeds the
+reference yield.
 
 ## Usage
 
@@ -16,11 +16,9 @@ get_MAS(crop = NULL, mas_table = NULL, edition = c("2026", "2025"))
 
 - crop:
 
-  Character. Crop name, in English (canonical, as in
-  `uptake_table$crop`) or Italian (Fert_Office label); matching is case-
-  and accent-insensitive, and a few generic DPI names (e.g.
-  `"Mais da insilato"`, `"Frumento tenero (granella)"`) are mapped to
-  the corresponding table row. Use `get_MAS()` to list all crops.
+  Character. Crop name, as in `uptake_table$crop`; matching is case- and
+  accent-insensitive. With `edition = "2025"` use the crop labels of
+  that table. Use `get_MAS()` to list all crops.
 
 - mas_table:
 
@@ -30,8 +28,8 @@ get_MAS(crop = NULL, mas_table = NULL, edition = c("2026", "2025"))
 
 - edition:
 
-  Character. `"2026"` (default; DPI 2026 / Fert_Office v1.26, Reg. reg.
-  2/2024) or `"2025"` (Guida DPI 2025, ZVN table, 17 crops).
+  Character. `"2026"` (default; DPI 2026 / Fert_Office v1.26, Regional
+  Regulation 2/2024) or `"2025"` (DPI 2025 guide, ZVN table, 17 crops).
 
 ## Value
 
@@ -46,25 +44,25 @@ For `check_MAS`: a list with `ok` (logical), `mas_N`, `N_planned`,
 
 The DPI 2026 values (default) are read from the bundled
 [mas.table](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)
-dataset, which mirrors the "MAS" sheet of Fert_Office v1.26 (239 crops).
+dataset, which mirrors the MAS sheet of Fert_Office v1.26 (239 crops).
 
 ## References
 
-DPI Emilia-Romagna - Norme Generali 2025, Allegato 9; Guida alla
-Fertilizzazione Minerale e Organica 2025 (N, P, K). Reg. reg. 2/2024.
-DPI 2026, FertDPI / Fert_Office_v1_26.
+DPI Emilia-Romagna - General Rules 2025, Annex 9; guide to mineral and
+organic fertilisation 2025 (N, P, K). Regional Regulation 2/2024. DPI
+2026, FertDPI / Fert_Office_v1_26.
 
 ## Examples
 
 ``` r
-get_MAS("Grano duro (granella)")
+get_MAS("Durum wheat (grain)")
 #>                   crop               crop_it             crop_en phase mas_N
 #> 49 Durum wheat (grain) Grano duro (granella) Durum wheat (grain)    nd   190
 #>    reference_yield max_theoretical_N standard_N max_N_dose         note
 #> 49               6               340        160        200 RR n. 2/2024
 get_MAS("Silage maize (class 700)")$mas_N
 #> [1] 280
-get_MAS("Frumento tenero (granella)", edition = "2025")  # ZVN 2025
+get_MAS("Frumento tenero (granella)", edition = "2025")  # soft wheat, ZVN 2025 table
 #>                         crop mas_N reference_yield    type
 #> 1 Frumento tenero (granella)   180             6.5 Erbacee
 head(get_MAS())  # full table
@@ -96,7 +94,7 @@ head(get_MAS())  # full table
 #> 4               340        100        150 RR n. 2/2024
 #> 5               340         NA         NA         <NA>
 #> 6               340        120        170 RR n. 2/2024
-check_MAS("Mais da granella", 250)
+check_MAS("Grain maize 500-700 (grain)", 250)
 #> $ok
 #> [1] TRUE
 #> 
@@ -109,7 +107,7 @@ check_MAS("Mais da granella", 250)
 #> $message
 #> [1] "Planned N is within MAS."
 #> 
-check_MAS("Grano duro (granella)", 210)  # over MAS
+check_MAS("Durum wheat (grain)", 210)  # over MAS
 #> $ok
 #> [1] FALSE
 #> 

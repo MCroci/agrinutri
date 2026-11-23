@@ -197,8 +197,8 @@ For machine-width strips along an A-B line instead of pixels, see
 
 ## Data sources
 
-Soil: Regione Emilia-Romagna, carte dei suoli 0-30 cm (tessitura;
-sostanza organica; azoto totale, fosforo assimilabile, potassio
-scambiabile), CC BY 4.0. Sentinel-2: Copernicus Sentinel data 2024.
-Field boundaries delineated from Sentinel-2; rainfall from ERA5. See
+Soil: Emilia-Romagna Region, soil maps 0-30 cm (texture; organic matter;
+total nitrogen, available phosphorus, exchangeable potassium), CC BY
+4.0. Sentinel-2: Copernicus Sentinel data 2024. Field boundaries
+delineated from Sentinel-2; rainfall from ERA5. See
 [`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md).

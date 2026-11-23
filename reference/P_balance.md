@@ -1,6 +1,6 @@
-# Phosphorus balance (DPI Emilia-Romagna 2026 metodo del bilancio)
+# Phosphorus balance (DPI Emilia-Romagna 2026 balance method)
 
-Implements the P2O5 balance of Fert_Office v1.26 foglio `Bilancio`.
+Implements the P2O5 balance of the Fert_Office v1.26 balance sheet.
 
 ## Usage
 
@@ -40,8 +40,7 @@ P_balance(
 - soil_group:
 
   DPI texture group; if `NULL` and `clay`/`sand` given, derived via
-  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md)
-  and mapped to Italian Ragg.
+  [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md).
 
 - clay, sand:
 
@@ -49,7 +48,7 @@ P_balance(
 
 - advance_P2O5:
 
-  Advance anni futuri (default 0 kg/ha).
+  Advance for future years (default 0 kg/ha).
 
 - depth_cm:
 
@@ -72,17 +71,18 @@ A data frame with A, B1, A2, B2, `strategy`, `ID_Gri_P`,
 Formula:
 
 
-      P2O5 da apportare = A (asportazione) + B1 (arricchimento) + A2 (advance_allowed)
-                           - B2 (riduzione)
+      P2O5 to apply = A (crop removal) + B1 (enrichment) + A2 (advance_allowed)
+                       - B2 (reduction)
 
-where B2 is the excess over the normal availability range ("Riduzione"
-strategy). The result is bounded to 0-250 kg P2O5/ha as in Fert_Office.
+where B2 is the excess over the normal availability range (reduction
+strategy, `strategy = "Riduzione"`). The result is bounded to 0-250 kg
+P2O5/ha as in Fert_Office.
 
 ## Examples
 
 ``` r
 P_balance(expected_yield_tons_ha = 6,
-          crop = "Grano duro (pianta intera)",
+          crop = "Durum wheat (whole plant)",
           olsen_value = 15, olsen_unit = "P2O5",
           clay = 18.5, sand = 15.5, total_carbonate = 15)
 #>      A A_fabbisogno       B1 A2 B2      strategy ID_Gri_P soil_weight_t_ha

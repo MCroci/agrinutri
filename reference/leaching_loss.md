@@ -1,7 +1,7 @@
 # Leaching Loss of Nitrogen
 
-DPI 2026 (Allegato 2; foglio `C&D` di Fert_Office v1.26): loss of
-readily available mineral nitrogen ("N pronto") from leaching.
+DPI 2026 (Annex 2; sheet `C&D` of Fert_Office v1.26): loss of readily
+available mineral nitrogen from leaching.
 
 ## Usage
 
@@ -64,14 +64,14 @@ A list containing:
 
 - surplus_pluviometrico:
 
-  Logical. `TRUE` when `winter_rain + start_spring_rain >= 300` mm (DPI
-  2026 scheda a dose standard: surplus-pluviometric flag).
+  Logical. `TRUE` when `winter_rain + start_spring_rain >= 300` mm
+  (rainfall-surplus flag of the DPI 2026 standard-dose scheme).
 
 ## Details
 
-Let \\N_p\\ be the leachable N pronto: `b1` for crops with a cycle
-shorter than one year, or a fixed 30 kg N/ha for perennial crops in
-production (`perennial = TRUE`, i.e. time coefficient 1).
+Let \\N_p\\ be the leachable readily available N: `b1` for crops with a
+cycle shorter than one year, or a fixed 30 kg N/ha for perennial crops
+in production (`perennial = TRUE`, i.e. time coefficient 1).
 
 - **C1** (\\C_a\\, autumn–winter):
 
@@ -84,9 +84,9 @@ production (`perennial = TRUE`, i.e. time coefficient 1).
 - **C2** (\\C_b\\, end of winter):
 
   With \\s = y + f - 250\\, where \\f\\ is February rainfall
-  (`start_spring_rain`): when \\s \> 0\\ the N pronto not yet lost
-  (\\N_p - C_a\\) is lost, plus 1 kg N/ha for every 10 mm of \\s\\ if
-  \\y \> 150\\ mm.
+  (`start_spring_rain`): when \\s \> 0\\ the readily available N not yet
+  lost (\\N_p - C_a\\) is lost, plus 1 kg N/ha for every 10 mm of \\s\\
+  if \\y \> 150\\ mm.
 
 `oxygen_availability` is validated against
 [`ca.table`](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)

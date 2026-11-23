@@ -1,9 +1,8 @@
-# Classify SO (soil organic matter) initial content by texture group
+# Classify SOM (soil organic matter) initial content by texture group
 
-Returns DPI 2026 SO class (molto bassa / bassa / media / elevata) by
-soil texture group (Sabbiosi / Medio impasto / Argillosi e limosi) and
-maps to the 3-class scheme "Scarsa / Normale / Elevata" used for the
-maximum annual SO input.
+Returns the DPI 2026 SOM rating (very low / low / medium / high) by soil
+texture group (sandy / loamy / clay textures) and maps it to the 3-class
+scheme (Poor / Normal / Rich) used for the maximum annual SOM input.
 
 ## Usage
 
@@ -19,7 +18,8 @@ classify_SOM(SOM, soil_group, so.table = agrinutri_data_get("so.table"))
 
 - soil_group:
 
-  Texture group (Italian).
+  DPI texture group (see
+  [`normalise_soil_group()`](https://mcroci.github.io/agrinutri/reference/normalise_soil_group.md)).
 
 - so.table:
 
@@ -28,12 +28,12 @@ classify_SOM(SOM, soil_group, so.table = agrinutri_data_get("so.table"))
 
 ## Value
 
-List with `rating` (4 classes) and `class` (3-class for SO input).
+List with `rating` (4 classes) and `class` (3-class for SOM input).
 
 ## Examples
 
 ``` r
-classify_SOM(SOM = 2, soil_group = "Medio impasto")
+classify_SOM(SOM = 2, soil_group = "Loamy textures")
 #> $rating
 #> [1] "medium"
 #> 

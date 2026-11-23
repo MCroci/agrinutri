@@ -19,13 +19,12 @@ methods. Every coefficient is an editable data table, so the balance can
 be re-parameterised for other regional guidelines. The default
 parameterisation implements the balance method (Annex 2) and the
 standard-dose method of the Emilia-Romagna Integrated Production
-Guidelines (*Disciplinari di Produzione Integrata*, DPI 2026) and
-follows the regional reference tool **Fert_Office v1.26**. On top of the
-regulatory balance it provides farm and pixel-level balances, a
-Sentinel-2 remote-sensing diagnosis (vegetation indices,
-Gaussian-process canopy traits, Nitrogen Nutrition Index) and
-variable-rate prescriptions that keep the field mean equal to the
-compliant balance dose, exported to tractor formats.
+Guidelines (DPI 2026) and follows the regional reference tool
+**Fert_Office v1.26**. On top of the regulatory balance it provides farm
+and pixel-level balances, a Sentinel-2 remote-sensing diagnosis
+(vegetation indices, Gaussian-process canopy traits, Nitrogen Nutrition
+Index) and variable-rate prescriptions that keep the field mean equal to
+the compliant balance dose, exported to tractor formats.
 
 All coefficient tables are ordinary R datasets (`uptake_table`,
 `mas.table`, `coef_time`, …), so the balance can be inspected, versioned
@@ -53,7 +52,7 @@ Fert_Office v1.26):
 library(agrinutri)
 
 bal <- N_balance(
-  expected_yield_tons_ha = 6, crop = "Grano duro (pianta intera)",
+  expected_yield_tons_ha = 6, crop = "Durum wheat (whole plant)",
   ccp = "Spring-summer crop 100-130 days",
   sand = 15.5, clay = 18.5, Ntot = 1.5, SOM = 2, CN = 7.73,
   oxygen_availability = "Slow", winter_rain = 150, start_spring_rain = 0,
@@ -62,16 +61,16 @@ bal <- N_balance(
 
 bal[c("A", "B", "C1", "C2", "D", "E", "F", "G")]   # every balance term
 calculate_N_fertilization(bal)                      # 142.246 kg N/ha
-check_MAS("Grano duro (pianta intera)", 142)        # MAS 190 kg N/ha: ok
+check_MAS("Durum wheat (whole plant)", 142)        # MAS 190 kg N/ha: ok
 
-P_balance(6, "Grano duro (pianta intera)", olsen_value = 15, olsen_unit = "P2O5",
+P_balance(6, "Durum wheat (whole plant)", olsen_value = 15, olsen_unit = "P2O5",
           clay = 18.5, sand = 15.5, total_carbonate = 15)$P2O5_required  # 112.9
-K_balance(6, "Grano duro (pianta intera)", k_value = 150, k_unit = "K2O",
+K_balance(6, "Durum wheat (whole plant)", k_value = 150, k_unit = "K2O",
           clay = 18.5, sand = 15.5)$K2O_required                         # 139.4
 ```
 
-Crop names are accepted in Italian (Fert_Office labels) or English
-([`list_crops()`](https://mcroci.github.io/agrinutri/reference/list_crops.md)).
+[`list_crops()`](https://mcroci.github.io/agrinutri/reference/list_crops.md)
+lists the accepted crop names.
 
 A whole farm, from a vector layer with one row per plot:
 
@@ -104,10 +103,10 @@ opens a Shiny interface with the same workflow.
 
 | Area | Main functions |
 |----|----|
-| Nitrogen balance (Allegato 2) | [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md), [`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md) and one function per term: [`calc_crop_N_demand()`](https://mcroci.github.io/agrinutri/reference/calc_crop_N_demand.md), [`soil_fertility()`](https://mcroci.github.io/agrinutri/reference/soil_fertility.md), [`leaching_loss()`](https://mcroci.github.io/agrinutri/reference/leaching_loss.md), [`calc_N_immobilization_loss()`](https://mcroci.github.io/agrinutri/reference/calc_N_immobilization_loss.md), [`nitrogen_from_previous_crop_residues()`](https://mcroci.github.io/agrinutri/reference/nitrogen_from_previous_crop_residues.md), [`organic_previous_years_N()`](https://mcroci.github.io/agrinutri/reference/organic_previous_years_N.md), [`organic_fertilization()`](https://mcroci.github.io/agrinutri/reference/organic_fertilization.md), [`natural_contribution()`](https://mcroci.github.io/agrinutri/reference/natural_contribution.md) |
+| Nitrogen balance (Annex 2) | [`N_balance()`](https://mcroci.github.io/agrinutri/reference/N_balance.md), [`calculate_N_fertilization()`](https://mcroci.github.io/agrinutri/reference/calculate_N_fertilization.md) and one function per term: [`calc_crop_N_demand()`](https://mcroci.github.io/agrinutri/reference/calc_crop_N_demand.md), [`soil_fertility()`](https://mcroci.github.io/agrinutri/reference/soil_fertility.md), [`leaching_loss()`](https://mcroci.github.io/agrinutri/reference/leaching_loss.md), [`calc_N_immobilization_loss()`](https://mcroci.github.io/agrinutri/reference/calc_N_immobilization_loss.md), [`nitrogen_from_previous_crop_residues()`](https://mcroci.github.io/agrinutri/reference/nitrogen_from_previous_crop_residues.md), [`organic_previous_years_N()`](https://mcroci.github.io/agrinutri/reference/organic_previous_years_N.md), [`organic_fertilization()`](https://mcroci.github.io/agrinutri/reference/organic_fertilization.md), [`natural_contribution()`](https://mcroci.github.io/agrinutri/reference/natural_contribution.md) |
 | P and K balances | [`P_balance()`](https://mcroci.github.io/agrinutri/reference/P_balance.md), [`K_balance()`](https://mcroci.github.io/agrinutri/reference/K_balance.md), [`classify_P_olsen()`](https://mcroci.github.io/agrinutri/reference/classify_P_olsen.md), [`classify_K()`](https://mcroci.github.io/agrinutri/reference/classify_K.md), [`estimate_soil_P_end_of_cycle()`](https://mcroci.github.io/agrinutri/reference/estimate_soil_P_end_of_cycle.md), [`estimate_soil_K_end_of_cycle()`](https://mcroci.github.io/agrinutri/reference/estimate_soil_K_end_of_cycle.md) |
 | Standard-dose scheme | [`scheda_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md), [`scheda_PK()`](https://mcroci.github.io/agrinutri/reference/dose_standard_PK.md), [`dose_standard_N()`](https://mcroci.github.io/agrinutri/reference/dose_standard_N.md), [`dose_standard_PK()`](https://mcroci.github.io/agrinutri/reference/dose_standard_PK.md) |
-| Regulatory limits and plan | [`get_MAS()`](https://mcroci.github.io/agrinutri/reference/get_MAS.md), [`check_MAS()`](https://mcroci.github.io/agrinutri/reference/check_MAS.md) (Reg. reg. 2/2024), [`plan_distribution()`](https://mcroci.github.io/agrinutri/reference/plan_distribution.md) (organic + mineral, 170 kg N/ha ZVN check), [`max_SO_input()`](https://mcroci.github.io/agrinutri/reference/max_SO_input.md) |
+| Regulatory limits and plan | [`get_MAS()`](https://mcroci.github.io/agrinutri/reference/get_MAS.md), [`check_MAS()`](https://mcroci.github.io/agrinutri/reference/check_MAS.md) (Regional Regulation 2/2024), [`plan_distribution()`](https://mcroci.github.io/agrinutri/reference/plan_distribution.md) (organic + mineral, 170 kg N/ha ZVN check), [`max_SO_input()`](https://mcroci.github.io/agrinutri/reference/max_SO_input.md) |
 | Soil | [`tri2()`](https://mcroci.github.io/agrinutri/reference/tri2.md), [`tri3()`](https://mcroci.github.io/agrinutri/reference/tri3.md), [`calc_soil_group_and_id_rag()`](https://mcroci.github.io/agrinutri/reference/calc_soil_group_and_id_rag.md), [`classify_pH()`](https://mcroci.github.io/agrinutri/reference/classify_pH.md), [`classify_SOM()`](https://mcroci.github.io/agrinutri/reference/classify_SOM.md), [`classify_CEC()`](https://mcroci.github.io/agrinutri/reference/classify_CEC.md), carbonate classes, [`soilgrids_input()`](https://mcroci.github.io/agrinutri/reference/soilgrids_input.md) |
 | Farm and spatial balance | [`farm_balance()`](https://mcroci.github.io/agrinutri/reference/farm_balance.md), [`spatial_N_balance()`](https://mcroci.github.io/agrinutri/reference/spatial_N_balance.md) |
 | Remote sensing | [`compute_vi()`](https://mcroci.github.io/agrinutri/reference/compute_vi.md) (NDVI, NDRE, GNDVI, CIred-edge, MCARI, MSAVI2), [`estimate_biophysical()`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md) (Gaussian-process retrieval from Sentinel-2 L2A), [`compute_NNI()`](https://mcroci.github.io/agrinutri/reference/compute_NNI.md), [`compute_NNI_from_S2()`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md), [`diagnose_N_status()`](https://mcroci.github.io/agrinutri/reference/diagnose_N_status.md) |
@@ -120,11 +119,11 @@ N = **A** − **B** + **C** + **D** − **E** − **F** − **G**
 
 | Term | Meaning |
 |----|----|
-| A | crop demand: unit uptake (Allegato 6) × expected yield |
+| A | crop demand: unit uptake (Annex 6) × expected yield |
 | B | soil supply: N mineralised from organic matter × time coefficient, plus ready N for crops with a cycle shorter than one year |
 | C | leaching: autumn–winter (Ca) and end-of-winter (Cb) losses from rainfall |
-| D | immobilisation and dispersion: B × correction factor by texture and drainage, plus a negative precession effect |
-| E | precession residues |
+| D | immobilisation and dispersion: B × correction factor by texture and drainage, plus a negative previous-crop effect |
+| E | previous crop residues |
 | F | previous years’ organic fertilisation × recovery coefficient × time coefficient |
 | G | atmospheric deposition × time coefficient, plus biological fixation of legumes |
 
@@ -139,7 +138,7 @@ field scenarios computed by the spreadsheet itself
 (`tests/testthat/fixtures/`, generated with
 `data-raw/fertoffice_validation.py`): every balance term and the
 reported N, P2O5 and K2O doses are compared. Where the printed tables of
-the DPI Norme Generali and Fert_Office disagree, agrinutri follows
+the DPI General Rules and Fert_Office disagree, agrinutri follows
 Fert_Office; the differences are listed in
 [`vignette("agrinutri-PK-and-distribution")`](https://mcroci.github.io/agrinutri/articles/agrinutri-PK-and-distribution.md).
 

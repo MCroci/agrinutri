@@ -1,7 +1,8 @@
-# Mg/K ratio assessment (Fert_Office foglio Gri_K) 0-0.1 basso; 0.1-2.1 equilibrato; 2.1-5.1 alto; \>5.1 molto alto.
+# Mg/K ratio assessment (Fert_Office K sheet) 0-0.1 low; 0.1-2.1 balanced; 2.1-5.1 high; \>5.1 very high, returned as the Italian labels `"basso"`, `"equilibrato"`, `"alto"`, `"molto alto"`.
 
-Mg/K ratio assessment (Fert_Office foglio Gri_K) 0-0.1 basso; 0.1-2.1
-equilibrato; 2.1-5.1 alto; \>5.1 molto alto.
+Mg/K ratio assessment (Fert_Office K sheet) 0-0.1 low; 0.1-2.1 balanced;
+2.1-5.1 high; \>5.1 very high, returned as the Italian labels `"basso"`,
+`"equilibrato"`, `"alto"`, `"molto alto"`.
 
 ## Usage
 

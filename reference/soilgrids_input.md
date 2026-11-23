@@ -114,7 +114,7 @@ if (FALSE) { # requireNamespace("geodata", quietly = TRUE) && interactive()
 aoi <- sf::st_read(system.file("extdata/cerzoo_field.geojson", package = "agrinutri"))
 soil <- soilgrids_input(aoi, crs_out = 32632)
 n <- spatial_N_balance(soil, expected_yield_tons_ha = 9,
-                       crop = "Grano tenero FF (granella)",
+                       crop = "Soft wheat FF - strong (grain)",
                        ccp = "Spring-summer crop 100-130 days",
                        winter_rain = 150, start_spring_rain = 0,
                        prev_crop = "Maize stalks buried")

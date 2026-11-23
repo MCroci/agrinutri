@@ -2,7 +2,7 @@
 
 Looks up QUEFTS crop parameters in the bundled `quefts_crop_pars_IT.csv`
 table. Crop names follow agrinutri / English DPI-style labels (e.g.
-`"Durum wheat (whole plant)"`, `"Grano duro (granella)"`).
+`"Durum wheat (whole plant)"`, `"Silage maize (class 700)"`).
 
 ## Usage
 
