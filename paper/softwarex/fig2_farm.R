@@ -70,9 +70,10 @@ bb <- st_bbox(out); ctx <- geo[lengths(st_intersects(geo, st_as_sfc(bb))) > 0 & 
 pa <- ggplot(out) +
   geom_sf(aes(fill = N_target), colour = "grey20", linewidth = 0.2) +
   geom_sf(data = out[!out$MAS_ok, ], fill = NA, colour = OKABE[[6]], linewidth = 0.8) +
-  geom_sf_label(aes(label = plot), size = (BASE - 1) / .pt, family = FONT, linewidth = 0,
+  geom_sf_label(aes(label = sprintf("%s
+%.0f", plot, N_target)), lineheight = 0.9, size = (BASE - 1) / .pt, family = FONT, linewidth = 0,
                 fill = alpha("white", 0.8), label.padding = unit(0.4, "mm")) +
-  fill_N(name = expression("Mineral N dose (kg N ha"^-1*")"), limits = c(0, 300)) +
+  fill_N(name = expression("Balance dose (kg N ha"^-1*")"), limits = c(100, 200), oob = scales::squish) +
   map_furniture(bb, len = 200) + coord_sf(xlim = bb[c(1, 3)], ylim = bb[c(2, 4)], datum = NA) + theme_map() + cbar()
 tl <- reshape(terms, direction = "long", varying = c("A", "C", "D", "B", "E", "F", "G"), v.names = "kg",
               timevar = "term", times = c("A", "C", "D", "B", "E", "F", "G"), idvar = "plot")
@@ -93,4 +94,4 @@ after ", tolower(lab$c2023)), lab$plot)) +
   labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand and losses (+)"), y = NULL) +
   theme_sat() + theme(legend.position = "top", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
                       legend.key.size = unit(2.5, "mm"), legend.margin = margin(0, 0, 0, 0))
-save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.3))), "fig2_farm", "double", 80)
+save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.3))), "fig2_farm", "double", 72)

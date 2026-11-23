@@ -47,7 +47,7 @@ print(yr[, c("year", "class", "yield", "rain", "N", "MAS", "P2O5", "K2O")])
 EN <- c("mais" = "Maize", "cereali vernini" = "Winter cereals", "prato e medica" = "Alfalfa",
         "pomodoro" = "Processing tomato", "altre estive" = "Other summer crops")   # 2026: 9-class names
 yr$name <- ifelse(yr$class %in% names(EN), EN[yr$class], yr$class)
-yr$lab <- ifelse(is.na(yr$crop), paste0(yr$year, "\n(no estimate)"), paste0(yr$year, "\n", sub(" ", "\n", yr$name), "\n", round(yr$rain), " mm"))  # crop and Oct-Jan rain
+yr$lab <- ifelse(is.na(yr$crop), paste0(yr$year, "\n(no estimate)"), paste0(yr$year, "\n", sub(" ", "\n", yr$name), "\n", round(yr$rain), " + ", round(yr$spring_rain), " mm"))  # crop, Oct-Jan + Feb rain
 yr$lab <- factor(yr$lab, levels = yr$lab)
 tl <- reshape(yr[!is.na(yr$crop), c("lab", "A", "C", "D", "B", "E", "F", "G")], direction = "long",
               varying = c("A", "C", "D", "B", "E", "F", "G"), v.names = "kg",
@@ -56,12 +56,14 @@ tl$term <- factor(tl$term, levels = c("A", "C", "D", "B", "E", "F", "G"))
 yk <- yr[!is.na(yr$crop), ]
 pa <- ggplot(tl, aes(lab, kg, fill = term)) + geom_col(width = 0.65, colour = "grey20", linewidth = 0.15) +
   geom_hline(yintercept = 0, linewidth = 0.3) +
-  geom_errorbar(data = yk, aes(lab, ymin = MAS, ymax = MAS, colour = "Maximum dose"), inherit.aes = FALSE,
+  geom_errorbar(data = yk, aes(lab, ymin = MAS, ymax = MAS, colour = "Crop maximum dose"), inherit.aes = FALSE,
                 width = 0.7, linewidth = 0.6) +
   geom_point(data = yk, aes(lab, N, shape = "Balance dose"), inherit.aes = FALSE, fill = "white", size = 1.8) +
   fill_terms(nrow = 7) + scale_x_discrete(drop = FALSE) +
-  scale_colour_manual(values = c("Maximum dose" = OKABE[[6]]), name = NULL, guide = guide_legend(order = 3)) +
+  scale_colour_manual(values = c("Crop maximum dose" = OKABE[[6]]), name = NULL, guide = guide_legend(order = 3)) +
   scale_shape_manual(values = c("Balance dose" = 23), name = NULL, guide = guide_legend(order = 2)) +
+  coord_cartesian(ylim = c(-130, 310)) +
+  annotate("text", x = nlevels(yr$lab), y = -128, label = sprintf("G = %.0f", -yk$G[nrow(yk)]), vjust = 0, size = (BASE - 1.5) / .pt, family = FONT, colour = "white") +
   labs(x = NULL, y = expression("N balance term (kg N ha"^-1*")")) +
   theme_sat() + theme(legend.position = "right", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
                       legend.margin = margin(0, 0, 0, 0), legend.key.size = unit(2.5, "mm"),

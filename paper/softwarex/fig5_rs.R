@@ -19,4 +19,4 @@ pa <- ggplot() + geom_spatraster(data = lai) + fr + map_furniture(bb, len = 100)
 pb <- ggplot() + geom_spatraster(data = nni) + fr + fill_NNI(breaks = c(0.6, 0.9, 1, 1.1, 1.4))
 pc <- ggplot(rx) + geom_sf(aes(fill = dose), colour = "white", linewidth = 0.15) + fr +
   fill_N(name = expression("N dose (kg N ha"^-1*")"), limits = c(0.8, 1.2) * Nstar)
-save_fig(add_tags(pa + pb + pc), "fig5_rs_prescription", "double", 75)
+save_fig(add_tags(pa + pb), "fig5_rs_prescription", 140, 75)   # the NNI-zone prescription is Fig. 6e

@@ -57,7 +57,7 @@ ax.text(4.6, 6.98, "A crop demand, B soil supply, C leaching, D immobilisation,\
 box(0.6, 4.55, 4.05, 1.65, "Balance terms",
     "calc_crop_N_demand()\nsoil_fertility()\nleaching_loss()  ...", col=BAL)
 box(4.85, 4.55, 3.75, 1.65, "Doses",
-    "N_balance()  P_balance()\nK_balance()\ndose_standard_N() / _PK()", col=BAL)
+    "N_balance()\ncalculate_N_fertilization()\nP_balance()  K_balance()", col=BAL)
 box(0.6, 3.1, 4.05, 1.3, "Limits and plan",
     "check_MAS()\nplan_distribution()", col=BAL)
 box(4.85, 3.1, 3.75, 1.3, "Scale: plot, year, pixel",
@@ -81,8 +81,8 @@ box(0.3, 0.6, 8.6, 1.55, "Coefficient tables (editable R data)",
 ax.text(4.6, 1.0, "default set: Emilia-Romagna guidelines; replace a table to change it",
         ha="center", va="top", fontsize=FT, style="italic")
 box(9.55, 0.25, 4.45, 1.9, "Export",
-    "export_prescription()\nISOXML, Shapefile, GeoJSON,\nKML, GeoPackage, JD, Trimble")
-box(14.25, 0.25, 4.45, 1.9, "Interfaces",
+    "export_prescription()\nISOXML, Shapefile, GeoJSON, KML,\nGeoPackage, John Deere, Trimble")
+box(14.25, 0.25, 4.45, 1.9, "Interfaces and tests",
     "R scripts and pipelines\nrun_app() (Shiny)\ntestthat unit tests")
 
 # --- flows --------------------------------------------------------------------

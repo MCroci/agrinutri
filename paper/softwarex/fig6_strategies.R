@@ -43,7 +43,7 @@ M <- list("Uniform" = cells$dose,
           "Calibration (direct)" = strip("calibration", FALSE)$dose,
           "NDVI quantile classes" = strip("classes", TRUE)$dose,
           "NNI zones" = strip("nni")$dose,
-          "Holland-Schepers" = zonal(hs_r))
+          "Holland-Schepers" = .preserve_mean(zonal(hs_r), as.numeric(st_area(cells)), Nstar, lo, hi))  # cell means rescaled like the pixels
 mm <- do.call(rbind, lapply(names(M), function(k) {
   g <- cells[, "geometry"]; g$dose <- M[[k]]; g$method <- k; g }))
 mu <- sapply(M, function(x) weighted.mean(x, as.numeric(st_area(cells))))
@@ -80,11 +80,12 @@ rule_plot <- function(k, first = FALSE) {
         inv <- k == "Calibration (inverse)"
         xs <- seq(min(d$x, na.rm = TRUE), max(d$x, na.rm = TRUE), length.out = 100)
         ys <- approx(c(VI_LO, VI_HI), if (inv) c(hi, lo) else c(lo, hi), xs, rule = 2)$y
-        list(geom_line(data = data.frame(x = xs, dose = ys), linetype = "dashed", linewidth = 0.35, colour = "grey45"),
+        CAL <<- list(geom_line(data = data.frame(x = xs, dose = ys), linetype = "dashed", linewidth = 0.5, colour = OKABE[[6]]),
              geom_point(data = data.frame(x = c(VI_LO, VI_HI), dose = if (inv) c(hi, lo) else c(lo, hi)),
-                        shape = 4, size = 1.3, stroke = 0.5, colour = "grey20"))
-      } } +
-    geom_point(aes(fill = dose, size = area), shape = 21, colour = "grey35", stroke = 0.12) + DOSE +
+                        shape = 4, size = 1.5, stroke = 0.7, colour = OKABE[[6]]))
+        NULL
+      } else { CAL <<- NULL; NULL } } +
+    geom_point(aes(fill = dose, size = area), shape = 21, colour = "grey35", stroke = 0.12) + DOSE + CAL +
     guides(fill = "none") + scale_size_area(max_size = 1, guide = "none") +
     scale_y_continuous(limits = c(lo - 3, hi + 3), breaks = c(140, 175, 210)) +
     { if (XV[[k]] == "NDVI") scale_x_continuous(limits = c(0.3, 0.98), breaks = c(0.4, 0.6, 0.8))
@@ -94,8 +95,8 @@ rule_plot <- function(k, first = FALSE) {
     theme_sat() + theme(panel.grid.major = element_blank(),
                         plot.title = element_text(face = "bold", size = BASE - 0.5, margin = margin(b = 0)),
                         plot.subtitle = element_text(size = BASE - 1.5, colour = "grey30", margin = margin(b = 1)),
-                        axis.title = element_text(size = BASE - 1), axis.text = element_text(size = BASE - 1.5),
-                        axis.text.y = if (first) element_text(size = BASE - 1.5) else element_blank(),
+                        axis.title = element_text(size = BASE - 0.5), axis.text = element_text(size = BASE - 1),
+                        axis.text.y = if (first) element_text(size = BASE - 1) else element_blank(),
                         axis.ticks.length = unit(0.6, "mm"), plot.margin = margin(1, 1.5, 1, 1.5))
 }
 map_plot <- function(k) {
@@ -111,7 +112,7 @@ key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)
   theme_sat() + theme(legend.position = "none", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
                       panel.grid = element_blank(), panel.border = element_blank(), plot.tag = element_blank())
 grid <- wrap_plots(c(Map(rule_plot, names(M), seq_along(M) == 1), lapply(names(M), map_plot)),
-                   nrow = 2, byrow = TRUE, heights = c(1, 1.1))
+                   nrow = 2, byrow = TRUE, heights = c(1, 1))
 fig <- grid / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(2.1, 0.08)) +
   plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), rep("", 9)))) &   # tags on the rules only
   theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1))

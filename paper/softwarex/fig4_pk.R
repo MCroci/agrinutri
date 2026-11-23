@@ -15,7 +15,7 @@ EN <- c("mais" = "Maize", "cereali vernini" = "Winter cereals", "prato e medica"
         "pomodoro" = "Processing tomato", "altre estive" = "Other summer crops")
 yr$class <- ifelse(yr$class %in% names(EN), EN[yr$class], yr$class)
 
-NUT <- c("P[2]*O[5]" = OKABE[[7]], "K[2]*O" = "grey40")
+NUT <- c("P[2]*O[5]" = "#999933", "K[2]*O" = "#332288")
 bars <- function(d, x) list(
   geom_col(aes(fill = nutrient), position = position_dodge(width = 0.75), width = 0.7,
            colour = "grey20", linewidth = 0.15),
