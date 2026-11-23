@@ -16,9 +16,14 @@ Nstar <- fm$N_target[fm$plot == "P01"]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
 s2  <- rast(file.path(D, "rs_s2_20240813.tif"))
 ndvi <- (s2[["B08"]] - s2[["B04"]]) / (s2[["B08"]] + s2[["B04"]]); names(ndvi) <- "NDVI"
 nni <- rast(file.path(D, "rs_NNI_full.tif"))
+# two-point calibration anchors from the field NDVI (5th and 95th percentile), as in the package vignette
+fv0 <- vect(st_transform(field, crs(ndvi)))
+q <- quantile(values(mask(ndvi, fv0), na.rm = TRUE), c(0.05, 0.95)); VI_LO <- round(q[[1]], 2); VI_HI <- round(q[[2]], 2)
+cat("calibration anchors NDVI", VI_LO, VI_HI, "
+")
 strip <- function(v, inv = TRUE) build_strip_prescription(field, machine_width = 24, cell_length = 30,
   variability = v, vi_raster = ndvi, nni_raster = nni, n_target = Nstar, min_dose = lo, max_dose = hi,
-  calibration_inverse = inv, preserve_mean = TRUE)
+  vi_low = VI_LO, vi_high = VI_HI, calibration_inverse = inv, preserve_mean = TRUE)
 cells <- strip("uniform")
 zonal <- function(r) {                                   # pixel prescription -> cell means, field mean kept
   cv <- st_transform(cells, crs(r))
@@ -64,6 +69,14 @@ block <- function(k, ylab = TRUE) {
   rule <- ggplot(d[is.finite(d$x), ], aes(x, dose)) +
     geom_hline(yintercept = Nstar, linetype = "dotted", linewidth = 0.35) +
     { if (XV[[k]] == "NNI") geom_vline(xintercept = c(0.9, 1.1), linewidth = 0.25, colour = "grey55") } +
+    { if (grepl("Calibration", k)) {
+        inv <- k == "Calibration (inverse)"
+        xs <- seq(min(d$x, na.rm = TRUE), max(d$x, na.rm = TRUE), length.out = 100)
+        ys <- approx(c(VI_LO, VI_HI), if (inv) c(hi, lo) else c(lo, hi), xs, rule = 2)$y
+        list(geom_line(data = data.frame(x = xs, dose = ys), linetype = "dashed", linewidth = 0.4, colour = "grey45"),
+             geom_point(data = data.frame(x = c(VI_LO, VI_HI), dose = if (inv) c(hi, lo) else c(lo, hi)),
+                        shape = 4, size = 1.6, stroke = 0.6, colour = "grey20"))
+      } } +
     geom_point(aes(fill = dose, size = area), shape = 21, colour = "grey35", stroke = 0.15) + DOSE +
     guides(fill = "none") +
     scale_size_area(max_size = 1.3, guide = "none") +
