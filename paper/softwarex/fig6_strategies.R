@@ -81,7 +81,7 @@ block <- function(k, ylab = TRUE) {
     guides(fill = "none") +
     scale_size_area(max_size = 1.3, guide = "none") +
     scale_y_continuous(limits = c(lo - 3, hi + 3), breaks = c(140, 175, 210)) +
-    labs(title = SHORT[[k]], subtitle = DRV[[k]], x = paste("Cell", XV[[k]]),
+    labs(title = SHORT[[k]], subtitle = sprintf("%s; mean %.0f", DRV[[k]], mu[[k]]), x = paste("Cell", XV[[k]]),
          y = if (ylab) expression("N (kg ha"^-1*")") else NULL) +
     theme_sat() + theme(panel.grid.major = element_blank(), plot.title = element_text(face = "bold", size = BASE, margin = margin(b = 0.5)),
                         plot.subtitle = element_text(size = BASE - 1, colour = "grey30", margin = margin(b = 1.5)),
@@ -89,10 +89,8 @@ block <- function(k, ylab = TRUE) {
   g <- cells[, "geometry"]; g$dose <- M[[k]]
   map <- ggplot(g) + geom_sf(aes(fill = dose), colour = "white", linewidth = 0.08) +
     geom_sf(data = field, fill = NA, colour = "grey20", linewidth = 0.25) + DOSE +
-    annotate("label", x = Inf, y = Inf, hjust = 1.05, vjust = 1.2, size = (BASE - 1) / .pt, family = FONT,
-             label = sprintf("mean %.0f", mu[[k]]), linewidth = 0, fill = alpha("white", 0.85)) +
     coord_sf(datum = NA) + theme_map() + theme(legend.position = "none")
-  wrap_elements(full = rule / map + plot_layout(heights = c(0.75, 1)))
+  wrap_elements(full = rule | map + plot_layout(widths = c(1.6, 1)))
 }
 key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)) + geom_raster() + DOSE +
   annotate("segment", x = Nstar, xend = Nstar, y = 0.5, yend = 1.5, linetype = "dotted", linewidth = 0.4) +
@@ -100,8 +98,8 @@ key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)
   labs(x = expression("Prescribed N dose (kg N ha"^-1*"); dotted: balance dose"), y = NULL) +
   theme_sat() + theme(legend.position = "none", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
                       panel.grid = element_blank(), panel.border = element_blank(), plot.tag = element_blank())
-blocks <- wrap_plots(Map(block, names(M), seq_along(M) %in% c(1, 4)), ncol = 3)
-fig <- blocks / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(2, 0.07)) +
+blocks <- wrap_plots(Map(block, names(M), seq_along(M) %in% c(1, 3, 5)), ncol = 2)
+fig <- blocks / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(3, 0.08)) +
   plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), "", "", ""))) &   # no tag on the dose bar
   theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1), plot.tag.location = "margin")
-save_fig(fig, "fig6_strategies", "double", 175)
+save_fig(fig, "fig6_strategies", "double", 140)
