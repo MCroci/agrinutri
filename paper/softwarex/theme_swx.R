@@ -32,7 +32,8 @@ theme_map <- function(base = BASE) {
 }
 # panel tags (a), (b), ... on a patchwork: add_tags(p1 + p2)
 add_tags <- function(p) (p + plot_annotation(tag_levels = "a", tag_prefix = "(", tag_suffix = ")")) &
-  theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1))
+  theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1),
+        plot.tag.location = "plot")                      # tags at the corner of each panel area: aligned rows
 invisible(Sys.setlocale("LC_TIME", "C"))                 # English month names on date axes
 cbar <- function() guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5))
 
@@ -45,6 +46,15 @@ fill_NNI <- function(name = "NNI", ...)
   scale_fill_gradientn(colours = c("#b2182b", "#ef8a62", "#f7f7f7", "#67a9cf", "#2166ac"),
                        values = rescale(c(0.6, 0.9, 1.0, 1.1, 1.4)), limits = c(0.6, 1.4),
                        oob = squish, na.value = "transparent", name = name, ...)
+
+# N balance terms: fixed order, colours and readable legend labels (Figs. 2-3)
+TERMS <- c("A", "C", "D", "B", "E", "F", "G")
+TERM_FILL <- c(A = OKABE[[5]], C = OKABE[[3]], D = OKABE[[2]], B = OKABE[[4]], E = OKABE[[7]],
+               F = OKABE[[8]], G = "grey60")
+TERM_LAB <- c(A = "A crop demand", C = "C leaching", D = "D immobilisation", B = "B soil supply",
+              E = "E previous crop", F = "F past organic inputs", G = "G deposition, fixation")
+fill_terms <- function(nrow = 2) scale_fill_manual(values = TERM_FILL, labels = TERM_LAB, name = NULL,
+                                           guide = guide_legend(nrow = nrow, order = 1))
 
 # scale bar and north arrow (projected coordinates in metres), placed in the lower-left corner
 map_furniture <- function(bb, len = 200) {

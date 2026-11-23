@@ -1,7 +1,7 @@
-# Fig. 5: within-field strategies on plot P01 (Figs. 2-4), all redistributing the balance dose N*
+# Fig. 6: within-field strategies on plot P01 (Figs. 2-5), all redistributing the balance dose N*
 #     of P01 on the same 24 m x 30 m cells: uniform, calibration ramp (inverse, direct), NDVI quantile classes, NNI zones,
 #     Holland-Schepers sufficiency index (variable_rate_N).
-# Run from the package root after fig2_farm.R and fig4_data.R:  Rscript paper/softwarex/fig5_strategies.R
+# Run from the package root after fig2_farm.R and fig5_data.R:  Rscript paper/softwarex/fig6_strategies.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -45,20 +45,40 @@ cat("N* P01:", Nstar, "\n"); print(summ)
 write.csv(data.frame(method = names(M), t(sapply(M, function(x) c(min = min(x), max = max(x),
           mean = weighted.mean(x, as.numeric(st_area(cells))))))), file.path(D, "methods_p01.csv"), row.names = FALSE)
 
-mm$diff <- mm$dose - Nstar
-pb <- ggplot(mm) + geom_sf(aes(fill = diff), colour = "white", linewidth = 0.1) +
-  geom_sf(data = field, fill = NA, colour = "grey20", linewidth = 0.25) +
-  facet_wrap(~method, ncol = 3) +
-  scale_fill_gradient2(low = "#1b7837", mid = "#f7f7f7", high = "#762a83", midpoint = 0,
-                       limits = c(lo, hi) - Nstar, oob = scales::squish,
-                       name = expression("Dose minus balance dose (kg N ha"^-1*")")) +
-  coord_sf(datum = NA) + theme_map() + cbar() +
-  theme(strip.text = element_text(size = BASE - 1, margin = margin(b = 1)))
-mm$area <- as.numeric(st_area(mm))
+# ---- figure: inputs, the six prescription maps on one dose scale, distributions -------------------
+SHORT <- c("Uniform" = "Uniform", "Calibration (inverse)" = "Calibration ramp, inverse",
+           "Calibration (direct)" = "Calibration ramp, direct", "NDVI quantile classes" = "Quantile classes",
+           "NNI zones" = "NNI zones", "Holland-Schepers" = "Sufficiency index")
+DRV <- c("Uniform" = "no input layer", "Calibration (inverse)" = "NDVI, more N on low vigour",
+         "Calibration (direct)" = "NDVI, more N on high vigour", "NDVI quantile classes" = "NDVI, five classes",
+         "NNI zones" = "deficient, optimal, luxury", "Holland-Schepers" = "NDVI, Holland-Schepers")
 mm$m0 <- factor(sub(" [(]mean.*", "", mm$method), levels = names(M))
-pc <- ggplot(st_drop_geometry(mm), aes(dose, m0, weight = area)) +
+LAB <- setNames(sprintf("%s
+%s
+mean %.0f", SHORT, DRV, mu[names(SHORT)]), names(SHORT))
+mm$lab <- factor(LAB[as.character(mm$m0)], levels = LAB)
+means <- data.frame(m0 = factor(names(M), levels = names(M)), dose = mu[names(M)])
+mm$area <- as.numeric(st_area(mm))
+fv <- vect(st_transform(field, crs(ndvi)))
+fr <- list(geom_sf(data = st_transform(field, crs(ndvi)), fill = NA, colour = "grey20", linewidth = 0.3),
+           coord_sf(datum = NA, expand = FALSE), theme_map(), cbar(),
+           theme(legend.key.width = unit(5.5, "mm")))
+pi1 <- ggplot() + tidyterra::geom_spatraster(data = mask(ndvi, fv)) + fr +
+  scale_fill_distiller(palette = "YlGn", direction = 1, na.value = "transparent", name = "NDVI (input)")
+pi2 <- ggplot() + tidyterra::geom_spatraster(data = mask(crop(nni, fv), fv)) + fr +
+  fill_NNI(name = "NNI (input)", breaks = c(0.6, 1, 1.4))
+pd <- ggplot(st_drop_geometry(mm), aes(dose, m0)) +
   geom_vline(xintercept = Nstar, linetype = "dotted", linewidth = 0.4) +
-  geom_boxplot(width = 0.55, outlier.size = 0.4, linewidth = 0.3, fill = "grey92") +
-  scale_y_discrete(limits = rev(names(M))) +
-  labs(x = expression("Cell dose (kg N ha"^-1*"); dotted: balance dose"), y = NULL) + theme_sat()
-save_fig(add_tags(pc / pb + plot_layout(heights = c(0.55, 1.5))), "fig5_strategies", "double", 140)
+  geom_jitter(aes(size = area), height = 0.18, width = 0, alpha = 0.35, colour = OKABE[[5]], stroke = 0) +
+  geom_point(data = means, shape = 23, fill = "white", size = 1.8) +
+  scale_size_area(max_size = 1.2, guide = "none") +
+  scale_y_discrete(limits = rev(names(M)), labels = SHORT) +
+  labs(x = expression("Cell dose (kg N ha"^-1*")"), y = NULL) + theme_sat()
+pm <- ggplot(mm) + geom_sf(aes(fill = dose), colour = "white", linewidth = 0.08) +
+  geom_sf(data = field, fill = NA, colour = "grey20", linewidth = 0.25) +
+  facet_wrap(~lab, ncol = 3) +
+  fill_N(name = expression("Prescribed N dose (kg N ha"^-1*")"), limits = c(lo, hi)) +
+  coord_sf(datum = NA) + theme_map() + cbar() +
+  theme(strip.text = element_text(size = BASE - 1, lineheight = 0.95, margin = margin(b = 1.5)))
+left <- (pi1 | pi2) / pd + plot_layout(heights = c(1, 1.25))
+save_fig(add_tags(left | pm) + plot_layout(widths = c(1, 1.75)), "fig6_strategies", "double", 120)

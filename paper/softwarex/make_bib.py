@@ -25,7 +25,7 @@ NFERT = r"""@misc{agrinutri2026,
 }"""
 
 txt = "\n".join(open(f, encoding="utf-8").read()
-                for f in ("../references.bib", "../references_review.bib", "../sat/references_extra.bib"))
+                for f in ("references_intl.bib", "../references.bib", "../references_review.bib", "../sat/references_extra.bib"))  # first match wins
 txt += chr(10) + EU2115
 entries = re.split(r"\n(?=@)", txt)
 out = []

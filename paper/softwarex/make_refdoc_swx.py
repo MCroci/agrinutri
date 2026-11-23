@@ -26,5 +26,10 @@ for name in ("Source Code", "Verbatim Char"):
         rfonts.set(qn(attr), "Consolas")
     if name == "Source Code":
         st.paragraph_format.alignment = 0  # left, not justified
+# explicit A4 page with 2.5 cm margins: pandoc reads the text width (16 cm) from here to size figures
+from docx.shared import Cm
+for sec in doc.sections:
+    sec.page_width, sec.page_height = Cm(21.0), Cm(29.7)
+    sec.left_margin = sec.right_margin = sec.top_margin = sec.bottom_margin = Cm(2.5)
 doc.save("reference-swx.docx")
 print("reference-swx.docx written")

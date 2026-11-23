@@ -78,17 +78,19 @@ tl <- reshape(terms, direction = "long", varying = c("A", "C", "D", "B", "E", "F
               timevar = "term", times = c("A", "C", "D", "B", "E", "F", "G"), idvar = "plot")
 tl$term <- factor(tl$term, levels = c("A", "C", "D", "B", "E", "F", "G"))
 tl$plot <- factor(tl$plot, levels = rev(lab$plot)); lab$plot <- factor(lab$plot, levels = rev(lab$plot))
-dose <- data.frame(plot = factor(out$plot, levels = levels(tl$plot)), N = out$N_target,
-                   std = vapply(out$crop, function(cr) dose_standard_N(cr)$dose_final, numeric(1)))
+std <- vapply(out$crop, function(cr) dose_standard_N(cr)$dose_final, numeric(1))
+dose <- data.frame(plot = factor(rep(out$plot, 2), levels = levels(tl$plot)), N = c(out$N_target, std),
+                   type = rep(c("Balance dose", "Standard dose"), each = nrow(out)))
 pb <- ggplot(tl, aes(kg, plot, fill = term)) + geom_col(width = 0.65, colour = "grey20", linewidth = 0.15) +
   geom_vline(xintercept = 0, linewidth = 0.3) +
-  geom_point(data = dose, aes(N, plot), inherit.aes = FALSE, shape = 23, fill = "white", size = 1.6) +
-  geom_point(data = dose, aes(std, plot), inherit.aes = FALSE, shape = 4, size = 1.4, stroke = 0.6, colour = OKABE[[6]]) +
-  scale_fill_manual(values = c(A = OKABE[[5]], C = OKABE[[3]], D = OKABE[[2]], B = OKABE[[4]],
-                               E = OKABE[[7]], F = OKABE[[8]], G = "grey60"), name = NULL) +
+  geom_point(data = dose, aes(N, plot, shape = type, colour = type), inherit.aes = FALSE,
+             fill = "white", size = 1.6, stroke = 0.6) +
+  fill_terms() +
+  scale_shape_manual(values = c("Balance dose" = 23, "Standard dose" = 4), name = NULL) +
+  scale_colour_manual(values = c("Balance dose" = "black", "Standard dose" = OKABE[[6]]), name = NULL) +
   scale_y_discrete(labels = setNames(paste0(lab$plot, "  ", lab$c2024, "
 after ", tolower(lab$c2023)), lab$plot)) +
   labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand and losses (+)"), y = NULL) +
-  theme_sat() + theme(legend.position = "top", legend.key.size = unit(2.5, "mm")) +
-  guides(fill = guide_legend(nrow = 1))
-save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.15))), "fig2_farm", "double", 72)
+  theme_sat() + theme(legend.position = "top", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
+                      legend.key.size = unit(2.5, "mm"), legend.margin = margin(0, 0, 0, 0))
+save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.3))), "fig2_farm", "double", 80)
