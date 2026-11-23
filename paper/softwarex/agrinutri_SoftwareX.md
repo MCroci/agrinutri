@@ -82,7 +82,7 @@ The variable-rate functions turn a vegetation index or NNI map into rates with a
 
 ## 2.3. Quality assurance
 
-Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edition) and Fert_Office differ, for example in the mineralisation rates of sandy soils and the immobilisation factors of poorly drained soils, agrinutri follows Fert_Office, the tool that inspections use, and its documentation lists the differences. The test suite (169 tests, 776 expectations, about 87 percent line coverage) covers every balance term, the regulatory checks, the exact mass balance of the prescriptions and the export formats, and runs on Windows, macOS and Linux through continuous integration.
+Where the printed tables of the guidelines (Norme Generali, Annex 2, 2024/25 edition) and Fert_Office differ, for example in the mineralisation rates of sandy soils and the immobilisation factors of poorly drained soils, agrinutri follows Fert_Office, the tool that inspections use, and its documentation lists the differences. The test suite (174 tests, 802 expectations, about 87 percent line coverage) covers every balance term, the regulatory checks, the exact mass balance of the prescriptions and the export formats, and runs on Windows, macOS and Linux through continuous integration.
 
 # 3. Illustrative examples
 
@@ -119,7 +119,7 @@ Because the inputs are columns, the balance runs over years as easily as over pl
 
 ## 3.4. From a satellite image to a machine file
 
-In 2024 plot P01, a maize field of 8.6 ha delineated from Sentinel-2 with Fields of The World [@kerner2024ftw], illustrates the remote-sensing chain on the Level-2A scene of 13 August 2024. A few calls go from the image to an ISOXML task file; the target is the balance dose of the plot, N\* = 175 kg N ha^−1^ (Section 3.2), and the cell doses may range between 80 and 120 percent of it:
+In 2024 plot P01, the 8.6 ha maize field of Fig. 2, illustrates the remote-sensing chain on the Level-2A scene of 13 August 2024. A few calls go from the image to an ISOXML task file; the target is the balance dose of the plot, N\* = 175 kg N ha^−1^ (Section 3.2), and the cell doses may range between 80 and 120 percent of it:
 
 ```r
 bio   <- estimate_biophysical("s2_20240813.tif", output_dir = tempdir(),
