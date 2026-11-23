@@ -7,9 +7,7 @@
 critical_N_curve(crop)
 }
 \arguments{
-\item{crop}{Character. Crop identifier (see list above). Case-insensitive;
-Italian synonyms (\code{"frumento"}, \code{"mais"}, \code{"colza"},
-\code{"riso"}, \code{"girasole"}, \code{"sorgo"}) are accepted.}
+\item{crop}{Character. Crop identifier (see list above). Case-insensitive.}
 }
 \value{
 A list with numeric elements \code{a}, \code{b}, \code{W_min}

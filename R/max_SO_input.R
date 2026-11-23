@@ -1,8 +1,8 @@
 #' Maximum annual organic matter input (t dry matter / ha)
 #'
-#' Returns the DPI 2026 maximum annual input of soil organic matter (SO) as
-#' dry matter t/ha, based on the classification of initial SO in soil:
-#' "Poor" = 13, "Normal" = 11, "Rich" = 9 (Fert_Office v1.26 foglio SO).
+#' Returns the DPI 2026 maximum annual input of soil organic matter (SOM) as
+#' dry matter t/ha, based on the classification of initial SOM in soil:
+#' "Poor" = 13, "Normal" = 11, "Rich" = 9 (Fert_Office v1.26 SOM sheet).
 #'
 #' @param so_class One of `"Poor"`, `"Normal"`, `"Rich"` (case-insensitive).
 #' @param so_max_input Lookup table (default `agrinutri::so_max_input`).
@@ -21,18 +21,17 @@ max_SO_input <- function(so_class = c("Poor", "Normal", "Rich"),
   as.numeric(v[1])
 }
 
-#' Classify SO (soil organic matter) initial content by texture group
+#' Classify SOM (soil organic matter) initial content by texture group
 #'
-#' Returns DPI 2026 SO class (molto bassa / bassa / media / elevata) by
-#' soil texture group (Sabbiosi / Medio impasto / Argillosi e limosi) and
-#' maps to the 3-class scheme "Scarsa / Normale / Elevata" used for the
-#' maximum annual SO input.
+#' Returns the DPI 2026 SOM rating (very low / low / medium / high) by
+#' soil texture group (sandy / loamy / clay textures) and maps it to the
+#' 3-class scheme (Poor / Normal / Rich) used for the maximum annual SOM input.
 #'
 #' @param SOM Soil organic matter (% mass).
-#' @param soil_group Texture group (Italian).
+#' @param soil_group DPI texture group (see [normalise_soil_group()]).
 #' @param so.table Lookup (default `agrinutri::so.table`).
-#' @return List with `rating` (4 classes) and `class` (3-class for SO input).
-#' @examples classify_SOM(SOM = 2, soil_group = "Medio impasto")
+#' @return List with `rating` (4 classes) and `class` (3-class for SOM input).
+#' @examples classify_SOM(SOM = 2, soil_group = "Loamy textures")
 #' @export
 classify_SOM <- function(SOM, soil_group, so.table = agrinutri_data_get("so.table")) {
   if (!is.numeric(SOM) || length(SOM) != 1 || is.na(SOM) || SOM < 0) {

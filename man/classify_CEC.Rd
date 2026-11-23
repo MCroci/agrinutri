@@ -2,8 +2,9 @@
 % Please edit documentation in R/soil_chemistry.R
 \name{classify_CEC}
 \alias{classify_CEC}
-\title{Classify cation exchange capacity (CSC, meq/100 g)
-From Fert_Office v1.26 foglio Gri_K: < 10 = bassa, 10-20 = media, > 20 = alta.}
+\title{Classify cation exchange capacity (CEC, meq/100 g)
+From the Fert_Office v1.26 K sheet: < 10 low, 10-20 medium, > 20 high,
+returned as the Italian labels \code{"bassa"}, \code{"media"}, \code{"alta"}.}
 \usage{
 classify_CEC(csc_meq)
 }
@@ -14,8 +15,9 @@ classify_CEC(csc_meq)
 List with \code{class}.
 }
 \description{
-Classify cation exchange capacity (CSC, meq/100 g)
-From Fert_Office v1.26 foglio Gri_K: < 10 = bassa, 10-20 = media, > 20 = alta.
+Classify cation exchange capacity (CEC, meq/100 g)
+From the Fert_Office v1.26 K sheet: < 10 low, 10-20 medium, > 20 high,
+returned as the Italian labels \code{"bassa"}, \code{"media"}, \code{"alta"}.
 }
 \examples{
 classify_CEC(18)

@@ -89,12 +89,11 @@ GS30+ / V8+.
 ## 3. Critical-N curve
 
 `critical_N_curve()` returns the (a, b, W_min) coefficients of the
-species-specific critical nitrogen dilution curve. Italian synonyms
-are accepted.
+species-specific critical nitrogen dilution curve.
 
 ```{r critical-curve}
 critical_N_curve("wheat")
-critical_N_curve("mais")   # italian
+critical_N_curve("maize")
 ```
 
 The curve is Nc = a * W^(-b), where Nc is the critical N concentration

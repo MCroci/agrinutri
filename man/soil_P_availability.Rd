@@ -2,7 +2,7 @@
 % Please edit documentation in R/soil_P_availability.R
 \name{soil_P_availability}
 \alias{soil_P_availability}
-\title{Compute soil P availability terms (B1 / A mantenimento / B2) for the P balance}
+\title{Compute soil P availability terms (B1 / A maintenance / B2) for the P balance}
 \usage{
 soil_P_availability(
   olsen_value,
@@ -21,8 +21,8 @@ soil_P_availability(
 
 \item{unit}{\code{"P"} or \code{"P2O5"} (default \code{"P"}).}
 
-\item{soil_group}{One of \code{"Sabbiosi"}, \code{"Medio impasto"}, \code{"Argillosi e limosi"}
-(must match \code{texture_groups.table$group}).}
+\item{soil_group}{DPI texture group: \code{"Sandy textures"}, \code{"Loamy textures"} or
+\code{"Clay textures"} (see \code{\link[=normalise_soil_group]{normalise_soil_group()}}).}
 
 \item{A_demand_P2O5}{Crop P2O5 demand (kg/ha) (from \code{calc_crop_P_demand()}).}
 
@@ -34,24 +34,24 @@ soil_P_availability(
 \item{p_availability.table, p_availability_meta, texture_groups.table}{Lookup tables.}
 }
 \value{
-A list with \code{strategy}, \code{B1} (arricchimento kg/ha), \code{A_mantenimento},
-\code{B2} (riduzione kg/ha), and diagnostic \code{soil_weight_t_ha}, \code{P_immobilisation_factor}.
+A list with \code{strategy}, \code{B1} (enrichment, kg/ha), \code{A_mantenimento}
+(maintenance, kg/ha), \code{B2} (reduction, kg/ha), and diagnostic \code{soil_weight_t_ha}, \code{P_immobilisation_factor}.
 }
 \description{
-Implements the DPI 2026 Allegato 2 logic coded in Fert_Office v1.26 foglio
-\code{Gri_P}: depending on the phosphorus availability class (\code{Arricchimento},
-\code{Mantenimento}, \code{Riduzione}) returns the contribution that goes onto the
-NECESSITA' side (B1, A anticipations) or onto the DISPONIBILITA' side (B2).
+Implements the DPI 2026 Annex 2 logic coded in the Fert_Office v1.26 P
+sheet: depending on the phosphorus availability strategy (enrichment,
+maintenance or reduction) returns the contribution that goes onto the
+requirement side (B1, A advances) or onto the supply side (B2).
 }
 \details{
-In "Riduzione" (very high P) the crop removal A is kept and the excess over
+In the reduction strategy (very high P) the crop removal A is kept and the excess over
 the upper bound of the normal range (68.7 ppm P2O5) times the soil weight is
 returned as B2, to be subtracted.
 
-The B1 arricchimento term equals the distance of the analytical value from
+The B1 enrichment term equals the distance of the analytical value from
 the lower bound of the normal class (22.9 ppm P2O5), multiplied by the soil
 weight at 30 cm (t/ha) and by the P immobilisation factor. As in
-Fert_Office (foglio \code{Gri_P}, cell L10) the factor is the texture-group base
+Fert_Office (P sheet, cell L10) the factor is the texture-group base
 value (\code{texture_groups.table$P_immobilisation_factor}: 1.2 sandy, 1.3 loamy,
 1.4 clay) plus 0.02 times the total carbonate content (percent). When
 \code{total_carbonate} is not supplied, the legacy constant
@@ -60,5 +60,5 @@ value (\code{texture_groups.table$P_immobilisation_factor}: 1.2 sandy, 1.3 loamy
 }
 \examples{
 soil_P_availability(olsen_value = 15, unit = "P2O5",
-                    soil_group = "Medio impasto", A_demand_P2O5 = 63.6)
+                    soil_group = "Loamy textures", A_demand_P2O5 = 63.6)
 }

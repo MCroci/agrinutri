@@ -1,9 +1,8 @@
 #' Classify exchangeable potassium availability
 #'
 #' Classifies K (or K2O) availability by soil texture grouping, following DPI
-#' Emilia-Romagna 2026 (Fert_Office v1.26 foglio `Gri_K`). The threshold ranges
-#' depend on the DPI texture group (`Sabbiosi`, `Medio impasto`,
-#' `Argillosi e limosi`).
+#' Emilia-Romagna 2026 (Fert_Office v1.26 K sheet). The threshold ranges
+#' depend on the DPI texture group (sandy, loamy or clay textures).
 #'
 #' @param value Numeric K or K2O value in ppm.
 #' @param unit `"K"` (default) or `"K2O"`. Conversion K2O = K / 0.83333.
@@ -11,9 +10,10 @@
 #' @param k_availability.table Lookup table, default `agrinutri::k_availability.table`.
 #'
 #' @return A list with `value_ppm_K`, `value_ppm_K2O`, `ID_Gri_K`, `rating`,
-#'   `strategy` (`Arricchimento` / `Mantenimento` / `Riduzione`).
+#'   `strategy` (`"Arricchimento"` / `"Mantenimento"` / `"Riduzione"`, that is
+#'   enrichment / maintenance / reduction).
 #' @examples
-#' classify_K(value = 150, unit = "K2O", soil_group = "Medio impasto")
+#' classify_K(value = 150, unit = "K2O", soil_group = "Loamy textures")
 #' @export
 classify_K <- function(value,
                        unit = c("K", "K2O"),
@@ -64,7 +64,7 @@ classify_K <- function(value,
 
 #' K leaching by clay content
 #'
-#' Step function from Fert_Office v1.26 foglio Gri_K (righe 23-28):
+#' Step function from the Fert_Office v1.26 K sheet (rows 23-28):
 #' clay < 5.1% -> 60 kg K2O/ha; 5.1-15.1 -> 30; 15.1-25.1 -> 20; >= 25.1 -> 10.
 #' @param clay_pct Clay percentage.
 #' @return Numeric, leachable K2O in kg/ha.
@@ -86,24 +86,24 @@ K_leaching_by_clay <- function(clay_pct) {
 #' @param k_value,unit,soil_group K analytical value and DPI texture group.
 #' @param A_demand_K2O Crop K2O demand (kg/ha) from `calc_crop_K_demand()`.
 #' @param clay_pct Clay percentage, used to compute leaching `H`.
-#' @param include_leaching Logical, add K leaching to mantenimento term. Default TRUE.
+#' @param include_leaching Logical, add K leaching to the maintenance term. Default TRUE.
 #' @param k_availability.table,texture_groups.table Lookup tables.
 #'
-#' As in Fert_Office v1.26 (foglio `Gri_K`), with K2O the analytical value and
+#' As in Fert_Office v1.26 (K sheet), with K2O the analytical value and
 #' W the soil weight of the 30 cm layer (t/ha):
 #' \itemize{
-#'   \item Arricchimento (low / very low): B1 = (lower bound of the "media"
+#'   \item enrichment (low / very low): B1 = (lower bound of the medium
 #'     class - K2O) x W / 1000 x (1 + 0.018 x clay);
-#'   \item Mantenimento: A + H;
-#'   \item Riduzione (high): B2 = (K2O - upper bound of the "media" class) x
+#'   \item maintenance: A + H;
+#'   \item reduction (high): B2 = (K2O - upper bound of the medium class) x
 #'     W / 1000, subtracted from A + H.
 #' }
 #'
-#' @return A list with `strategy`, `ID_Gri_K`, `B1`, `A_mantenimento` (asportazione + H),
+#' @return A list with `strategy`, `ID_Gri_K`, `B1`, `A_mantenimento` (crop removal + H),
 #'   `B2`, `H` (leaching).
 #' @examples
 #' soil_K_availability(k_value = 150, unit = "K2O",
-#'                     soil_group = "Medio impasto",
+#'                     soil_group = "Loamy textures",
 #'                     A_demand_K2O = 119.4, clay_pct = 18.5)
 #' @export
 soil_K_availability <- function(k_value, unit = c("K","K2O"),

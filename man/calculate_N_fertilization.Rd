@@ -49,7 +49,7 @@ Where:
 # Calculate nitrogen balance
 balance <- N_balance(
   expected_yield_tons_ha = 60,
-  crop = "Mais trinciato (classe 700)",
+  crop = "Silage maize (class 700)",
   ccp = "Spring-summer crop 100-130 days",
   sand = 50, clay = 35,
   Ntot = 1.2, SOM = 1.2, CN = 9.5,

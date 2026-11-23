@@ -22,14 +22,14 @@ classify_K(
 }
 \value{
 A list with \code{value_ppm_K}, \code{value_ppm_K2O}, \code{ID_Gri_K}, \code{rating},
-\code{strategy} (\code{Arricchimento} / \code{Mantenimento} / \code{Riduzione}).
+\code{strategy} (\code{"Arricchimento"} / \code{"Mantenimento"} / \code{"Riduzione"}, that is
+enrichment / maintenance / reduction).
 }
 \description{
 Classifies K (or K2O) availability by soil texture grouping, following DPI
-Emilia-Romagna 2026 (Fert_Office v1.26 foglio \code{Gri_K}). The threshold ranges
-depend on the DPI texture group (\code{Sabbiosi}, \verb{Medio impasto},
-\verb{Argillosi e limosi}).
+Emilia-Romagna 2026 (Fert_Office v1.26 K sheet). The threshold ranges
+depend on the DPI texture group (sandy, loamy or clay textures).
 }
 \examples{
-classify_K(value = 150, unit = "K2O", soil_group = "Medio impasto")
+classify_K(value = 150, unit = "K2O", soil_group = "Loamy textures")
 }

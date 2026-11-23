@@ -23,5 +23,5 @@ Crop K2O demand
 }
 \examples{
 calc_crop_K_demand(expected_yield_tons_ha = 6,
-                   crop = "Grano duro (pianta intera)")
+                   crop = "Durum wheat (whole plant)")
 }

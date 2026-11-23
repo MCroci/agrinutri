@@ -42,7 +42,7 @@
   )
 }
 
-#' Resolve a crop name (Italian or English) to its canonical entry
+#' Resolve a crop name to its canonical entry
 #'
 #' agrinutri reference tables (`uptake_table`, `mas.table`, `crops.table`,
 #' `standard_pk_doses.table`) carry the canonical English crop names in
@@ -55,14 +55,13 @@
 #' If the input matches none of the columns, the input is returned
 #' unchanged together with a warning.
 #'
-#' @param x Character. Crop name in Italian or English.
+#' @param x Character. Crop name.
 #' @param table Lookup table; default `agrinutri::uptake_table`.
 #' @return Character. The canonical crop name (English, as in the
 #'   `crop` column).
 #' @examples
 #' resolve_crop("Durum wheat (grain)")
-#' resolve_crop("Grano duro (granella)")
-#' resolve_crop("Mais trinciato classe 700")
+#' resolve_crop("durum wheat (GRAIN)")
 #' @export
 resolve_crop <- function(x, table = agrinutri_data_get("uptake_table")) {
   if (!is.character(x) || length(x) != 1 || is.na(x)) {
@@ -146,10 +145,10 @@ resolve_ccp <- function(x, table = agrinutri_data_get("coef_time")) {
   x
 }
 
-#' List all crops with both Italian and English names
+#' List all crops
 #'
-#' @return A data frame with columns `crop` (Italian, canonical) and
-#'   `crop_en` (English).
+#' @return A data frame with columns `crop` (canonical name) and
+#'   `crop_en` (English name).
 #' @examples
 #' head(list_crops())
 #' @export

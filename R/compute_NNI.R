@@ -26,9 +26,7 @@
 #'         (Debaeke et al. 2012)
 #' }
 #'
-#' @param crop Character. Crop identifier (see list above). Case-insensitive;
-#'   Italian synonyms (\code{"frumento"}, \code{"mais"}, \code{"colza"},
-#'   \code{"riso"}, \code{"girasole"}, \code{"sorgo"}) are accepted.
+#' @param crop Character. Crop identifier (see list above). Case-insensitive.
 #'
 #' @return A list with numeric elements \code{a}, \code{b}, \code{W_min}
 #'   and \code{reference} (character).

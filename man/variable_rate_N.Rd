@@ -81,7 +81,7 @@ ndvi <- terra::rast(s2.rast)   # s2.rast is a PackedSpatRaster; unwrap it
 
 # 1) Compute agronomic dose with the balance
 bal <- N_balance(expected_yield_tons_ha = 6,
-                 crop = "Grano duro (pianta intera)",
+                 crop = "Durum wheat (whole plant)",
                  ccp  = "Spring-summer crop 100-130 days",
                  sand = 15.5, clay = 18.5,
                  Ntot = 1.5, SOM = 2, CN = 7.73,
@@ -95,7 +95,7 @@ n_dose <- calculate_N_fertilization(bal)   # ~128 kg/ha
 
 # 2) Spatialise via NDVI calibration
 vr <- variable_rate_N(ndvi, n_dose = n_dose, method = "calibration",
-                      mas_cap = get_MAS("Grano duro (pianta intera)")$mas_N)
+                      mas_cap = get_MAS("Durum wheat (whole plant)")$mas_N)
 terra::plot(vr$rate_raster)
 vr$mean_kg_ha
 }

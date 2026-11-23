@@ -22,11 +22,11 @@ organic_fertilization(
 Use \code{0} for no organic application (returns 0 kg N/ha).}
 
 \item{soil_group}{Optional. Soil group from \code{calc_soil_group_and_id_rag()}
-(e.g. "Sandy textures", "Franco") to use DPI efficiency by texture. If \code{NULL},
+(e.g. "Sandy textures", "Loamy textures") to use DPI efficiency by texture. If \code{NULL},
 efficiency is taken from \code{f.table} (no texture/distribution).}
 
 \item{distribution_efficiency}{Optional. \code{"efficient"}, \code{"medium"}, or \code{"low"}
-(DPI: Alta/Media/Bassa). Required together with \code{soil_group} for the DPI efficiency path.}
+(DPI high/medium/low efficiency). Required together with \code{soil_group} for the DPI efficiency path.}
 
 \item{f.table}{A data frame with columns \code{source}, \code{frequency}, \code{value}.
 Used when \code{soil_group} is \code{NULL}. Default is \code{agrinutri::f.table}.}
@@ -41,9 +41,9 @@ fertilization. Optionally applies \strong{DPI efficiency} by material type, soil
 \code{distribution_efficiency} are both given). If either is \code{NULL}, falls back to
 \code{f.table}: \code{value * quantity / 100}. Function \code{\link{N_balance}()} passes
 computed soil texture and defaults distribution to \code{"medium"} so \code{Forg} matches
-the DPI path used by Fert_Office (\emph{Apporti al terreno}). In the balance formula the term
-to subtract is the \strong{efficient N} (N utile) available to the crop in the
-year of application, not total N (DPI Guida / FertDPI).
+the DPI path used by Fert_Office (soil inputs sheet). In the balance formula the term
+to subtract is the \strong{efficient N} available to the crop in the
+year of application, not total N (DPI guide / FertDPI).
 }
 \examples{
 organic_fertilization(source = "Cattle slurry", frequency = "every year", quantity = 50)
@@ -51,6 +51,6 @@ organic_fertilization("Cattle slurry", "every year", 80,
   soil_group = "Sandy textures", distribution_efficiency = "efficient")
 }
 \references{
-DPI Emilia-Romagna, Guida alla fertilizzazione; efficienza in funzione di
-tipologia di effluente, tessitura e modalita di distribuzione (Tabella 7 Norme Generali).
+DPI Emilia-Romagna, fertilisation guide; efficiency by type of effluent,
+soil texture and distribution technique (Table 7 of the DPI General Rules).
 }

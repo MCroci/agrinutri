@@ -15,19 +15,19 @@ classify_pH(pH, ph.table = agrinutri_data_get("ph.table"))
 List with \code{ID_pH} and \code{class}.
 }
 \description{
-DPI 2026 7-class scheme from Fert_Office v1.26 foglio \code{pH}:
+DPI 2026 7-class scheme from the Fert_Office v1.26 pH sheet:
 \itemize{
-\item fortemente acido: pH < 5.4
-\item acido: 5.4 - 6.0
-\item leggermente acido: 6.1 - 6.7
-\item neutro: 6.8 - 7.3
-\item leggermente alcalino: 7.4 - 8.1
-\item alcalino: 8.2 - 8.6
-\item fortemente alcalino: > 8.6
+\item strongly acid: pH < 5.4
+\item acid: 5.4 - 6.0
+\item slightly acid: 6.1 - 6.7
+\item neutral: 6.8 - 7.3
+\item slightly alkaline: 7.4 - 8.1
+\item alkaline: 8.2 - 8.6
+\item strongly alkaline: > 8.6
 }
 The class is found as in Fert_Office (\code{VLOOKUP} on the lower thresholds
 0, 5.4, 6.0, 6.7, 7.3, 8.1, 8.61), so a value equal to a threshold falls in
-the upper class: for instance pH 6.0 is "leggermente acido". The ranges
+the upper class: for instance pH 6.0 is "slightly acid". The ranges
 above are those printed in the DPI table for one-decimal pH readings.
 }
 \examples{

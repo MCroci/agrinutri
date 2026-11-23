@@ -55,7 +55,7 @@
 #' @examples
 #' \dontrun{
 #' fld <- list(
-#'   crop = "Grano duro (granella)",
+#'   crop = "Grano duro (granella)",   # durum wheat (grain): label of the QUEFTS table
 #'   expected_yield_tons_ha = 6,
 #'   ccp = "Spring-summer crop 100-130 days",
 #'   sand = 15.5, clay = 18.5, Ntot = 1.5, SOM = 2.0, CN = 7.73,

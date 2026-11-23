@@ -6,9 +6,9 @@
 #' \itemize{
 #'   \item English (legacy agrinutri 0.1.0): "Sandy textures",
 #'         "Loamy textures", "Clay textures".
-#'   \item Italian plural (canonical DPI; foglio B, SO, Gri_K):
+#'   \item Italian plural (DPI labels):
 #'         "Sabbiosi", "Medio impasto", "Argillosi e limosi".
-#'   \item Italian singular adjective (foglio Ragg_Tes):
+#'   \item Italian singular adjective:
 #'         "Sabbioso", "Franco", "Argilloso".
 #' }
 #'
@@ -21,8 +21,7 @@
 #'   (canonical English), `it_plural`, `it_singular`.
 #' @examples
 #' normalise_soil_group("Loamy textures")
-#' normalise_soil_group("Medio impasto")
-#' normalise_soil_group("Franco")
+#' normalise_soil_group("loamy")
 #' @export
 normalise_soil_group <- function(x) {
   if (!is.character(x) || length(x) != 1 || is.na(x)) {

@@ -13,7 +13,7 @@ K_leaching_by_clay(clay_pct)
 Numeric, leachable K2O in kg/ha.
 }
 \description{
-Step function from Fert_Office v1.26 foglio Gri_K (righe 23-28):
+Step function from the Fert_Office v1.26 K sheet (rows 23-28):
 clay < 5.1\% -> 60 kg K2O/ha; 5.1-15.1 -> 30; 15.1-25.1 -> 20; >= 25.1 -> 10.
 }
 \examples{

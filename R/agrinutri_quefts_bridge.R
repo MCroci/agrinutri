@@ -58,7 +58,7 @@ agrinutri_to_quefts_soil <- function(N_supply, P_supply = 10, K_supply = 60,
 #'
 #' Looks up QUEFTS crop parameters in the bundled `quefts_crop_pars_IT.csv`
 #' table. Crop names follow agrinutri / English DPI-style labels
-#' (e.g. `"Durum wheat (whole plant)"`, `"Grano duro (granella)"`).
+#' (e.g. `"Durum wheat (whole plant)"`, `"Silage maize (class 700)"`).
 #'
 #' @param crop Character. Crop name as accepted by [N_balance()].
 #' @param crop_pars_path Character. Optional path to a custom CSV. If

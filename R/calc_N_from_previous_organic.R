@@ -3,9 +3,9 @@
 #' Residual N available to the crop from organic fertilizer applied in previous
 #' years. DPI formula: F = N_applied_previous_year (kg/ha) x Recovery_coeff x
 #' C_tempo. The recovery coefficient depends on organic type and application
-#' frequency (DPI Allegato 2, Tab. 5-6); the supply becomes available over a
+#' frequency (DPI Annex 2, Tables 5-6); the supply becomes available over a
 #' whole year, so it is scaled by the time coefficient of the crop phase, as in
-#' Fert_Office v1.26 (foglio `F`, cell M14).
+#' Fert_Office v1.26 (sheet F, cell M14).
 #'
 #' @param N_applied_previous_year Numeric. Total N (kg/ha) applied in the previous year
 #'   from organic fertilization (same type and frequency as current practice).
@@ -19,8 +19,8 @@
 #'   Returns 0 if N_applied_previous_year is 0, NA, or NULL.
 #'
 #' @references
-#' DPI Emilia-Romagna, Guida alla fertilizzazione 2026, sec. 3.1.6 - N da fertilizzazioni
-#' organiche degli anni precedenti.
+#' DPI Emilia-Romagna, fertilisation guide 2026, sec. 3.1.6 - N from organic
+#' fertilisation in previous years.
 #'
 #' @export
 #' @examples

@@ -19,5 +19,5 @@ A named list with elements suitable for \code{\link[Rquefts:quefts]{Rquefts::que
 \description{
 Looks up QUEFTS crop parameters in the bundled \code{quefts_crop_pars_IT.csv}
 table. Crop names follow agrinutri / English DPI-style labels
-(e.g. \code{"Durum wheat (whole plant)"}, \code{"Grano duro (granella)"}).
+(e.g. \code{"Durum wheat (whole plant)"}, \code{"Silage maize (class 700)"}).
 }

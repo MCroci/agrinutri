@@ -3,7 +3,7 @@
 \name{dose_standard_PK}
 \alias{dose_standard_PK}
 \alias{scheda_PK}
-\title{Scheda a dose Standard - Phosphorus and Potassium (DPI 2026)}
+\title{Standard-dose scheme - Phosphorus and Potassium (DPI 2026)}
 \usage{
 dose_standard_PK(
   crop,
@@ -41,8 +41,8 @@ A named list with \code{dose_base_P2O5}, \code{dose_base_K2O},
 \code{dose_final_P2O5}, \code{dose_final_K2O}, and subtotals.
 }
 \description{
-Implements the DPI 2026 simplified "Scheda a dose Standard" method for P2O5
-and K2O, matching Fert_Office v1.26 foglio \code{Scheda_PK}. The base dose for
+Implements the DPI 2026 simplified standard-dose method for P2O5
+and K2O, matching the Fert_Office v1.26 standard-dose sheet for P and K. The base dose for
 phosphorus is selected from \code{standard_pk_doses.table} according to soil P
 class; potassium base dose depends on soil K class. Then user-selected
 decrements and increments are applied. No MAS cap exists for P/K in DPI
@@ -50,7 +50,7 @@ decrements and increments are applied. No MAS cap exists for P/K in DPI
 }
 \examples{
 scheda_PK(
-  crop = "Grano duro (pianta intera)",
+  crop = "Durum wheat (whole plant)",
   soil_P_class = "normal",
   soil_K_class = "normal"
 )

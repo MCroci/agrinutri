@@ -2,16 +2,16 @@
 % Please edit documentation in R/crop_lookup.R
 \name{list_crops}
 \alias{list_crops}
-\title{List all crops with both Italian and English names}
+\title{List all crops}
 \usage{
 list_crops()
 }
 \value{
-A data frame with columns \code{crop} (Italian, canonical) and
-\code{crop_en} (English).
+A data frame with columns \code{crop} (canonical name) and
+\code{crop_en} (English name).
 }
 \description{
-List all crops with both Italian and English names
+List all crops
 }
 \examples{
 head(list_crops())

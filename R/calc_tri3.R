@@ -16,7 +16,7 @@
 #'   - This function provides a simplified classification based on the USDA soil
 #'     texture triangle. For a more detailed classification, consider using the
 #'     `tri2()` function.
-#'   - As in Fert_Office (foglio `Suolo`), `clay` and `sand` are truncated to
+#'   - As in Fert_Office (soil sheet), `clay` and `sand` are truncated to
 #'     whole percentages (`INT`) before the triangle lookup, so 40.6 % clay is
 #'     read as 40 %.
 #'   - Ensure that `clay` and `sand` percentages are valid (within 0-100) and their

@@ -35,10 +35,10 @@ g/kg), \code{olsen_p} (mg/kg P) and \code{k_exch} (mg/kg K).
 }
 \section{Sources}{
 
-Soil maps: Regione Emilia-Romagna, Area Geologia, Suoli e Sismica, carte dei
-suoli della Regione Emilia-Romagna, strato 0-30 cm (tessitura, 2nd edition;
-dotazione in sostanza organica, 3rd edition; azoto totale, fosforo assimilabile,
-potassio scambiabile), released under CC BY 4.0. Sentinel-2: Copernicus
+Soil maps: Emilia-Romagna Region, Geology, Soils and Seismic Area, soil maps
+of the Emilia-Romagna Region, 0-30 cm layer (texture, 2nd edition; organic
+matter content, 3rd edition; total nitrogen, available phosphorus,
+exchangeable potassium), released under CC BY 4.0. Sentinel-2: Copernicus
 Sentinel data 2024, processed by ESA, read from the Microsoft Planetary Computer.
 Rainfall: ERA5 (Hersbach et al., 2020). Yields: ISTAT, provincial statistics of
 Piacenza, or the reference yields of the guidelines where missing.

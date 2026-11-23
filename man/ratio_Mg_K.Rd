@@ -2,8 +2,9 @@
 % Please edit documentation in R/soil_chemistry.R
 \name{ratio_Mg_K}
 \alias{ratio_Mg_K}
-\title{Mg/K ratio assessment (Fert_Office foglio Gri_K)
-0-0.1 basso; 0.1-2.1 equilibrato; 2.1-5.1 alto; >5.1 molto alto.}
+\title{Mg/K ratio assessment (Fert_Office K sheet)
+0-0.1 low; 0.1-2.1 balanced; 2.1-5.1 high; >5.1 very high, returned as the
+Italian labels \code{"basso"}, \code{"equilibrato"}, \code{"alto"}, \code{"molto alto"}.}
 \usage{
 ratio_Mg_K(mg_ppm, k_ppm)
 }
@@ -14,8 +15,9 @@ ratio_Mg_K(mg_ppm, k_ppm)
 List with \code{ratio} and \code{class}.
 }
 \description{
-Mg/K ratio assessment (Fert_Office foglio Gri_K)
-0-0.1 basso; 0.1-2.1 equilibrato; 2.1-5.1 alto; >5.1 molto alto.
+Mg/K ratio assessment (Fert_Office K sheet)
+0-0.1 low; 0.1-2.1 balanced; 2.1-5.1 high; >5.1 very high, returned as the
+Italian labels \code{"basso"}, \code{"equilibrato"}, \code{"alto"}, \code{"molto alto"}.
 }
 \examples{
 ratio_Mg_K(mg_ppm = 121.5, k_ppm = 150)

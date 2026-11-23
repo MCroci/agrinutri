@@ -1,28 +1,28 @@
 #' Organic nitrogen efficiency by material, soil texture and distribution (DPI)
 #'
 #' Returns the fraction of total organic N that is available to the crop in the
-#' year of application, according to DPI (tipo di effluente, tessitura, modalita
-#' di distribuzione). Used when \code{soil_group} and \code{distribution_efficiency}
+#' year of application, according to DPI (type of effluent, soil texture and
+#' distribution technique). Used when \code{soil_group} and \code{distribution_efficiency}
 #' are passed to \code{organic_fertilization()}.
 #'
 #' @param source Character. Organic fertilizer source (e.g. "Cattle slurry").
 #' @param soil_group Character. Soil group from \code{calc_soil_group_and_id_rag()}
-#'   (e.g. "Sandy textures", "Franco", "Clayey") or DPI class: "sabbioso", "franco", "argilloso".
-#' @param distribution_efficiency Character. "efficient" (Alta), "medium" (Media), or "low" (Bassa).
-#'   Alta = iniezione, fertirrigazione, interramento entro 4 h; Media = rasoterra con interramento;
-#'   Bassa = spandimento superficiale senza incorporazione.
+#'   (e.g. "Sandy textures", "Loamy textures", "Clay textures").
+#' @param distribution_efficiency Character. "efficient", "medium", or "low".
+#'   Efficient = injection, fertigation, incorporation within 4 h; medium = band
+#'   spreading with incorporation; low = surface spreading without incorporation.
 #'
 #' @return Numeric. Efficiency as a fraction between 0 and 1, or `NA` if not found.
-#'   For ammendanti (compost, letame maturo, digestato palabile) returns 0.40 (40%).
+#'   For soil amendments (compost, mature manure, solid digestate) returns 0.40 (40%).
 #'
 #' @references
-#' DPI Emilia-Romagna, Guida alla fertilizzazione; FertDPI foglio Efficienza.
-#' Terreno sabbioso/franco/argilloso x distribuzione efficiente/media/poco efficiente.
+#' DPI Emilia-Romagna, fertilisation guide; FertDPI efficiency sheet.
+#' Sandy/loamy/clay soil x efficient/medium/low-efficiency distribution.
 #'
 #' @export
 #' @examples
 #' organic_N_efficiency("Cattle slurry", "Sandy textures", "efficient")
-#' organic_N_efficiency("Composted manure", "Franco", "medium")  # 0.40
+#' organic_N_efficiency("Composted manure", "Loamy textures", "medium")  # 0.40
 organic_N_efficiency <- function(source, soil_group, distribution_efficiency) {
   eff <- .organic_efficiency_table()
   soil_dpi <- .soil_group_to_dpi(soil_group)

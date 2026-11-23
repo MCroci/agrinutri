@@ -22,22 +22,22 @@ soil_K_availability(
 
 \item{clay_pct}{Clay percentage, used to compute leaching \code{H}.}
 
-\item{include_leaching}{Logical, add K leaching to mantenimento term. Default TRUE.}
+\item{include_leaching}{Logical, add K leaching to the maintenance term. Default TRUE.}
 
 \item{k_availability.table, texture_groups.table}{Lookup tables.
 
-As in Fert_Office v1.26 (foglio \code{Gri_K}), with K2O the analytical value and
+As in Fert_Office v1.26 (K sheet), with K2O the analytical value and
 W the soil weight of the 30 cm layer (t/ha):
 \itemize{
-\item Arricchimento (low / very low): B1 = (lower bound of the "media"
+\item enrichment (low / very low): B1 = (lower bound of the medium
 class - K2O) x W / 1000 x (1 + 0.018 x clay);
-\item Mantenimento: A + H;
-\item Riduzione (high): B2 = (K2O - upper bound of the "media" class) x
+\item maintenance: A + H;
+\item reduction (high): B2 = (K2O - upper bound of the medium class) x
 W / 1000, subtracted from A + H.
 }}
 }
 \value{
-A list with \code{strategy}, \code{ID_Gri_K}, \code{B1}, \code{A_mantenimento} (asportazione + H),
+A list with \code{strategy}, \code{ID_Gri_K}, \code{B1}, \code{A_mantenimento} (crop removal + H),
 \code{B2}, \code{H} (leaching).
 }
 \description{
@@ -45,6 +45,6 @@ Compute soil K availability terms for the K balance
 }
 \examples{
 soil_K_availability(k_value = 150, unit = "K2O",
-                    soil_group = "Medio impasto",
+                    soil_group = "Loamy textures",
                     A_demand_K2O = 119.4, clay_pct = 18.5)
 }

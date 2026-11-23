@@ -1,24 +1,24 @@
 #' Estimate end-of-cycle soil P2O5 content (ppm)
 #'
-#' Given the starting soil P2O5 (ppm), the crop P2O5 asportazione (kg/ha) and
+#' Given the starting soil P2O5 (ppm), the crop P2O5 removal (kg/ha) and
 #' the fertilization plan (from `plan_distribution`), returns the estimated
 #' soil P2O5 at the end of the cycle in ppm P2O5 (useful as input for the
-#' following year's calculation). Formula from Fert_Office v1.26 foglio
-#' `Gri_P!C27`:
+#' following year's calculation). Formula from the Fert_Office v1.26 P sheet
+#' (cell C27):
 #' \preformatted{
 #'   P2O5_end_ppm = P2O5_start_ppm + (P2O5_applied - P2O5_removed) / (soil_weight_30cm/1000) / P_immobilisation_factor
 #' }
 #' @param P2O5_start_ppm Initial Olsen P2O5 ppm (or pass P and `unit="P"`).
 #' @param unit `"P"` or `"P2O5"`.
 #' @param P2O5_applied kg P2O5/ha applied via fertilisers.
-#' @param P2O5_removed kg P2O5/ha removed by crop (asportazione).
+#' @param P2O5_removed kg P2O5/ha removed by crop.
 #' @param soil_group DPI texture grouping.
 #' @param depth_cm Soil depth (default 30 cm).
 #' @param texture_groups.table,p_availability_meta Lookups.
 #' @return Numeric ppm P2O5 at end of cycle.
 #' @examples
 #' estimate_soil_P_end_of_cycle(P2O5_start_ppm = 15, P2O5_applied = 170,
-#'                              P2O5_removed = 64, soil_group = "Medio impasto")
+#'                              P2O5_removed = 64, soil_group = "Loamy textures")
 #' @export
 estimate_soil_P_end_of_cycle <- function(P2O5_start_ppm,
                                          unit = c("P2O5", "P"),
@@ -49,7 +49,7 @@ estimate_soil_P_end_of_cycle <- function(P2O5_start_ppm,
 #' \preformatted{
 #'   K2O_end_ppm = K2O_start_ppm + (K2O_applied - K2O_removed - K2O_leaching) / (soil_weight_30cm/1000)
 #' }
-#' The lisciviazione (H) is taken from `K_leaching_by_clay(clay_pct)`.
+#' The leaching term (H) is taken from `K_leaching_by_clay(clay_pct)`.
 #'
 #' @param K2O_start_ppm Initial exchangeable K2O ppm.
 #' @param K2O_applied,K2O_removed kg K2O/ha applied / removed.
@@ -61,7 +61,7 @@ estimate_soil_P_end_of_cycle <- function(P2O5_start_ppm,
 #' @examples
 #' estimate_soil_K_end_of_cycle(K2O_start_ppm = 150, K2O_applied = 230,
 #'                              K2O_removed = 119.4, clay_pct = 18.5,
-#'                              soil_group = "Medio impasto")
+#'                              soil_group = "Loamy textures")
 #' @export
 estimate_soil_K_end_of_cycle <- function(K2O_start_ppm,
                                          K2O_applied, K2O_removed,

@@ -21,9 +21,9 @@ texture grouping:
 \itemize{
 \item English (legacy agrinutri 0.1.0): "Sandy textures",
 "Loamy textures", "Clay textures".
-\item Italian plural (canonical DPI; foglio B, SO, Gri_K):
+\item Italian plural (DPI labels):
 "Sabbiosi", "Medio impasto", "Argillosi e limosi".
-\item Italian singular adjective (foglio Ragg_Tes):
+\item Italian singular adjective:
 "Sabbioso", "Franco", "Argilloso".
 }
 
@@ -33,6 +33,5 @@ universal \code{ID_Rag} integer key used internally to join the lookup tables.
 }
 \examples{
 normalise_soil_group("Loamy textures")
-normalise_soil_group("Medio impasto")
-normalise_soil_group("Franco")
+normalise_soil_group("loamy")
 }

@@ -26,5 +26,5 @@ multiplied by the expected yield.
 }
 \examples{
 calc_crop_P_demand(expected_yield_tons_ha = 6,
-                   crop = "Grano duro (pianta intera)")
+                   crop = "Durum wheat (whole plant)")
 }

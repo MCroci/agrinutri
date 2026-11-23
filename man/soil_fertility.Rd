@@ -41,7 +41,7 @@ A named list containing:
 \item b1: Readily available nitrogen (kg/ha), DPI B2 (0 for perennial crops
 in production).
 \item b2: Mineralized nitrogen from SOM (kg/ha), DPI B1.
-\item b1_potential: N pronto before the perennial rule (used by the leaching
+\item b1_potential: readily available N before the perennial rule (used by the leaching
 term).
 \item no_till_reduction: Reduction for no-till seeding (kg/ha).
 \item B: Total soil supply b1 + b2 - no_till_reduction (kg/ha).
@@ -51,8 +51,8 @@ term).
 }
 \description{
 Estimates readily available and mineralized nitrogen in the soil as in
-Fert_Office v1.26 (foglio \code{B}). DPI naming: b1 = readily available N from
-soil total N ("N pronto", DPI B2); b2 = mineralized N from SOM (DPI B1).
+Fert_Office v1.26 (sheet B). DPI naming: b1 = readily available N from
+soil total N (DPI B2); b2 = mineralized N from SOM (DPI B1).
 }
 \details{
 \itemize{
@@ -61,7 +61,7 @@ crops with a time coefficient below 1 (cycle shorter than one year).
 Perennial crops in production (\code{C_tempo} = 1) use B = b2 only.
 \item b2 = \code{coef.N.mineralised} x min(SOM, 3) x \code{C_tempo}; the DPI keeps
 the mineralised N constant above 3 percent organic matter.
-\item With \code{soil_seeding = "no-till"} (semina su sodo) the soil supply is
+\item With \code{soil_seeding = "no-till"} the soil supply is
 reduced by 10 kg N/ha, for crops where the DPI allows it
 (\code{crops.table$no_till_reduction}) and only when b1 is counted.
 }

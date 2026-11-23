@@ -2,26 +2,25 @@
 % Please edit documentation in R/max_SO_input.R
 \name{classify_SOM}
 \alias{classify_SOM}
-\title{Classify SO (soil organic matter) initial content by texture group}
+\title{Classify SOM (soil organic matter) initial content by texture group}
 \usage{
 classify_SOM(SOM, soil_group, so.table = agrinutri_data_get("so.table"))
 }
 \arguments{
 \item{SOM}{Soil organic matter (\% mass).}
 
-\item{soil_group}{Texture group (Italian).}
+\item{soil_group}{DPI texture group (see \code{\link[=normalise_soil_group]{normalise_soil_group()}}).}
 
 \item{so.table}{Lookup (default \code{agrinutri::so.table}).}
 }
 \value{
-List with \code{rating} (4 classes) and \code{class} (3-class for SO input).
+List with \code{rating} (4 classes) and \code{class} (3-class for SOM input).
 }
 \description{
-Returns DPI 2026 SO class (molto bassa / bassa / media / elevata) by
-soil texture group (Sabbiosi / Medio impasto / Argillosi e limosi) and
-maps to the 3-class scheme "Scarsa / Normale / Elevata" used for the
-maximum annual SO input.
+Returns the DPI 2026 SOM rating (very low / low / medium / high) by
+soil texture group (sandy / loamy / clay textures) and maps it to the
+3-class scheme (Poor / Normal / Rich) used for the maximum annual SOM input.
 }
 \examples{
-classify_SOM(SOM = 2, soil_group = "Medio impasto")
+classify_SOM(SOM = 2, soil_group = "Loamy textures")
 }

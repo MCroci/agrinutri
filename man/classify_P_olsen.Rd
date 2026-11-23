@@ -24,15 +24,17 @@ classify_P_olsen(
 A list with:
 \itemize{
 \item \code{value_ppm_P}, \code{value_ppm_P2O5}: input converted to both units.
-\item \code{ID_Gri_P}: class id (1 molto bassa ... 5 molto elevata).
+\item \code{ID_Gri_P}: class id (1 very low ... 5 very high).
 \item \code{rating}: human-readable class.
-\item \code{soil_class}: DPI "Classe dotaz." (\verb{molto scarso}, \code{scarso}, \code{normale}, \verb{molto alto}).
-\item \code{strategy}: one of \code{"Arricchimento"}, \code{"Mantenimento"}, \code{"Riduzione"}.
+\item \code{soil_class}: DPI availability class, returned as the Italian DPI label
+(\code{"molto scarso"}, \code{"scarso"}, \code{"normale"}, \code{"molto alto"}).
+\item \code{strategy}: one of \code{"Arricchimento"} (enrichment), \code{"Mantenimento"}
+(maintenance), \code{"Riduzione"} (reduction).
 }
 }
 \description{
 Classifies soil phosphorus availability using the Olsen method, following
-DPI Emilia-Romagna 2026 (Fert_Office v1.26 foglio \code{Gri_P}). The input may be
+DPI Emilia-Romagna 2026 (Fert_Office v1.26 P sheet). The input may be
 expressed either as elemental P or as P2O5 equivalent; the conversion
 factor is P2O5 = P / 0.436681.
 }

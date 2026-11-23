@@ -23,8 +23,7 @@ accepted and converted with \code{terra::rast()}.}
 \code{"NDRE"}, \code{"NDVI"}, \code{"CIred_edge"}.}
 
 \item{crop}{Character. One of \code{"wheat"}, \code{"maize"},
-\code{"rice"}, \code{"barley"}. Case-insensitive; Italian aliases
-("frumento", "mais", "orzo") are accepted.}
+\code{"rice"}, \code{"barley"}. Case-insensitive.}
 
 \item{slope, intercept}{Optional numeric overrides for the linear
 regression \code{NNI = slope * VI + intercept}. Both must be

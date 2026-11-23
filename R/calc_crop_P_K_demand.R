@@ -10,7 +10,7 @@
 #' @export
 #' @examples
 #' calc_crop_P_demand(expected_yield_tons_ha = 6,
-#'                    crop = "Grano duro (pianta intera)")
+#'                    crop = "Durum wheat (whole plant)")
 calc_crop_P_demand <- function(expected_yield_tons_ha,
                                crop,
                                uptake_table = agrinutri_data_get("uptake_table")) {
@@ -39,7 +39,7 @@ calc_crop_P_demand <- function(expected_yield_tons_ha,
 #' @export
 #' @examples
 #' calc_crop_K_demand(expected_yield_tons_ha = 6,
-#'                    crop = "Grano duro (pianta intera)")
+#'                    crop = "Durum wheat (whole plant)")
 calc_crop_K_demand <- function(expected_yield_tons_ha,
                                crop,
                                uptake_table = agrinutri_data_get("uptake_table")) {

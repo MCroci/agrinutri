@@ -2,12 +2,12 @@
 % Please edit documentation in R/crop_lookup.R
 \name{resolve_crop}
 \alias{resolve_crop}
-\title{Resolve a crop name (Italian or English) to its canonical entry}
+\title{Resolve a crop name to its canonical entry}
 \usage{
 resolve_crop(x, table = agrinutri_data_get("uptake_table"))
 }
 \arguments{
-\item{x}{Character. Crop name in Italian or English.}
+\item{x}{Character. Crop name.}
 
 \item{table}{Lookup table; default \code{agrinutri::uptake_table}.}
 }
@@ -30,6 +30,5 @@ unchanged together with a warning.
 }
 \examples{
 resolve_crop("Durum wheat (grain)")
-resolve_crop("Grano duro (granella)")
-resolve_crop("Mais trinciato classe 700")
+resolve_crop("durum wheat (GRAIN)")
 }

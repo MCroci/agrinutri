@@ -1,7 +1,7 @@
 #' Nitrogen Balance Calculation
 #'
 #' Calculates the nitrogen balance of a crop with the DPI Emilia-Romagna 2026
-#' balance method (Allegato 2), reproducing the regional tool Fert_Office v1.26
+#' balance method (Annex 2), reproducing the regional tool Fert_Office v1.26
 #' term by term. Where the printed DPI tables and Fert_Office differ, agrinutri
 #' follows Fert_Office (see `vignette("agrinutri-PK-and-distribution")`).
 #'
@@ -35,14 +35,14 @@
 #'   \code{N_balance()} uses \code{"medium"} for \code{Forg} (typical farm practice
 #'   when not specified). Ignored for \code{Forg} when \code{forg_quantity == 0}.
 #' @param soil_seeding One of `"traditional"` (default) or `"no-till"`. If `"no-till"`,
-#'   the soil supply B is reduced by 10 kg/ha (DPI Allegato 2), for crops with
+#'   the soil supply B is reduced by 10 kg/ha (DPI Annex 2), for crops with
 #'   a cycle shorter than one year where the DPI allows it.
 #' @param greenhouse Logical. If `TRUE`, 2 kg/ha are added to D (DPI 2026 greenhouse factor).
 #'   Default `FALSE`.
 #' @param E_to_D Logical. If `TRUE` (default), negative `E` (e.g. buried stalks = -40) is
 #'   added to `D` as in Fert_Office v1.26 sheet C&D, and `E` in the output is set to 0.
 #'   If `FALSE`, `E` stays negative and the balance uses `calculate_N_fertilization()`.
-#'   `E` is counted only for crop phases where the DPI counts the precession
+#'   `E` is counted only for crop phases where the DPI counts the previous crop
 #'   (`coef_time$precession_to_count`), i.e. not for perennial crops in production.
 #' @param n_fixation_pct Share (%) of the legume N demand covered by biological
 #'   fixation. `NULL` (default) uses the value proposed for the crop
@@ -81,7 +81,7 @@
 #' @export
 #'
 #' @examples
-#' N_balance(expected_yield_tons_ha = 60, crop = "Mais trinciato (classe 700)",
+#' N_balance(expected_yield_tons_ha = 60, crop = "Silage maize (class 700)",
 #'           ccp = "Spring-summer crop 100-130 days", sand = 50, clay = 35,
 #'           Ntot = 1.2, SOM = 1.2, CN = 9.5, oxygen_availability = "Normal",
 #'           winter_rain = 160, start_spring_rain = 40,

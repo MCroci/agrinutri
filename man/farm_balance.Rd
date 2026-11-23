@@ -50,7 +50,7 @@ can be written back to disk as GeoJSON or any other OGR format.
 Every feature must carry at least:
 \tabular{lll}{
 \strong{Column} \tab \strong{Example} \tab \strong{Notes} \cr
-\code{crop} \tab "Mais da insilato (classe 700)" \tab DPI 2026 name \cr
+\code{crop} \tab "Silage maize (class 700)" \tab DPI 2026 name \cr
 \code{expected_yield_tons_ha} \tab 60 \tab target yield \cr
 \code{ccp} \tab "Spring-summer crop 100-130 days" \tab climate period \cr
 \code{sand}, \code{clay} \tab 50, 35 \tab pct of texture \cr
@@ -65,9 +65,6 @@ Every feature must carry at least:
 \code{organic_previous_year_N} \tab 50 \tab optional; kg N ha\eqn{^{-1}} from organic applied last year (term \code{F}) \cr
 \code{area_ha} \tab 5.2 \tab used to derive \code{N_total_kg}
 }
-Italian aliases (Frumento tenero, Liquame bovino, Cereali vernini -
-paglia asportata, ...) are accepted because the underlying agrinutri
-functions carry the translation layer.
 }
 
 \section{Output columns added to the layer}{

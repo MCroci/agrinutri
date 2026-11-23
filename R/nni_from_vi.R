@@ -26,8 +26,7 @@
 #' @param index Character. The vegetation index used. One of
 #'   \code{"NDRE"}, \code{"NDVI"}, \code{"CIred_edge"}.
 #' @param crop Character. One of \code{"wheat"}, \code{"maize"},
-#'   \code{"rice"}, \code{"barley"}. Case-insensitive; Italian aliases
-#'   ("frumento", "mais", "orzo") are accepted.
+#'   \code{"rice"}, \code{"barley"}. Case-insensitive.
 #' @param slope,intercept Optional numeric overrides for the linear
 #'   regression \code{NNI = slope * VI + intercept}. Both must be
 #'   supplied together.

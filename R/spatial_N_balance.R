@@ -17,8 +17,7 @@
 #'   }
 #' @param expected_yield_tons_ha Numeric scalar. Expected crop yield
 #'   (t ha\eqn{^{-1}}).
-#' @param crop Character. Crop name (Italian or English, see
-#'   \code{\link{resolve_crop}()}).
+#' @param crop Character. Crop name (see \code{\link{list_crops}()}).
 #' @param ccp Character. Crop calendar period.
 #' @param oxygen_availability Character. Oxygen availability class (default
 #'   \code{"Normal"}).
@@ -65,7 +64,7 @@
 #' n_map <- spatial_N_balance(
 #'   soil_stack = soil,
 #'   expected_yield_tons_ha = 60,
-#'   crop = "Mais trinciato (classe 700)",
+#'   crop = "Silage maize (class 700)",
 #'   ccp  = "Spring-summer crop 100-130 days",
 #'   oxygen_availability = "Normal",
 #'   winter_rain = 160, start_spring_rain = 40,

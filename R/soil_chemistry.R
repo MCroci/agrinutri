@@ -1,18 +1,18 @@
 #' Classify soil pH
 #'
-#' DPI 2026 7-class scheme from Fert_Office v1.26 foglio `pH`:
+#' DPI 2026 7-class scheme from the Fert_Office v1.26 pH sheet:
 #' \itemize{
-#'   \item fortemente acido: pH < 5.4
-#'   \item acido: 5.4 - 6.0
-#'   \item leggermente acido: 6.1 - 6.7
-#'   \item neutro: 6.8 - 7.3
-#'   \item leggermente alcalino: 7.4 - 8.1
-#'   \item alcalino: 8.2 - 8.6
-#'   \item fortemente alcalino: > 8.6
+#'   \item strongly acid: pH < 5.4
+#'   \item acid: 5.4 - 6.0
+#'   \item slightly acid: 6.1 - 6.7
+#'   \item neutral: 6.8 - 7.3
+#'   \item slightly alkaline: 7.4 - 8.1
+#'   \item alkaline: 8.2 - 8.6
+#'   \item strongly alkaline: > 8.6
 #' }
 #' The class is found as in Fert_Office (`VLOOKUP` on the lower thresholds
 #' 0, 5.4, 6.0, 6.7, 7.3, 8.1, 8.61), so a value equal to a threshold falls in
-#' the upper class: for instance pH 6.0 is "leggermente acido". The ranges
+#' the upper class: for instance pH 6.0 is "slightly acid". The ranges
 #' above are those printed in the DPI table for one-decimal pH readings.
 #' @param pH Numeric.
 #' @param ph.table Lookup (default `agrinutri::ph.table`).
@@ -74,8 +74,9 @@ classify_carbonate_att <- function(caco3_att, active_carbonate.table = agrinutri
   list(ID = NA_integer_, class = NA_character_, caco3_att = caco3_att)
 }
 
-#' Classify cation exchange capacity (CSC, meq/100 g)
-#' From Fert_Office v1.26 foglio Gri_K: < 10 = bassa, 10-20 = media, > 20 = alta.
+#' Classify cation exchange capacity (CEC, meq/100 g)
+#' From the Fert_Office v1.26 K sheet: < 10 low, 10-20 medium, > 20 high,
+#' returned as the Italian labels `"bassa"`, `"media"`, `"alta"`.
 #' @param csc_meq Numeric meq/100 g.
 #' @return List with `class`.
 #' @examples classify_CEC(18)
@@ -88,8 +89,9 @@ classify_CEC <- function(csc_meq) {
   list(class = cl, csc = csc_meq)
 }
 
-#' Mg/K ratio assessment (Fert_Office foglio Gri_K)
-#' 0-0.1 basso; 0.1-2.1 equilibrato; 2.1-5.1 alto; >5.1 molto alto.
+#' Mg/K ratio assessment (Fert_Office K sheet)
+#' 0-0.1 low; 0.1-2.1 balanced; 2.1-5.1 high; >5.1 very high, returned as the
+#' Italian labels `"basso"`, `"equilibrato"`, `"alto"`, `"molto alto"`.
 #' @param mg_ppm,k_ppm Magnesium and potassium ppm.
 #' @return List with `ratio` and `class`.
 #' @examples ratio_Mg_K(mg_ppm = 121.5, k_ppm = 150)
@@ -109,10 +111,11 @@ ratio_Mg_K <- function(mg_ppm, k_ppm) {
   list(ratio = r, class = cl)
 }
 
-#' K/CSC ratio assessment (Fert_Office foglio Gri_K)
-#' <0.1% basso; 0.1-2.1 ottimale; 2.1-5.1 alto; ... (percentage of CSC)
+#' K/CEC ratio assessment (Fert_Office K sheet)
+#' <0.1% low; 0.1-2.1 optimal; 2.1-5.1 high (percentage of CEC), returned as
+#' the Italian labels `"basso"`, `"ottimale"`, `"alto"`.
 #' @param k_meq_per_100g K in meq/100g.
-#' @param csc_meq CSC in meq/100g.
+#' @param csc_meq CEC in meq/100g.
 #' @return List with `pct` and `class`.
 #' @examples ratio_K_CEC(k_meq_per_100g = 0.38, csc_meq = 18)
 #' @export

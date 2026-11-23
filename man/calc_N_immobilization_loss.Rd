@@ -20,11 +20,11 @@ calc_N_immobilization_loss(
 \item{id_rag}{Soil drainage index (ID_Rag), ranging from 1 (well-drained) to 5 (poorly drained).}
 
 \item{greenhouse}{Logical. If \code{TRUE}, adds 2 kg/ha of nitrogen immobilization as per
-DPI 2026 foglio C&D (cella D23 "In serra = 2"). Default \code{FALSE}.}
+DPI 2026 (Fert_Office sheet C&D, cell D23, greenhouse = 2). Default \code{FALSE}.}
 
 \item{E_residual}{Optional numeric. When the previous crop has negative residual N
-(e.g. maize stalks buried, sorghum) the DPI 2026 sums \code{-E} into D (see foglio C&D,
-cella I21 "E da conteggiare"). If provided and negative, \code{-E_residual} is added to D.
+(e.g. maize stalks buried, sorghum) the DPI 2026 sums \code{-E} into D (see
+Fert_Office sheet C&D, cell I21). If provided and negative, \code{-E_residual} is added to D.
 Default \code{0} (no adjustment; E is handled separately in \code{calculate_N_fertilization}).}
 }
 \value{

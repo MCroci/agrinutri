@@ -3,7 +3,7 @@
 \name{dose_standard_N}
 \alias{dose_standard_N}
 \alias{scheda_N}
-\title{Scheda a dose Standard - Nitrogen (DPI Emilia-Romagna 2026)}
+\title{Standard-dose scheme - Nitrogen (DPI Emilia-Romagna 2026)}
 \usage{
 dose_standard_N(
   crop,
@@ -19,8 +19,8 @@ scheda_N(...)
 \arguments{
 \item{crop}{Crop name exactly as in \code{agrinutri::mas.table$crop}.}
 
-\item{phase}{Optional phase string (e.g. "Primaverile-estiva 100-130 gg") for crops
-with multiple fases. If \code{NULL} (default) and the crop has multiple rows, the
+\item{phase}{Optional phase string (as in \code{mas.table$phase}) for crops
+with multiple phases. If \code{NULL} (default) and the crop has multiple rows, the
 first match is used and a note is emitted.}
 
 \item{decrements}{Named numeric vector (kg/ha) with one or more of:
@@ -50,30 +50,30 @@ A named list with components:
 }
 }
 \description{
-Implements the DPI 2026 simplified "Scheda a dose Standard" method for nitrogen,
-as coded in Fert_Office v1.26 sheet \code{Scheda_N}. Starts from a crop-specific
+Implements the DPI 2026 simplified standard-dose method for nitrogen,
+as coded in the Fert_Office v1.26 standard-dose sheet for N. Starts from a crop-specific
 standard base dose (from \code{mas.table$standard_N}) and applies user-selected
 decrement and increment factors. The final dose is then capped at MAS
-(maximum allowed dose) from DPI 2026 Allegato 9 / Reg. reg. 2/2024.
+(maximum allowed dose) from DPI 2026 Annex 9 / Regional Regulation 2/2024.
 }
 \details{
 The decrement/increment catalogue (with default values in kg/ha) is:\tabular{lll}{
    Direction \tab Factor \tab Default kg/ha \cr
-   Decremento \tab Resa bassa (< 5 t/ha) \tab user-defined \cr
-   Decremento \tab Ammendante nell'anno precedente \tab user-defined \cr
-   Decremento \tab Tenore SO nel suolo elevato \tab user-defined \cr
-   Decremento \tab Dopo medica o prato > 5 anni \tab 60 \cr
-   Decremento \tab Dopo una leguminosa \tab 30 \cr
-   Incremento \tab Resa alta (> 7 t/ha) \tab user-defined \cr
-   Incremento \tab Tenore SO nel suolo basso \tab user-defined \cr
-   Incremento \tab Ristoppio o interramento paglie \tab 30 \cr
-   Incremento \tab Lisciviazione x surplus pluviometrico \tab user-defined \cr
-   Incremento \tab Terreno compattato o semina su sodo \tab 10 \cr
+   Decrement \tab Low yield (< 5 t/ha) \tab user-defined \cr
+   Decrement \tab Soil amendment in the previous year \tab user-defined \cr
+   Decrement \tab High soil organic matter \tab user-defined \cr
+   Decrement \tab After alfalfa or meadow > 5 years \tab 60 \cr
+   Decrement \tab After a legume \tab 30 \cr
+   Increment \tab High yield (> 7 t/ha) \tab user-defined \cr
+   Increment \tab Low soil organic matter \tab user-defined \cr
+   Increment \tab Cereal after cereal or straw burial \tab 30 \cr
+   Increment \tab Leaching after rainfall surplus \tab user-defined \cr
+   Increment \tab Compacted soil or no-till seeding \tab 10 \cr
 }
 }
 \examples{
-# Grano duro pianta intera, fase primaverile-estiva 100-130 gg
-scheda_N(crop = "Grano duro (pianta intera)",
+# Durum wheat (whole plant)
+scheda_N(crop = "Durum wheat (whole plant)",
          decrements = c(after_alfalfa_meadow = 60),
          increments = c(straw_burial = 30,
                         compacted_no_till = 10))

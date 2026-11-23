@@ -2,7 +2,7 @@
 % Please edit documentation in R/K_balance.R
 \name{K_balance}
 \alias{K_balance}
-\title{Potassium balance (DPI Emilia-Romagna 2026 metodo del bilancio)}
+\title{Potassium balance (DPI Emilia-Romagna 2026 balance method)}
 \usage{
 K_balance(
   expected_yield_tons_ha,
@@ -29,7 +29,7 @@ K_balance(
 
 \item{clay, sand}{Soil clay/sand percentages (\%).}
 
-\item{advance_K2O}{Advance anni futuri (default 0).}
+\item{advance_K2O}{Advance for future years (default 0).}
 
 \item{include_leaching}{Logical, use clay-based H leaching (default TRUE).}
 }
@@ -37,13 +37,13 @@ K_balance(
 A data frame with A, H, B1, A2, B2, strategy, ID_Gri_K, K2O_required.
 }
 \description{
-Implements the K2O balance of Fert_Office v1.26 foglio \code{Bilancio} / \code{Gri_K}.
+Implements the K2O balance of the Fert_Office v1.26 balance and K sheets.
 }
 \details{
 Formula:
 \preformatted{
-  K2O da apportare = A (asportazione) + H (lisciviazione clay-based) + B1 (arricchimento)
-                     + A2 (advance_allowed) - B2 (riduzione)
+  K2O to apply = A (crop removal) + H (clay-based leaching) + B1 (enrichment)
+                 + A2 (advance_allowed) - B2 (reduction)
 }
 where B1 (enrichment) and B2 (reduction) depend on the exchangeable-K class
 (see \code{\link[=soil_K_availability]{soil_K_availability()}}). The result is bounded to 0-300 kg K2O/ha as in
@@ -51,7 +51,7 @@ Fert_Office.
 }
 \examples{
 K_balance(expected_yield_tons_ha = 6,
-          crop = "Grano duro (pianta intera)",
+          crop = "Durum wheat (whole plant)",
           k_value = 150, k_unit = "K2O",
           clay = 18.5, sand = 15.5)
 }

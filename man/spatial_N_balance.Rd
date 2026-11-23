@@ -37,8 +37,7 @@ Required layers (matched by name, case-insensitive):
 \item{expected_yield_tons_ha}{Numeric scalar. Expected crop yield
 (t ha\eqn{^{-1}}).}
 
-\item{crop}{Character. Crop name (Italian or English, see
-\code{\link{resolve_crop}()}).}
+\item{crop}{Character. Crop name (see \code{\link{list_crops}()}).}
 
 \item{ccp}{Character. Crop calendar period.}
 
@@ -95,7 +94,7 @@ soil[["TN"]] <- soil[["TN"]] * 10   # the Cremonesi TN raster is in percent; Nto
 n_map <- spatial_N_balance(
   soil_stack = soil,
   expected_yield_tons_ha = 60,
-  crop = "Mais trinciato (classe 700)",
+  crop = "Silage maize (class 700)",
   ccp  = "Spring-summer crop 100-130 days",
   oxygen_availability = "Normal",
   winter_rain = 160, start_spring_rain = 40,

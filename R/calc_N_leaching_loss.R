@@ -1,9 +1,9 @@
 #' Leaching Loss of Nitrogen
 #'
-#' DPI 2026 (Allegato 2; foglio \verb{C&D} di Fert_Office v1.26): loss of readily
-#' available mineral nitrogen ("N pronto") from leaching.
+#' DPI 2026 (Annex 2; sheet \verb{C&D} of Fert_Office v1.26): loss of readily
+#' available mineral nitrogen from leaching.
 #'
-#' Let \eqn{N_p} be the leachable N pronto: \code{b1} for crops with a cycle
+#' Let \eqn{N_p} be the leachable readily available N: \code{b1} for crops with a cycle
 #' shorter than one year, or a fixed 30 kg N/ha for perennial crops in
 #' production (\code{perennial = TRUE}, i.e. time coefficient 1).
 #'
@@ -16,7 +16,7 @@
 #'     crop or pre-planting, as in Fert_Office).}
 #'   \item{\strong{C2} (\eqn{C_b}, end of winter)}{
 #'     With \eqn{s = y + f - 250}, where \eqn{f} is February rainfall
-#'     (\code{start_spring_rain}): when \eqn{s > 0} the N pronto not yet lost
+#'     (\code{start_spring_rain}): when \eqn{s > 0} the readily available N not yet lost
 #'     (\eqn{N_p - C_a}) is lost, plus 1 kg N/ha for every 10 mm of \eqn{s} if
 #'     \eqn{y > 150} mm.}
 #' }
@@ -39,8 +39,8 @@
 #'         \item{C1}{Autumn--winter leaching loss (kg N/ha).}
 #'         \item{C2}{End-of-winter leaching loss (kg N/ha).}
 #'         \item{surplus_pluviometrico}{Logical. \code{TRUE} when
-#'           \code{winter_rain + start_spring_rain >= 300} mm (DPI 2026 scheda a
-#'           dose standard: surplus-pluviometric flag).}
+#'           \code{winter_rain + start_spring_rain >= 300} mm (rainfall-surplus
+#'           flag of the DPI 2026 standard-dose scheme).}
 #'
 #' @export
 #'

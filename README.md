@@ -20,7 +20,7 @@ planning of field and tree crops with nutrient balance methods. Every coefficien
 is an editable data table, so the balance can be re-parameterised for other
 regional guidelines. The default parameterisation implements the balance method
 (Annex 2) and the standard-dose method of the Emilia-Romagna Integrated
-Production Guidelines (*Disciplinari di Produzione Integrata*, DPI 2026) and
+Production Guidelines (DPI 2026) and
 follows the regional reference tool **Fert_Office v1.26**. On top of the
 regulatory balance it provides farm and pixel-level balances, a Sentinel-2
 remote-sensing diagnosis (vegetation indices, Gaussian-process canopy traits,
@@ -50,7 +50,7 @@ Durum wheat, 6 t/ha, on a silt-loam soil (the sample field of Fert_Office v1.26)
 library(agrinutri)
 
 bal <- N_balance(
-  expected_yield_tons_ha = 6, crop = "Grano duro (pianta intera)",
+  expected_yield_tons_ha = 6, crop = "Durum wheat (whole plant)",
   ccp = "Spring-summer crop 100-130 days",
   sand = 15.5, clay = 18.5, Ntot = 1.5, SOM = 2, CN = 7.73,
   oxygen_availability = "Slow", winter_rain = 150, start_spring_rain = 0,
@@ -59,16 +59,15 @@ bal <- N_balance(
 
 bal[c("A", "B", "C1", "C2", "D", "E", "F", "G")]   # every balance term
 calculate_N_fertilization(bal)                      # 142.246 kg N/ha
-check_MAS("Grano duro (pianta intera)", 142)        # MAS 190 kg N/ha: ok
+check_MAS("Durum wheat (whole plant)", 142)        # MAS 190 kg N/ha: ok
 
-P_balance(6, "Grano duro (pianta intera)", olsen_value = 15, olsen_unit = "P2O5",
+P_balance(6, "Durum wheat (whole plant)", olsen_value = 15, olsen_unit = "P2O5",
           clay = 18.5, sand = 15.5, total_carbonate = 15)$P2O5_required  # 112.9
-K_balance(6, "Grano duro (pianta intera)", k_value = 150, k_unit = "K2O",
+K_balance(6, "Durum wheat (whole plant)", k_value = 150, k_unit = "K2O",
           clay = 18.5, sand = 15.5)$K2O_required                         # 139.4
 ```
 
-Crop names are accepted in Italian (Fert_Office labels) or English
-(`list_crops()`).
+`list_crops()` lists the accepted crop names.
 
 A whole farm, from a vector layer with one row per plot:
 
@@ -98,10 +97,10 @@ export_prescription(rx, file.path(tempdir(), "rx.shp"), format = "shp")
 
 | Area | Main functions |
 |---|---|
-| Nitrogen balance (Allegato 2) | `N_balance()`, `calculate_N_fertilization()` and one function per term: `calc_crop_N_demand()`, `soil_fertility()`, `leaching_loss()`, `calc_N_immobilization_loss()`, `nitrogen_from_previous_crop_residues()`, `organic_previous_years_N()`, `organic_fertilization()`, `natural_contribution()` |
+| Nitrogen balance (Annex 2) | `N_balance()`, `calculate_N_fertilization()` and one function per term: `calc_crop_N_demand()`, `soil_fertility()`, `leaching_loss()`, `calc_N_immobilization_loss()`, `nitrogen_from_previous_crop_residues()`, `organic_previous_years_N()`, `organic_fertilization()`, `natural_contribution()` |
 | P and K balances | `P_balance()`, `K_balance()`, `classify_P_olsen()`, `classify_K()`, `estimate_soil_P_end_of_cycle()`, `estimate_soil_K_end_of_cycle()` |
 | Standard-dose scheme | `scheda_N()`, `scheda_PK()`, `dose_standard_N()`, `dose_standard_PK()` |
-| Regulatory limits and plan | `get_MAS()`, `check_MAS()` (Reg. reg. 2/2024), `plan_distribution()` (organic + mineral, 170 kg N/ha ZVN check), `max_SO_input()` |
+| Regulatory limits and plan | `get_MAS()`, `check_MAS()` (Regional Regulation 2/2024), `plan_distribution()` (organic + mineral, 170 kg N/ha ZVN check), `max_SO_input()` |
 | Soil | `tri2()`, `tri3()`, `calc_soil_group_and_id_rag()`, `classify_pH()`, `classify_SOM()`, `classify_CEC()`, carbonate classes, `soilgrids_input()` |
 | Farm and spatial balance | `farm_balance()`, `spatial_N_balance()` |
 | Remote sensing | `compute_vi()` (NDVI, NDRE, GNDVI, CIred-edge, MCARI, MSAVI2), `estimate_biophysical()` (Gaussian-process retrieval from Sentinel-2 L2A), `compute_NNI()`, `compute_NNI_from_S2()`, `diagnose_N_status()` |
@@ -114,11 +113,11 @@ N = **A** − **B** + **C** + **D** − **E** − **F** − **G**
 
 | Term | Meaning |
 |---|---|
-| A | crop demand: unit uptake (Allegato 6) × expected yield |
+| A | crop demand: unit uptake (Annex 6) × expected yield |
 | B | soil supply: N mineralised from organic matter × time coefficient, plus ready N for crops with a cycle shorter than one year |
 | C | leaching: autumn–winter (Ca) and end-of-winter (Cb) losses from rainfall |
-| D | immobilisation and dispersion: B × correction factor by texture and drainage, plus a negative precession effect |
-| E | precession residues |
+| D | immobilisation and dispersion: B × correction factor by texture and drainage, plus a negative previous-crop effect |
+| E | previous crop residues |
 | F | previous years' organic fertilisation × recovery coefficient × time coefficient |
 | G | atmospheric deposition × time coefficient, plus biological fixation of legumes |
 
@@ -131,7 +130,7 @@ The test suite checks agrinutri against Fert_Office v1.26 on random field
 scenarios computed by the spreadsheet itself
 (`tests/testthat/fixtures/`, generated with `data-raw/fertoffice_validation.py`):
 every balance term and the reported N, P2O5 and K2O doses are compared.
-Where the printed tables of the DPI Norme Generali and Fert_Office disagree,
+Where the printed tables of the DPI General Rules and Fert_Office disagree,
 agrinutri follows Fert_Office; the differences are listed in
 `vignette("agrinutri-PK-and-distribution")`.
 

@@ -20,7 +20,7 @@ plan_distribution(
 )
 }
 \arguments{
-\item{soil_group}{Italian DPI texture group.}
+\item{soil_group}{DPI texture group (see \code{\link[=normalise_soil_group]{normalise_soil_group()}}).}
 
 \item{n_balance, p_balance, k_balance}{Optional numeric requirements (kg/ha).}
 
@@ -32,8 +32,9 @@ name plus explicit titres)
 \item \code{year}: application year (e.g. 2024, 2025)
 \item \code{modality_epoch}: ID or label from \code{distribution_modalities.table}
 \item \code{level} (optional): efficiency level of the distribution
-\code{"bassa"/"media"/"alta"}, which in Fert_Office depends on modality,
-epoch and crop cycle (foglio \code{Ciclo_Modalita}); default \code{"media"}.
+(low, medium, high), given as \code{"bassa"}, \code{"media"} or \code{"alta"}; in
+Fert_Office it depends on modality, epoch and crop cycle (cycle-modality
+sheet); default \code{"media"} (medium).
 The N dose class (< 125, 125-249, >= 250 kg N/ha) is computed from the
 quantity and selects the efficiency as in Fert_Office.
 \item Optional \code{N_pct}, \code{P2O5_pct}, \code{K2O_pct}, \code{dry_matter_pct} override the table.
@@ -56,13 +57,13 @@ A list with:
 \itemize{
 \item \code{rows}: per-application data frame (fertilizer, quantity, delivered N/P/K, efficiency, useful N/P/K)
 \item \code{totals}: totals of useful N, P2O5, K2O delivered
-\item \code{alerts}: if balances provided, OK/Eccesso/Deficit for each nutrient
+\item \code{alerts}: if balances provided, \code{"OK"}/\code{"Eccesso"} (excess)/\code{"Deficit"} for each nutrient
 \item \code{zvn_zoot_N}: total zootec N delivered (useful for ZVN check)
 }
 }
 \description{
 Builds the fertilisation distribution plan for a crop according to DPI
-Emilia-Romagna 2026 (Fert_Office v1.26 foglio \code{Distribuz}). Combines:
+Emilia-Romagna 2026 (Fert_Office v1.26 distribution sheet). Combines:
 }
 \details{
 \itemize{
@@ -78,5 +79,5 @@ For each input row the function computes the "useful" contribution to the
 crop for N (via efficiency), P2O5 and K2O (assumed 100\%), and aggregates
 the totals. If \code{n_balance}, \code{p_balance}, \code{k_balance} are provided the
 function also checks the totals against the required doses and returns
-alerts (\code{OK} / \code{Eccesso} / \code{Deficit}).
+alerts (\code{"OK"}, \code{"Eccesso"} for excess, \code{"Deficit"}).
 }
