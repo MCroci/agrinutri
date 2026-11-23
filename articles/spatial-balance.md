@@ -34,7 +34,6 @@ matter and C/N are derived from organic carbon.
 
 library(agrinutri)
 library(terra)
-#> terra 1.9.50
 
 rer  <- terra::rast(system.file("extdata/rer_soil_piacenza.tif", package = "agrinutri"))
 soil <- c(rer[["ntot"]],                        # g/kg, as Ntot in N_balance()

@@ -9,7 +9,7 @@ Emilia-Romagna 2026 (Fert_Office v1.26 foglio Distribuz). Combines:"></head><bod
 
     <a class="navbar-brand me-2" href="../index.html">agrinutri</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,8 +85,11 @@ name plus explicit titres)</p></li>
 <li><p><code>quantity_t_ha</code>: amount in t/ha (fresh matter)</p></li>
 <li><p><code>year</code>: application year (e.g. 2024, 2025)</p></li>
 <li><p><code>modality_epoch</code>: ID or label from <code>distribution_modalities.table</code></p></li>
-<li><p><code>level</code> (optional): efficiency level <code>"bassa"/"media"/"alta"</code> if you
-want to override the default selection.</p></li>
+<li><p><code>level</code> (optional): efficiency level of the distribution
+<code>"bassa"/"media"/"alta"</code>, which in Fert_Office depends on modality,
+epoch and crop cycle (foglio <code>Ciclo_Modalita</code>); default <code>"media"</code>.
+The N dose class (&lt; 125, 125-249, &gt;= 250 kg N/ha) is computed from the
+quantity and selects the efficiency as in Fert_Office.</p></li>
 <li><p>Optional <code>N_pct</code>, <code>P2O5_pct</code>, <code>K2O_pct</code>, <code>dry_matter_pct</code> override the table.</p></li>
 </ul></dd>
 
@@ -118,8 +121,9 @@ want to override the default selection.</p></li>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 <ul><li><p>Organic applications (one or more matrices from <code>organic_fertilizers.table</code>, with
-efficiency selected from <code>efficiency.table</code> by soil group, dose level,
-and sector of matrix).</p></li>
+efficiency selected from <code>efficiency.table</code> by soil group, efficiency
+level of the distribution, sector of the matrix and N dose class; manures,
+composts and solid digestate (types 2-3) take a fixed 40% as in Fert_Office).</p></li>
 <li><p>Mineral / synthesis fertilisers (from <code>mineral_fertilizers.table</code> or user-specified
 triplets of N, P2O5, K2O titres).</p></li>
 </ul><p>For each input row the function computes the "useful" contribution to the

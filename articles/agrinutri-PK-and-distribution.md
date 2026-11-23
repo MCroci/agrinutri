@@ -887,12 +887,12 @@ plan$rows
 #> 1 organic          letame bovino 2025              1     1          20.0  100
 #> 2 mineral UREA AGRICOLA PRIL.46%   NA             11    11           0.3  138
 #>   P2O5_kg K2O_kg efficiency_pct N_useful P2O5_useful K2O_useful zootec
-#> 1      48    140             50       50          48        140   TRUE
+#> 1      48    140             40       40          48        140   TRUE
 #> 2       0      0            100      138           0          0  FALSE
 # Cumulated useful nutrients
 plan$totals
 #>    N_useful P2O5_useful  K2O_useful 
-#>         188          48         140
+#>         178          48         140
 # Target vs delivered alerts
 plan$alerts
 #> $N
@@ -1149,7 +1149,6 @@ rescaling and (optionally) caps each pixel at the MAS limit.
 ``` r
 
 library(terra)
-#> terra 1.9.50
 
 # NDVI raster: example from agrinutri (SpatRaster or multi-band stack; functions use the NDVI layer if named)
 data(s2.rast)
@@ -1468,16 +1467,16 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] terra_1.9-50    agrinutri_1.0.1
+#> [1] terra_1.9-60    agrinutri_1.1.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] cli_3.6.6          knitr_1.52         rlang_1.3.0        xfun_0.62         
 #>  [5] KernSmooth_2.23-27 DBI_1.3.0          otel_0.3.0         sf_1.1-3          
-#>  [9] textshaping_1.0.5  jsonlite_2.0.0     e1071_1.7-17       htmltools_0.5.9   
-#> [13] ragg_1.5.2         sass_0.4.10        rmarkdown_2.32     grid_4.6.2        
+#>  [9] textshaping_1.1.0  jsonlite_2.0.0     e1071_1.7-17       htmltools_0.5.9   
+#> [13] ragg_1.5.2         sass_0.5.0         rmarkdown_2.32     grid_4.6.2        
 #> [17] classInt_0.4-11    evaluate_1.0.5     jquerylib_0.1.4    fastmap_1.2.0     
 #> [21] yaml_2.3.12        lifecycle_1.0.5    compiler_4.6.2     codetools_0.2-20  
-#> [25] fs_2.1.0           htmlwidgets_1.6.4  Rcpp_1.1.2         systemfonts_1.3.2 
+#> [25] fs_2.1.0           htmlwidgets_1.6.4  Rcpp_1.1.2         systemfonts_1.3.4 
 #> [29] digest_0.6.39      R6_2.6.1           class_7.3-24       bslib_0.12.0      
 #> [33] proxy_0.4-29       tools_4.6.2        units_1.0-1        pkgdown_2.2.1     
 #> [37] cachem_1.1.0       desc_1.4.3

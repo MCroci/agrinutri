@@ -45,8 +45,11 @@ plan_distribution(
 
   - `modality_epoch`: ID or label from `distribution_modalities.table`
 
-  - `level` (optional): efficiency level `"bassa"/"media"/"alta"` if you
-    want to override the default selection.
+  - `level` (optional): efficiency level of the distribution
+    `"bassa"/"media"/"alta"`, which in Fert_Office depends on modality,
+    epoch and crop cycle (foglio `Ciclo_Modalita`); default `"media"`.
+    The N dose class (\< 125, 125-249, \>= 250 kg N/ha) is computed from
+    the quantity and selects the efficiency as in Fert_Office.
 
   - Optional `N_pct`, `P2O5_pct`, `K2O_pct`, `dry_matter_pct` override
     the table.
@@ -90,7 +93,9 @@ A list with:
 
 - Organic applications (one or more matrices from
   `organic_fertilizers.table`, with efficiency selected from
-  `efficiency.table` by soil group, dose level, and sector of matrix).
+  `efficiency.table` by soil group, efficiency level of the
+  distribution, sector of the matrix and N dose class; manures, composts
+  and solid digestate (types 2-3) take a fixed 40% as in Fert_Office).
 
 - Mineral / synthesis fertilisers (from `mineral_fertilizers.table` or
   user-specified triplets of N, P2O5, K2O titres).
