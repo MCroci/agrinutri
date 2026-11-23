@@ -67,7 +67,7 @@ cat("farm ha", round(sum(out$area_ha), 1), "| N total kg", round(sum(out$N_total
 lab <- st_drop_geometry(out)[, c("plot", "c2024", "c2023")]
 lab$name <- paste0(lab$plot, " ", lab$c2024)
 bb <- st_bbox(out); ctx <- geo[lengths(st_intersects(geo, st_as_sfc(bb))) > 0 & !geo$id %in% out$id, ]
-pa <- ggplot(out) + geom_sf(data = ctx, fill = "grey90", colour = "white", linewidth = 0.2) +   # neighbouring fields
+pa <- ggplot(out) +
   geom_sf(aes(fill = N_target), colour = "grey20", linewidth = 0.2) +
   geom_sf(data = out[!out$MAS_ok, ], fill = NA, colour = OKABE[[6]], linewidth = 0.8) +
   geom_sf_label(aes(label = plot), size = (BASE - 1) / .pt, family = FONT, linewidth = 0,
@@ -85,7 +85,7 @@ pb <- ggplot(tl, aes(kg, plot, fill = term)) + geom_col(width = 0.65, colour = "
   geom_vline(xintercept = 0, linewidth = 0.3) +
   geom_point(data = dose, aes(N, plot, shape = type, colour = type), inherit.aes = FALSE,
              fill = "white", size = 1.6, stroke = 0.6) +
-  fill_terms() +
+  fill_terms() + scale_fill_manual(values = TERM_FILL, name = NULL, guide = guide_legend(nrow = 1, order = 1)) +
   scale_shape_manual(values = c("Balance dose" = 23, "Standard dose" = 4), name = NULL) +
   scale_colour_manual(values = c("Balance dose" = "black", "Standard dose" = OKABE[[6]]), name = NULL) +
   scale_y_discrete(labels = setNames(paste0(lab$plot, "  ", lab$c2024, "

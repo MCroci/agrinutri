@@ -59,7 +59,7 @@ idx <- list(NDVI = cellmean(ndvi), NNI = cellmean(nni))
 area <- as.numeric(st_area(cells))
 DOSE <- fill_N(name = NULL, limits = c(lo, hi))
 COL  <- scale_colour_viridis_c(option = "mako", direction = -1, limits = c(lo, hi), guide = "none")
-block <- function(k) {
+block <- function(k, ylab = TRUE) {
   d <- data.frame(x = idx[[XV[[k]]]], dose = M[[k]], area = area)
   rule <- ggplot(d[is.finite(d$x), ], aes(x, dose)) +
     geom_hline(yintercept = Nstar, linetype = "dotted", linewidth = 0.35) +
@@ -68,8 +68,9 @@ block <- function(k) {
     guides(fill = "none") +
     scale_size_area(max_size = 1.3, guide = "none") +
     scale_y_continuous(limits = c(lo - 3, hi + 3), breaks = c(140, 175, 210)) +
-    labs(title = SHORT[[k]], subtitle = DRV[[k]], x = paste("Cell", XV[[k]]), y = expression("N (kg ha"^-1*")")) +
-    theme_sat() + theme(plot.title = element_text(face = "bold", size = BASE, margin = margin(b = 0.5)),
+    labs(title = SHORT[[k]], subtitle = DRV[[k]], x = paste("Cell", XV[[k]]),
+         y = if (ylab) expression("N (kg ha"^-1*")") else NULL) +
+    theme_sat() + theme(panel.grid.major = element_blank(), plot.title = element_text(face = "bold", size = BASE, margin = margin(b = 0.5)),
                         plot.subtitle = element_text(size = BASE - 1, colour = "grey30", margin = margin(b = 1.5)),
                         axis.title = element_text(size = BASE - 1))
   g <- cells[, "geometry"]; g$dose <- M[[k]]
@@ -80,22 +81,14 @@ block <- function(k) {
     coord_sf(datum = NA) + theme_map() + theme(legend.position = "none")
   wrap_elements(full = rule / map + plot_layout(heights = c(0.75, 1)))
 }
-fv <- vect(st_transform(field, crs(ndvi)))
-fr <- list(geom_sf(data = st_transform(field, crs(ndvi)), fill = NA, colour = "grey20", linewidth = 0.3),
-           coord_sf(datum = NA, expand = FALSE), theme_map(), cbar(),
-           theme(legend.key.width = unit(6, "mm"), legend.margin = margin(0, 0, 0, 0), legend.box.spacing = unit(1, "mm")))
-pi1 <- ggplot() + tidyterra::geom_spatraster(data = mask(ndvi, fv)) + fr +
-  scale_fill_distiller(palette = "YlGn", direction = 1, na.value = "transparent", name = "NDVI", breaks = c(0.4, 0.6, 0.8))
-pi2 <- ggplot() + tidyterra::geom_spatraster(data = mask(crop(nni, fv), fv)) + fr +
-  fill_NNI(name = "NNI", breaks = c(0.6, 1, 1.4))
 key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)) + geom_raster() + DOSE +
   annotate("segment", x = Nstar, xend = Nstar, y = 0.5, yend = 1.5, linetype = "dotted", linewidth = 0.4) +
-  annotate("text", x = Nstar, y = 1.8, label = sprintf("balance dose N* = %.0f", Nstar), size = (BASE - 1) / .pt,
-           family = FONT) +
-  scale_x_continuous(breaks = c(lo, 160, Nstar, 190, hi), expand = c(0, 0)) + scale_y_continuous(limits = c(0.5, 2)) +
-  labs(x = expression("Prescribed N dose (kg N ha"^-1*")"), y = NULL) +
+  scale_x_continuous(breaks = c(lo, 160, Nstar, 190, hi), expand = c(0, 0)) +
+  labs(x = expression("Prescribed N dose (kg N ha"^-1*"); dotted: balance dose"), y = NULL) +
   theme_sat() + theme(legend.position = "none", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-                      panel.grid = element_blank(), panel.border = element_blank(), aspect.ratio = 0.18)
-top <- wrap_elements(full = (pi1 | pi2 | key) + plot_layout(widths = c(1, 1, 1.5)))
-blocks <- wrap_plots(lapply(names(M), block), ncol = 3)
-save_fig(add_tags(top / blocks + plot_layout(heights = c(0.45, 2))), "fig6_strategies", "double", 215)
+                      panel.grid = element_blank(), panel.border = element_blank(), plot.tag = element_blank())
+blocks <- wrap_plots(Map(block, names(M), seq_along(M) %in% c(1, 4)), ncol = 3)
+fig <- blocks / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(2, 0.07)) +
+  plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), "", "", ""))) &   # no tag on the dose bar
+  theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1), plot.tag.location = "margin")
+save_fig(fig, "fig6_strategies", "double", 175)
