@@ -99,7 +99,7 @@ rule_plot <- function(k, first = FALSE) {
     scale_y_continuous(limits = c(lo - 3, hi + 3), breaks = c(140, 175, 210)) +
     { if (XV[[k]] == "NDVI") scale_x_continuous(limits = c(0.3, 1.05), breaks = c(0.4, 0.6, 0.8, 1.0))
       else scale_x_continuous(breaks = c(0.6, 0.9, 1.1)) } +
-    labs(title = TIT[[k]], subtitle = sprintf("mean %.0f", mu[[k]]), x = XV[[k]],
+    labs(title = sprintf("(%s) %s", letters[match(k, names(M))], TIT[[k]]), subtitle = sprintf("mean %.0f", mu[[k]]), x = XV[[k]],
          y = if (first) expression("Cell dose (kg N ha"^-1*")") else NULL) +
     theme_sat() + theme(panel.grid.major = element_blank(),
                         plot.title = element_text(face = "bold", size = BASE - 0.5, margin = margin(b = 0)),
@@ -120,9 +120,8 @@ key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)
   labs(x = expression("Prescribed N dose (kg N ha"^-1*"); dotted: balance dose N*"), y = NULL) +
   theme_sat() + theme(legend.position = "none", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
                       panel.grid = element_blank(), panel.border = element_blank(), plot.tag = element_blank())
-grid <- wrap_plots(c(Map(rule_plot, names(M), seq_along(M) == 1), lapply(names(M), map_plot)),
-                   nrow = 2, byrow = TRUE, heights = c(1, 1))
-fig <- grid / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(2.1, 0.08)) +
-  plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), rep("", 9)))) &   # tags on the rules only
-  theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1))
-save_fig(fig, "fig8_strategies", "double", 90)
+nm <- names(M); first <- seq_along(nm) %in% c(1, 4)               # two rows of three methods, rule above map
+row3 <- function(ii) c(Map(rule_plot, nm[ii], first[ii]), lapply(nm[ii], map_plot))
+grid <- wrap_plots(c(row3(1:3), row3(4:6)), ncol = 3, byrow = TRUE, heights = c(0.75, 1, 0.75, 1))
+fig <- grid / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(3.5, 0.06))
+save_fig(fig, "fig8_strategies", "double", 175)
