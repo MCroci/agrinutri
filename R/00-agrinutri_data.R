@@ -6,8 +6,14 @@
 #'
 #' Kept in `00-agrinutri_data.R` so collation loads this before other sources.
 #'
+#' A table supplied in the option `agrinutri.tables` (a named list) replaces the
+#' bundled one, so the balance can be re-parameterised without editing the package:
+#' `options(agrinutri.tables = list(uptake_table = my_uptake))`. See [agrinutri_tables].
+#'
 #' @keywords internal
 agrinutri_data_get <- function(name) {
+  user <- getOption("agrinutri.tables")
+  if (!is.null(user[[name]])) return(user[[name]])
   ns <- asNamespace("agrinutri")
   if (exists(name, envir = ns, inherits = FALSE)) {
     return(get(name, envir = ns, inherits = FALSE))

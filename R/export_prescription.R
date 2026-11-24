@@ -362,9 +362,15 @@ export_prescription_all <- function(x,
 .write_prep_for_isoxml <- function(sfobj, dose_field, area_min) {
   if (!dose_field %in% names(sfobj))
     stop("Dose field '", dose_field, "' not found in the input.")
+  # st_make_valid() can return mixed POLYGON / MULTIPOLYGON / GEOMETRYCOLLECTION cells (clipped strips);
+  # the writer below needs one simple polygon per row (coordinates indexed by L2), so split them first
+  # and compute the areas afterwards, so that the field total is not counted twice.
+  sfobj <- sf::st_make_valid(sfobj)
+  if (any(sf::st_is(sfobj, "GEOMETRYCOLLECTION")))
+    sfobj <- sf::st_collection_extract(sfobj, "POLYGON", warn = FALSE)
+  sfobj <- suppressWarnings(sf::st_cast(sf::st_cast(sfobj, "MULTIPOLYGON"), "POLYGON"))
   sfobj$area_m2 <- as.numeric(sf::st_area(sfobj))
   sfobj <- sfobj[sfobj$area_m2 >= area_min, , drop = FALSE]
-  sfobj <- sf::st_make_valid(sfobj)
   sfobj <- sf::st_transform(sfobj, 4326)
   sfobj$DOSE <- round(as.numeric(sfobj[[dose_field]]), 1)
   sfobj$ID <- seq_len(nrow(sfobj))

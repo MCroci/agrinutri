@@ -188,3 +188,17 @@ test_that("export_prescription_all writes every requested format", {
   expect_message(export_prescription_all(.rx_sf(), d, formats = character(0)),
                  "Exported 0 format")
 })
+
+test_that("ISOXML export works on a strip prescription with clipped (mixed-geometry) cells", {
+  skip_if_not_installed("sf"); skip_if_not_installed("xml2")
+  farm <- sf::st_read(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"), quiet = TRUE)
+  rx <- build_strip_prescription(farm[farm$plot == "P01", ], machine_width = 24, cell_length = 30,
+                                 variability = "uniform", n_target = 175)
+  d <- file.path(tempdir(), "isoxml_strip"); unlink(d, recursive = TRUE)
+  f <- suppressMessages(export_prescription(rx, d, format = "isoxml"))
+  expect_true(file.exists(f))
+  x <- xml2::read_xml(f)
+  expect_gt(length(xml2::xml_find_all(x, ".//PNT")), 4 * nrow(rx))
+  area <- as.numeric(xml2::xml_attr(xml2::xml_find_first(x, ".//PFD"), "D"))
+  expect_equal(area, sum(as.numeric(sf::st_area(rx))), tolerance = 0.01)   # field area counted once
+})

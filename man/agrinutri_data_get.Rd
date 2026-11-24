@@ -13,5 +13,9 @@ to \code{\link[utils:data]{utils::data()}} so vignettes and \code{::} calls work
 }
 \details{
 Kept in \code{00-agrinutri_data.R} so collation loads this before other sources.
+
+A table supplied in the option \code{agrinutri.tables} (a named list) replaces the
+bundled one, so the balance can be re-parameterised without editing the package:
+\code{options(agrinutri.tables = list(uptake_table = my_uptake))}. See \link{agrinutri_tables}.
 }
 \keyword{internal}

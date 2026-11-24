@@ -1,5 +1,16 @@
 # agrinutri News
 
+## Development version
+
+* New `agrinutri_tables()`: replaces any bundled coefficient table (e.g.
+  `uptake_table`) for the session, so the balance can be re-parameterised for
+  another region without editing the package. `agrinutri_tables()` with no
+  arguments restores the bundled tables.
+* `export_prescription(format = "isoxml")`: prescriptions with mixed or
+  multipart geometries (e.g. strip cells clipped to the field) are now made
+  valid and split into single polygons before writing; the export failed on
+  them before.
+
 ## Version 1.1.0 (2026-11-23)
 
 * `plan_distribution()`: the organic N efficiency now follows Fert_Office
