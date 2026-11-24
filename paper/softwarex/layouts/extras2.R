@@ -34,7 +34,7 @@ g5 <- ggplot() + annotate("rect", xmin = 0.15, xmax = 0.85, ymin = 0.2, ymax = 0
 ar <- ggplot() + annotate("text", x = 0.5, y = 0.45, label = "→", size = 14 / .pt, colour = "grey40") +
   xlim(0, 1) + ylim(0, 1) + theme_void()
 ga <- (g1 | ar | g2 | ar | g3 | ar | g4 | ar | g5) + plot_layout(widths = c(1, 0.18, 1.1, 0.18, 1, 0.18, 1, 0.18, 0.9)) +
-  plot_annotation(title = "agrinutri: an open R engine from the nutrient balance to the variable-rate machine file",
+  plot_annotation(title = "agrinutri: from nutrient balances to variable-rate fertiliser prescriptions",
                   theme = theme(plot.title = element_text(size = BASE + 0.5, face = "bold", family = FONT, hjust = 0.5)))
 put(ga, "GA_graphical_abstract", 133, 53)
 cat("extras2 written\n")

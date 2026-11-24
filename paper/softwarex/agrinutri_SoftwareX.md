@@ -1,5 +1,5 @@
 ---
-title: "agrinutri: an open R engine for nutrient balances and variable-rate fertilisation planning"
+title: "agrinutri: an R package for nutrient balances and variable-rate fertiliser prescriptions from Sentinel-2"
 bibliography: references.bib
 link-citations: true
 ---
@@ -180,7 +180,7 @@ agrinutri turns a nutrient balance into a reusable component.
 
 # 5. Conclusions
 
-agrinutri is an open R engine for the predictive nutrient balance of nitrogen, phosphorus and potassium. It applies the balance to fields, farms, years and soil maps, returns every term, and links the balance dose to satellite diagnosis and to variable-rate prescriptions whose field mean equals that dose. Planned work covers a CRAN release, further parameter sets and the coupling of P and K balances with sensor data.
+agrinutri is an open-source R package for the predictive nutrient balance of nitrogen, phosphorus and potassium. It applies the balance to fields, farms, years and soil maps, returns every term, and links the balance dose to satellite diagnosis and to variable-rate prescriptions whose field mean equals that dose. Planned work covers a CRAN release, further parameter sets and the coupling of P and K balances with sensor data.
 
 # Declaration of competing interest
 
