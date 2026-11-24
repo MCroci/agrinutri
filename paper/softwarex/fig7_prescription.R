@@ -1,10 +1,10 @@
-# Candidate extra figure X5: how the prescription map of plot P01 is built, step by step, on the real data
+# Fig. 7: how the prescription map of plot P01 is built, step by step, on the real data
 # (Sentinel-2 L2A of 13 August 2024, balance dose N* = 175 kg N/ha, bounds 140-210).
-# Run from the package root after fig5_data.R:  Rscript paper/softwarex/layouts/X5_prescription_workflow.R
+# Run from the package root after fig7_data.R:  Rscript paper/softwarex/fig7_prescription.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
-D <- "paper/softwarex/data"; OUT <- "paper/softwarex/layouts"
+D <- "paper/softwarex/data"
 Nstar <- read.csv(file.path(D, "farm_2024.csv"))$N_target[1]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
 field <- st_read(file.path(D, "rs_field_utm.geojson"), quiet = TRUE)
 rx    <- st_read(file.path(D, "rs_rx.geojson"), quiet = TRUE)
@@ -19,12 +19,14 @@ fr <- list(geom_sf(data = field, fill = NA, colour = "grey15", linewidth = 0.3, 
                  plot.subtitle = element_text(size = BASE - 1, colour = "grey30", hjust = 0, margin = margin(b = 2))))
 step <- function(n, t, s) labs(title = sprintf("%d  %s", n, t), subtitle = s)
 
-# 1 false-colour composite (NIR, red, green), stretched
-fc <- c(s2[["B08"]], s2[["B04"]], s2[["B03"]]); fc <- mask(fc, fv)
-q <- global(fc, quantile, probs = c(0.02, 0.98), na.rm = TRUE)
-for (i in 1:3) fc[[i]] <- clamp((fc[[i]] - q[i, 1]) / (q[i, 2] - q[i, 1]) * 255, 0, 255)
+# 1 natural-colour composite (red, green, blue), stretched
+fc <- c(s2[["B04"]], s2[["B03"]], s2[["B02"]]); fc <- mask(fc, fv)
+# one stretch for all bands (keeps the colour balance), from the field interior so the bright margin does not set it
+v <- values(mask(fc, buffer(fv, -20)), na.rm = TRUE)
+q <- quantile(v, c(0.01, 0.99))
+for (i in 1:3) fc[[i]] <- clamp((fc[[i]] - q[1]) / (q[2] - q[1]) * 255, 0, 255)
 p1 <- ggplot() + geom_spatraster_rgb(data = fc, r = 1, g = 2, b = 3, max_col_value = 255, interpolate = FALSE) + fr +
-  step(1, "Sentinel-2 scene", "13 Aug 2024, false colour")
+  step(1, "Sentinel-2 scene", "13 Aug 2024, natural colour")
 # 2 LAI
 p2 <- ggplot() + geom_spatraster(data = lai) + fr +
   scale_fill_viridis_c(option = "viridis", limits = c(0, 6), na.value = "transparent", name = "LAI") +
@@ -58,7 +60,7 @@ td <- file.path(tempdir(), "TASKDATA"); unlink(td, recursive = TRUE)
 export_prescription(rx[, "dose"], td, format = "isoxml")
 xmlf <- list.files(td, pattern = "\\.XML$", full.names = TRUE, recursive = TRUE, ignore.case = TRUE)[1]
 xl <- readLines(xmlf, warn = FALSE); xl <- trimws(unlist(strsplit(paste(xl, collapse = "\n"), "(?<=>)\\s*(?=<)", perl = TRUE)))
-xl <- substr(xl[nzchar(xl)], 1, 46)[1:min(9, length(xl))]
+xl <- substr(xl[nzchar(xl)], 1, 36)[1:min(9, length(xl))]
 p8 <- ggplot() + annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill = "grey97", colour = "grey60", linewidth = 0.3) +
   annotate("text", x = 0.03, y = seq(0.93, by = -0.1, length.out = length(xl)), label = xl, hjust = 0, vjust = 1,
            family = "mono", size = (BASE - 2) / .pt) +
@@ -69,6 +71,5 @@ p8 <- ggplot() + annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill =
         plot.subtitle = element_text(size = BASE - 1, colour = "grey30", margin = margin(b = 2))) +
   step(8, "Machine file", "export_prescription(format = \"isoxml\")")
 fig <- wrap_plots(p1, p2, p3, p4, p5, p6, p7, p8, nrow = 2)
-ggsave(file.path(OUT, "X5_prescription_workflow.png"), fig, device = ragg::agg_png, width = 190, height = 120,
-       units = "mm", dpi = 300, bg = "white")
+save_fig(fig, "fig7_prescription", "double", 120)
 cat("zone mean", round(m0, 1), "-> final mean", round(m1, 1), "| XML:", basename(xmlf), "\n")

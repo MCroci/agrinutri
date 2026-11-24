@@ -10,14 +10,14 @@ put <- function(p, name, w, h) ggsave(file.path(OUT, paste0(name, ".png")), p, d
                                       width = w, height = h, units = "mm", dpi = 300, bg = "white")
 
 # ---- Fig. 2: farm --------------------------------------------------------------------------
-e <- run("fig2_farm.R")
+e <- run("fig3_farm.R")
 put(add_tags(e$pa + e$pb + plot_layout(widths = c(1, 1.3))), "fig2_A", 190, 72)
 put(add_tags(e$pb + e$pa + plot_layout(widths = c(1.6, 1))), "fig2_B", 190, 72)
 put(add_tags(e$pa / e$pb + plot_layout(heights = c(1, 1))), "fig2_C", 140, 150)
 put(e$pb, "fig2_D", 140, 70)
 
 # ---- Fig. 3: P01 nitrogen through the rotation --------------------------------------------------
-e <- run("fig3_p01_years.R")
+e <- run("fig4_p01_years.R")
 put(e$pa, "fig3_A", 190, 80)
 put(e$pa + theme(legend.position = "top") + guides(fill = guide_legend(nrow = 1)), "fig3_B", 190, 90)
 yk <- e$yk
@@ -33,7 +33,7 @@ put(e$pa + coord_flip(ylim = c(-130, 310)) + theme(axis.text.y = element_text(si
     "fig3_D", 140, 150)
 
 # ---- Fig. 4: phosphorus and potassium -------------------------------------------------------------
-e <- run("fig4_pk.R")
+e <- run("fig6_pk.R")
 mt <- theme(plot.tag.location = "margin")
 put(add_tags(e$pb / (e$pc | e$pd) + plot_layout(heights = c(0.8, 1))) & mt, "fig4_A", 190, 150)
 put(add_tags((e$pb | e$pa + theme(legend.position = "none")) / (e$pc | e$pd) +
@@ -49,7 +49,7 @@ put(add_tags(e$pa / e$pb), "fig5_C", 90, 150)
 put(add_tags(e$pb + e$pc), "fig5_D", 140, 75)
 
 # ---- Fig. 6: precision-agriculture methods -------------------------------------------------------
-e <- run("fig6_strategies.R")
+e <- run("fig8_strategies.R")
 tg <- function(n) plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), rep("", n))))
 tt <- theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1))
 put(e$fig, "fig6_A", 190, 90)

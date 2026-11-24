@@ -1,8 +1,8 @@
-# Fig. 4: phosphorus and potassium. (a) P2O5 and K2O doses of plot P01 through the rotation 2019-2026
+# Fig. 6: phosphorus and potassium. (a) P2O5 and K2O doses of plot P01 through the rotation 2019-2026
 # (Fig. 3); (b, c) availability classes of
 # Olsen P and exchangeable K on the regional 100 m soil maps around the farm, which set the
 # strategy (enrichment, maintenance, reduction) of every balance.
-# Run from the package root after fig3_p01_years.R:  Rscript paper/softwarex/fig4_pk.R
+# Run from the package root after fig4_p01_years.R:  Rscript paper/softwarex/fig6_pk.R
 suppressMessages({ library(sf); library(terra); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -29,7 +29,7 @@ fd$nutrient <- factor(fd$nutrient, levels = names(NUT))
 pa <- ggplot(fd, aes(plot, kg)) + bars() + scale_y_continuous(limits = c(0, 310), expand = expansion(c(0, 0.02))) +
   labs(x = NULL, y = expression("Dose (kg ha"^-1*")")) + theme(axis.text.x = element_text(lineheight = 0.9))
 
-yr$lab <- factor(paste0(yr$year, "\n", sub(" ", "\n", yr$class)), levels = paste0(yr$year, "\n", sub(" ", "\n", yr$class)))
+yr$lab <- factor(paste0(yr$year, "\n", gsub(" ", "\n", yr$class)), levels = paste0(yr$year, "\n", gsub(" ", "\n", yr$class)))
 yd <- data.frame(lab = rep(yr$lab, 2), nutrient = factor(rep(names(NUT), each = nrow(yr)), levels = names(NUT)),
                  kg = c(yr$P2O5, yr$K2O))
 pb <- ggplot(yd, aes(lab, kg)) + bars() + scale_y_continuous(limits = c(0, 310), expand = expansion(c(0, 0.02))) +
@@ -61,4 +61,4 @@ print(st_drop_geometry(out)[, c("plot", "crop", "P2O5_target", "K2O_target")])
 
 pb <- pb + labs(y = expression("Dose (kg ha"^-1*")"))
 pa <- pa + theme(legend.position = "none")
-save_fig(add_tags(pb / (pc | pd) + plot_layout(heights = c(0.8, 1))) & theme(plot.tag.location = "margin"), "fig4_pk", "double", 150)
+save_fig(add_tags(pb + pc + pd + plot_layout(widths = c(1.8, 1, 1))) & theme(plot.tag.location = "margin"), "fig6_pk", "double", 75)

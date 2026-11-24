@@ -1,8 +1,8 @@
-# Fig. 3: plot P01 (Figs. 2 and 4-6) through the rotation 2019-2026.
+# Fig. 4: plot P01 (Figs. 2 and 4-6) through the rotation 2019-2026.
 # N balance terms, dose and maximum dose per year, with the October-January rainfall under each crop.
 # Crop class per year from the satellite crop maps (previous crop: class of the year before),
 # soil from the regional maps 0-30 cm, rainfall from ERA5, yields from ISTAT Piacenza.
-# Run from the package root after piacenza/a01_inputs.R:  Rscript paper/softwarex/fig3_p01_years.R
+# Run from the package root after piacenza/a01_inputs.R:  Rscript paper/softwarex/fig4_p01_years.R
 suppressMessages({ library(sf); library(terra); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -68,4 +68,4 @@ pa <- ggplot(tl, aes(lab, kg, fill = term)) + geom_col(width = 0.65, colour = "g
   theme_sat() + theme(legend.position = "right", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
                       legend.margin = margin(0, 0, 0, 0), legend.key.size = unit(2.5, "mm"),
                       axis.text.x = element_text(size = BASE - 1.5, lineheight = 0.9))
-save_fig(pa, "fig3_p01_years", "double", 80)
+save_fig(pa + theme(legend.position = "top") + guides(fill = guide_legend(nrow = 1)), "fig4_p01_years", "double", 90)

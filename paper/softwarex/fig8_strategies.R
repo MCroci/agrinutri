@@ -1,7 +1,7 @@
-# Fig. 6: precision-agriculture methods on plot P01 (Figs. 2-5): for each method the rule (cell dose against the
+# Fig. 8: precision-agriculture methods on plot P01 (Figs. 2-5): for each method the rule (cell dose against the
 #     driving layer) and the prescription map; all redistribute the balance dose N* on the same 24 m x 30 m cells.
 #     (a) input layers NDVI and NNI and the dose scale; (b-g) uniform, calibration ramps, NDVI classes, NNI zones, sufficiency index.
-# Run from the package root after fig2_farm.R and fig5_data.R:  Rscript paper/softwarex/fig6_strategies.R
+# Run from the package root after fig3_farm.R and fig7_data.R:  Rscript paper/softwarex/fig8_strategies.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -125,4 +125,4 @@ grid <- wrap_plots(c(Map(rule_plot, names(M), seq_along(M) == 1), lapply(names(M
 fig <- grid / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(2.1, 0.08)) +
   plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), rep("", 9)))) &   # tags on the rules only
   theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1))
-save_fig(fig, "fig6_strategies", "double", 90)
+save_fig(fig, "fig8_strategies", "double", 90)

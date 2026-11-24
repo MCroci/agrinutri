@@ -1,8 +1,8 @@
-# Fig. 2: farm balance with farm_balance() (diamonds: balance dose; crosses: dose_standard_N()) on a farm of satellite-delineated fields of the
+# Fig. 3: farm balance with farm_balance() (diamonds: balance dose; crosses: dose_standard_N()) on a farm of satellite-delineated fields of the
 # Piacenza plain (the nearest field of each crop around plot P01), crop year 2024.
 # Inputs per field as in Section 3.4: crop class 2024 (previous crop: class 2023), regional soil
 # maps 0-30 cm, ERA5 rainfall, ISTAT yields 2024. Run from the package root after
-# piacenza/a01_inputs.R:  Rscript paper/softwarex/fig2_farm.R
+# piacenza/a01_inputs.R:  Rscript paper/softwarex/fig3_farm.R
 suppressMessages({ library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -94,4 +94,4 @@ after ", tolower(lab$c2023)), lab$plot)) +
   labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand and losses (+)"), y = NULL) +
   theme_sat() + theme(legend.position = "top", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
                       legend.key.size = unit(2.5, "mm"), legend.margin = margin(0, 0, 0, 0))
-save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.3))), "fig2_farm", "double", 72)
+save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.3))), "fig3_farm", "double", 72)
