@@ -40,7 +40,7 @@ ui <- navbarPage(
   tabPanel("Distribution plan", icon = icon("truck"),         planUI("plan")),
   tabPanel("Precision N",       icon = icon("satellite"),     precisionUI("prec")),
   tabPanel("Spatial balance",   icon = icon("map"),           spatialUI("spat")),
-  tabPanel("Farm / Azienda",    icon = icon("tractor"),       farmUI("farm")),
+  tabPanel("Farm",    icon = icon("tractor"),       farmUI("farm")),
 
   tabPanel("About", icon = icon("circle-info"),
            fluidRow(column(10, offset = 1,
@@ -51,7 +51,7 @@ ui <- navbarPage(
                  "interface exposes the core functionality of the package through",
                  "interactive forms and visualisations."),
                p(tags$strong("Reference parameterisation: "),
-                 "Emilia-Romagna Integrated Production Guidelines (DPI 2026)."),
+                 "Emilia-Romagna coefficient tables (default; replaceable with agrinutri_tables())."),
                p(tags$strong("Source code and documentation: "),
                  tags$a(href = "https://github.com/mcroci/agrinutri",
                         "https://github.com/mcroci/agrinutri")),
@@ -60,7 +60,7 @@ ui <- navbarPage(
                h4("Two working modes"),
                tags$ul(
                  tags$li(tags$strong("Agronomist view (default): "),
-                         "clean forms, realtime validation of MAS and ZVN",
+                         "clean forms, realtime checks of the crop maximum and livestock N",
                          "constraints, single-click export of the fertilisation",
                          "plan. Designed for extension services and on-farm consulting."),
                  tags$li(tags$strong("Research view: "),

@@ -70,7 +70,7 @@ planUI <- function(id) {
                       "Side-dress stage 2"   = 12),
                     selected = 11),
         checkboxInput(ns("zvn"),
-                      "Enforce 170 kg N ha\u207B\u00B9 ZVN limit",
+                      "Enforce the 170 kg N ha\u207B\u00B9 livestock N limit",
                       value = TRUE),
         tags$hr(),
         actionButton(ns("run_plan"),

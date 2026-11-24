@@ -148,7 +148,7 @@
                            colour = .C_ADD_DARK, linewidth = 0.7) +
       ggplot2::annotate("text",
         x = nrow(df) + 1, y = mas_cap,
-        label = sprintf("MAS = %.0f", mas_cap),
+        label = sprintf("max = %.0f", mas_cap),
         hjust = 1, vjust = -0.4, colour = .C_ADD_DARK, size = 3.3)
   g
 }
@@ -239,11 +239,11 @@
   zvn_applied <- sc(zvn_applied)
   zvn_limit   <- sc(zvn_limit)
   if (!requireNamespace("patchwork", quietly = TRUE)) {
-    return(.agrinutri_gauge(net, mas, "Net N*  vs  MAS"))
+    return(.agrinutri_gauge(net, mas, "Net N*  vs  crop maximum"))
   }
-  g1 <- .agrinutri_gauge(net, mas, "Net N*  vs  MAS cap")
+  g1 <- .agrinutri_gauge(net, mas, "Net N*  vs  crop maximum")
   g2 <- .agrinutri_gauge(zvn_applied, zvn_limit,
-                     "Livestock N  vs  ZVN 170 kg/ha")
+                     "Livestock N  vs  170 kg/ha")
   patchwork::wrap_plots(g1, g2, ncol = 2)
 }
 
@@ -355,13 +355,13 @@
                           colour = .C_ADD_DARK, linewidth = 0.8) +
       ggplot2::annotate("text",
         x = 1.3, y = mas_cap,
-        label = sprintf("MAS = %.0f", mas_cap),
+        label = sprintf("max = %.0f", mas_cap),
         hjust = 0, size = 3.4, colour = .C_ADD_DARK)
   g +
     ggplot2::geom_hline(yintercept = zvn, linetype = "dotted",
                         colour = "grey40", linewidth = 0.6) +
     ggplot2::annotate("text", x = 1.3, y = zvn,
-                       label = sprintf("ZVN limit = %.0f", zvn),
+                       label = sprintf("limit = %.0f", zvn),
                        hjust = 0, size = 3.2, colour = "grey40") +
     ggplot2::coord_flip(clip = "off") +
     ggplot2::labs(x = NULL, y = expression("kg N ha"^-1),

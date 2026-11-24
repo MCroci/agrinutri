@@ -165,7 +165,7 @@ precisionUI <- function(id) {
                                           "NDVI_ref (SI = 1)",
                                           NA, step = 0.01)),
                   column(6, numericInput(ns("mas_cap"),
-                                          "MAS cap override (kg N/ha)",
+                                          "Crop maximum dose override (kg N/ha)",
                                           NA, step = 5))
                 )
               )

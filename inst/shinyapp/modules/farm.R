@@ -8,16 +8,16 @@ farmUI <- function(id) {
   fluidRow(
     column(4,
       .agrinutri_card(
-        h3(icon("tractor"), " Farm / Azienda"),
+        h3(icon("tractor"), " Farm"),
         p(class = "agrinutri-lead",
-          "Carica un GeoJSON dove ogni feature \u00E8 un appezzamento. ",
+          "Upload a GeoJSON where each feature is a field. ",
           tags$br(),
-          "Ogni feature deve avere le colonne richieste da ", tags$code("N_balance()"),
-          " (colture DPI 2026, analisi del suolo, storico organico)."),
+          "Each feature needs the columns required by ", tags$code("N_balance()"),
+          " (crop, soil analysis, organic history)."),
         radioButtons(ns("source_sel"),
           "Origine dati",
-          choices = c("Demo inclusa (35.5 ha, 8 appezzamenti)" = "demo",
-                      "Carica un tuo GeoJSON / Shapefile"      = "upload"),
+          choices = c("Bundled demo (35.5 ha, 8 fields)" = "demo",
+                      "Upload your GeoJSON / Shapefile"      = "upload"),
           selected = "demo"),
         conditionalPanel(
           condition = sprintf("input['%s'] == 'upload'", ns("source_sel")),
@@ -254,7 +254,7 @@ farmServer <- function(id, research_mode, app_state) {
         ggplot2::geom_hline(yintercept = 170, linetype = "dotted",
                             colour = "grey40") +
         ggplot2::annotate("text", x = 1, y = 172,
-                          label = "ZVN 170 kg/ha",
+                          label = "170 kg/ha",
                           hjust = 0, size = 3.2, colour = "grey40") +
         ggplot2::scale_fill_manual(values = c(
           ok = "#D5E4F0", breach = "#F2D7D5"),

@@ -8,8 +8,8 @@ welcomeUI <- function(id) {
       .agrinutri_card(
         h2(tags$strong("Transparent, balance-based N, P and K management")),
         p(class = "agrinutri-lead",
-          "agrinutri computes legally-compliant field N, P and K doses from the",
-          "Emilia-Romagna DPI 2026 balance, splits them into organic and",
+          "agrinutri computes field N, P and K doses from a predictive",
+          "nutrient balance, splits them into organic and",
           "mineral applications, and -- when a Sentinel-2 scene or UAV",
           "multispectral raster is available -- redistributes the N target",
           "pixel-by-pixel while preserving the balance at the field scale."),
@@ -36,7 +36,7 @@ welcomeUI <- function(id) {
           tags$li(tags$strong("Distribution plan: "),
                   "takes the N (and optionally P, K) target and splits it",
                   "into pre-sowing organic + in-season mineral, enforcing the",
-                  "170 kg N ha\u207B\u00B9 ZVN ceiling and crop-specific MAS."),
+                  "170 kg N ha\u207B\u00B9 livestock N limit and the crop maximum dose."),
           tags$li(tags$strong("Variable-rate + NNI: "),
                   "upload an NDVI / NDRE raster to get a pixel-level VRT map",
                   "or run the GPR-based NNI pipeline on a Sentinel-2 L2A scene.")

@@ -66,7 +66,7 @@ nBalanceUI <- function(id) {
           .agrinutri_research_box(
             h4("Research overrides"),
             p(class = "agrinutri-muted",
-              "Override the DPI 2026 default coefficients. Leave blank to use",
+              "Override the default coefficients. Leave blank to use",
               "the bundled tables."),
             fluidRow(
               column(4, numericInput(ns("a_override"),
@@ -97,10 +97,10 @@ nBalanceUI <- function(id) {
         p(class = "agrinutri-muted",
           "Each red segment adds to the N requirement; each green segment",
           "reduces it; the running total lands on the blue bar (Net N*).",
-          "The dashed line is the MAS cap for the selected crop."),
+          "The dashed line is the maximum dose of the selected crop."),
         plotOutput(ns("waterfall_plot"), height = "380px"),
         tags$hr(),
-        h4("Compliance"),
+        h4("Dose against the limits"),
         plotOutput(ns("gauge_plot"), height = "190px"),
         tags$hr(),
         h4("Breakdown of every balance term"),
@@ -181,10 +181,10 @@ nBalanceServer <- function(id, research_mode, app_state) {
                    "Net N* (kg N ha\u207B\u00B9)")),
           div(class = "agrinutri-kpi",
               span(class = "agrinutri-kpi-value", .agrinutri_fmt(mas, 0)),
-              span(class = "agrinutri-kpi-label", "MAS cap")),
+              span(class = "agrinutri-kpi-label", "Crop maximum dose")),
           div(class = "agrinutri-kpi",
               span(class = "agrinutri-kpi-value", check),
-              span(class = "agrinutri-kpi-label", "MAS check"))
+              span(class = "agrinutri-kpi-label", "Within the maximum"))
         )
       )
     })
@@ -324,7 +324,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
           "",
           "## Crop: `r report_crop`",
           "Expected yield: **`r sprintf('%.1f t/ha', report_yield)`**  ",
-          "Source: DPI 2026 (Emilia-Romagna Integrated Production).",
+          "Coefficients: agrinutri default tables (Emilia-Romagna).",
           "",
           "### Net mineral N to apply: **`r sprintf('%.0f kg N/ha', report_net)`**",
           "",
