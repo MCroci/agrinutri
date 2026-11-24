@@ -3,9 +3,13 @@
 Colour codes the modules: nutrient balance (blue), remote sensing (green), variable rate
 (purple), data and outputs (grey). Run from paper/softwarex/:  python fig1_architecture.py
 """
+import os
+
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 import pubfig
+
+VARIANT = os.environ.get("FIG1_VARIANT", "A")   # A = article figure; B, C = layout alternatives
 
 p = pubfig.set_style("elsevier")
 fig, ax = pubfig.new_figure(width="double", aspect=0.56, journal="elsevier")
@@ -18,6 +22,8 @@ BAL = ("#0072B2", "#E3EEF7")
 RS = ("#009E73", "#E0F2EB")
 VR = ("#6A51A3", "#ECE8F4")
 GREY = ("0.25", "0.94")
+if VARIANT == "D":                             # layout alternative: greyscale
+    BAL, RS, VR = ("0.1", "0.93"), ("0.35", "0.96"), ("0.5", "0.9")
 
 
 def box(x, y, w, h, title, body="", col=GREY, fill=None, ls="-", lw=0.7, title_fs=FS):
@@ -27,6 +33,10 @@ def box(x, y, w, h, title, body="", col=GREY, fill=None, ls="-", lw=0.7, title_f
                                 lw=lw, ls=ls))
     ax.text(x + w / 2, y + h - 0.22, title, ha="center", va="top",
             fontsize=title_fs, fontweight="bold", color=ec if ec != "0.25" else "black")
+    if VARIANT == "B":                         # layout alternative: titles only, no function names
+        body = ""
+    elif VARIANT == "C" and body:              # layout alternative: one key function per box
+        body = body.split("\n")[0].split("  ")[0]
     if body:
         ax.text(x + w / 2, y + h - 0.62, body, ha="center", va="top",
                 fontsize=FT, family="monospace", linespacing=1.35)
@@ -98,4 +108,5 @@ arrow(4.6, 2.15, 4.6, 2.9, ls="--")                       # tables -> balance
 ax.text(9.22, 3.85, "N*", ha="center", va="bottom", fontsize=FS, style="italic",
         fontweight="bold", color=VR[0])
 
-pubfig.save_figure(fig, "figures/fig1_architecture", journal="elsevier", kind="lineart")
+pubfig.save_figure(fig, "figures/fig1_architecture" if VARIANT == "A" else f"layouts/fig1_{VARIANT}",
+                   journal="elsevier", kind="lineart")

@@ -44,7 +44,7 @@ fill_SD  <- function(name = expression("SD (kg N ha"^-1*")"), ...)
   scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "transparent", name = name, ...)
 fill_NNI <- function(name = "NNI", ...)
   scale_fill_gradientn(colours = c("#b2182b", "#ef8a62", "#f7f7f7", "#f7f7f7", "#67a9cf", "#2166ac"),
-                       values = rescale(c(0.6, 0.89, 0.9, 1.1, 1.11, 1.4)), limits = c(0.6, 1.4),   # white = optimal
+                       values = scales::rescale(c(0.6, 0.89, 0.9, 1.1, 1.11, 1.4)), limits = c(0.6, 1.4),   # white = optimal
                        oob = squish, na.value = "transparent", name = name, ...)
 
 # N balance terms: fixed order, colours and readable legend labels (Figs. 2-3)
@@ -71,6 +71,7 @@ map_furniture <- function(bb, len = 200) {
 }
 
 save_fig <- function(p, file, width = "double", height = 80, dir = "paper/softwarex/figures") {
+  if (isTRUE(getOption("swx.nosave"))) return(invisible(file))   # layouts/layout_variants.R reuses the panels
   w <- if (is.character(width)) WIDTH[[width]] else width
   ggsave(file.path(dir, paste0(file, ".png")), p, device = ragg::agg_png, width = w, height = height,
          units = "mm", dpi = 600, bg = "white")
