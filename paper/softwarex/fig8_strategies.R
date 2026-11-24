@@ -120,8 +120,12 @@ key <- ggplot(data.frame(x = seq(lo, hi, length.out = 200)), aes(x, 1, fill = x)
   labs(x = expression("Prescribed N dose (kg N ha"^-1*"); dotted: balance dose N*"), y = NULL) +
   theme_sat() + theme(legend.position = "none", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
                       panel.grid = element_blank(), panel.border = element_blank(), plot.tag = element_blank())
-nm <- names(M); first <- seq_along(nm) %in% c(1, 4)               # two rows of three methods, rule above map
-row3 <- function(ii) c(Map(rule_plot, nm[ii], first[ii]), lapply(nm[ii], map_plot))
-grid <- wrap_plots(c(row3(1:3), row3(4:6)), ncol = 3, byrow = TRUE, heights = c(0.75, 1, 0.75, 1))
-fig <- grid / (plot_spacer() | key | plot_spacer()) + plot_layout(heights = c(3.5, 0.06))
-save_fig(fig, "fig8_strategies", "double", 175)
+# maps only: two rows of three, method and field mean in the title of each map
+mapt <- function(k) map_plot(k) + labs(title = sprintf("(%s) %s", letters[match(k, names(M))], TIT[[k]]),
+                                       subtitle = sprintf("%s; mean %.0f", DRV[[k]], mu[[k]])) +
+  theme(plot.title = element_text(family = FONT, face = "bold", size = BASE, hjust = 0, margin = margin(b = 0.5)),
+        plot.subtitle = element_text(family = FONT, size = BASE - 1, colour = "grey30", hjust = 0, margin = margin(b = 1)),
+        plot.margin = margin(2, 2, 2, 2))
+grid <- wrap_plots(lapply(names(M), mapt), ncol = 3)
+fig <- wrap_plots(list(grid, plot_spacer() | key | plot_spacer()), ncol = 1, heights = c(2, 0.05))
+save_fig(fig, "fig8_strategies", "double", 140)
