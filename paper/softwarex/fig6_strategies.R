@@ -16,19 +16,27 @@ Nstar <- fm$N_target[fm$plot == "P01"]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
 s2  <- rast(file.path(D, "rs_s2_20240813.tif"))
 ndvi <- (s2[["B08"]] - s2[["B04"]]) / (s2[["B08"]] + s2[["B04"]]); names(ndvi) <- "NDVI"
 nni <- rast(file.path(D, "rs_NNI_full.tif"))
-VI_LO <- 0.35; VI_HI <- 0.80                              # package defaults, replaced below
-strip <- function(v, inv = TRUE) build_strip_prescription(field, machine_width = 24, cell_length = 30,
+ANC <- list(inv = c(0.35, 0.80), dir = c(0.35, 0.80))    # package defaults, replaced below
+strip <- function(v, inv = TRUE) { a <- ANC[[if (inv) "inv" else "dir"]]
+  build_strip_prescription(field, machine_width = 24, cell_length = 30,
   variability = v, vi_raster = ndvi, nni_raster = nni, n_target = Nstar, min_dose = lo, max_dose = hi,
-  vi_low = VI_LO, vi_high = VI_HI, calibration_inverse = inv, preserve_mean = TRUE)
+  vi_low = a[1], vi_high = a[2], calibration_inverse = inv, preserve_mean = TRUE) }
 cells <- strip("uniform")
-# two-point calibration anchors symmetric around the area-weighted mean cell NDVI: the line passes
-# through (mean NDVI, N*), so its field mean is already the balance dose and the rescaling only
-# corrects the cells clipped at the bounds; half-width = half the 5th-95th percentile range of cell NDVI
+# two-point calibration with baselines: the anchors are as far apart as the 5th-95th percentile of
+# cell NDVI, so a few cells sit on each plateau (max dose below the low anchor, min dose above the high
+# one), and the pair is shifted along NDVI until the area-weighted mean of the clamped ramp equals N*.
+# The mean is then already the balance dose, the rescaling changes nothing and the cells lie on the ramp.
 ndvi_cell <- terra::extract(ndvi, vect(st_transform(cells, crs(ndvi))), fun = mean, na.rm = TRUE, ID = FALSE)[, 1]
-m  <- weighted.mean(ndvi_cell, as.numeric(st_area(cells)), na.rm = TRUE)
-hw <- diff(quantile(ndvi_cell, c(0.05, 0.95), na.rm = TRUE)) / 2
-VI_LO <- round(m - hw, 2); VI_HI <- round(m + hw, 2)
-cat("mean cell NDVI", round(m, 3), "| calibration anchors", VI_LO, VI_HI, "
+area <- as.numeric(st_area(cells))
+q <- quantile(ndvi_cell, c(0.05, 0.95), na.rm = TRUE)  # skewed NDVI: the high anchor lands above the field maximum
+ramp_mean <- function(sh, inv) weighted.mean(agrinutri:::.dose_from_calibration(ndvi_cell, lo, hi,
+  q[1] + sh, q[2] + sh, inv), area, na.rm = TRUE) - Nstar
+for (k in c("inv", "dir")) {
+  sh <- uniroot(ramp_mean, c(-0.5, 0.5), inv = k == "inv")$root
+  ANC[[k]] <- unname(q + sh)
+}
+stopifnot(abs(ramp_mean(ANC$inv[1] - q[1], TRUE)) < 0.01)
+cat("calibration anchors: inverse", round(ANC$inv, 3), "| direct", round(ANC$dir, 3), "
 ")
 zonal <- function(r) {                                   # pixel prescription -> cell means, field mean kept
   cv <- st_transform(cells, crs(r))
@@ -78,17 +86,18 @@ rule_plot <- function(k, first = FALSE) {
     { if (XV[[k]] == "NNI") geom_vline(xintercept = c(0.9, 1.1), linewidth = 0.25, colour = "grey55") } +
     { if (grepl("Calibration", k)) {
         inv <- k == "Calibration (inverse)"
-        xs <- seq(min(d$x, na.rm = TRUE), max(d$x, na.rm = TRUE), length.out = 100)
-        ys <- approx(c(VI_LO, VI_HI), if (inv) c(hi, lo) else c(lo, hi), xs, rule = 2)$y
+        a <- ANC[[if (inv) "inv" else "dir"]]           # the line runs past both anchors to show both baselines
+        xs <- seq(max(0.3, min(d$x, a, na.rm = TRUE) - 0.03), max(d$x, a, na.rm = TRUE) + 0.07, length.out = 200)
+        ys <- approx(a, if (inv) c(hi, lo) else c(lo, hi), xs, rule = 2)$y
         CAL <<- list(geom_line(data = data.frame(x = xs, dose = ys), linetype = "dashed", linewidth = 0.5, colour = OKABE[[6]]),
-             geom_point(data = data.frame(x = c(VI_LO, VI_HI), dose = if (inv) c(hi, lo) else c(lo, hi)),
+             geom_point(data = data.frame(x = a, dose = if (inv) c(hi, lo) else c(lo, hi)),
                         shape = 4, size = 1.5, stroke = 0.7, colour = OKABE[[6]]))
         NULL
       } else { CAL <<- NULL; NULL } } +
     geom_point(aes(fill = dose, size = area), shape = 21, colour = "grey35", stroke = 0.12) + DOSE + CAL +
     guides(fill = "none") + scale_size_area(max_size = 1, guide = "none") +
     scale_y_continuous(limits = c(lo - 3, hi + 3), breaks = c(140, 175, 210)) +
-    { if (XV[[k]] == "NDVI") scale_x_continuous(limits = c(0.3, 0.98), breaks = c(0.4, 0.6, 0.8))
+    { if (XV[[k]] == "NDVI") scale_x_continuous(limits = c(0.3, 1.05), breaks = c(0.4, 0.6, 0.8, 1.0))
       else scale_x_continuous(breaks = c(0.6, 0.9, 1.1)) } +
     labs(title = TIT[[k]], subtitle = sprintf("mean %.0f", mu[[k]]), x = XV[[k]],
          y = if (first) expression("Cell dose (kg N ha"^-1*")") else NULL) +
