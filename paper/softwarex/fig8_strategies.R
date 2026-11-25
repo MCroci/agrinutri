@@ -13,9 +13,12 @@ fm <- read.csv(file.path(D, "farm_2024.csv"), stringsAsFactors = FALSE)
 field <- st_read(file.path(D, "rs_field.geojson"), quiet = TRUE)
 inp   <- readRDS(file.path(D, "p01_inputs.rds"))
 Nstar <- fm$N_target[fm$plot == "P01"]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
-s2  <- rast(file.path(D, "rs_s2_20240813.tif"))
+s2  <- rast(file.path(D, "rs_s2_20240721.tif"))
 ndvi <- (s2[["B08"]] - s2[["B04"]]) / (s2[["B08"]] + s2[["B04"]]); names(ndvi) <- "NDVI"
 nni <- rast(file.path(D, "rs_NNI_full.tif"))
+# inward buffer of one S2 pixel (as edge_buffer = 10 in fig7_data.R): boundary pixels mix crop and margin
+inner <- vect(sf::st_buffer(st_transform(field, crs(ndvi)), -10))
+ndvi <- mask(ndvi, inner); nni <- mask(nni, project(inner, crs(nni)))
 ANC <- list(inv = c(0.35, 0.80), dir = c(0.35, 0.80))    # package defaults, replaced below
 strip <- function(v, inv = TRUE) { a <- ANC[[if (inv) "inv" else "dir"]]
   build_strip_prescription(field, machine_width = 24, cell_length = 30,

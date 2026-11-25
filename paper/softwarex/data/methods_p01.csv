@@ -1,7 +1,7 @@
 "method","min","max","mean"
 "Uniform",175,175,175
-"Calibration (inverse)",161,210,174.99967223245
-"Calibration (direct)",140,189,175.00032776755
-"NDVI quantile classes",147.2,210,174.998451059505
-"NNI zones",141,210,175.018235309397
-"Holland-Schepers",173.192177700602,210,175
+"Calibration (inverse)",161,210,174.997689904558
+"Calibration (direct)",140,189,175.002310095442
+"NDVI quantile classes",143.8,210,174.982954187942
+"NNI zones",152.2,210,175.00074960807
+"Holland-Schepers",171.275696839642,209.195709604741,175

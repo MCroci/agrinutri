@@ -1,5 +1,5 @@
 # Fig. 7: how the prescription map of plot P01 is built, step by step, on the real data
-# (Sentinel-2 L2A of 13 August 2024, balance dose N* = 175 kg N/ha, bounds 140-210).
+# (Sentinel-2 L2A of 21 July 2024, balance dose N* = 175 kg N/ha, bounds 140-210).
 # Run from the package root after fig7_data.R:  Rscript paper/softwarex/fig7_prescription.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)
@@ -8,9 +8,11 @@ D <- "paper/softwarex/data"
 Nstar <- read.csv(file.path(D, "farm_2024.csv"))$N_target[1]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
 field <- st_read(file.path(D, "rs_field_utm.geojson"), quiet = TRUE)
 rx    <- st_read(file.path(D, "rs_rx.geojson"), quiet = TRUE)
-s2    <- rast(file.path(D, "rs_s2_20240813.tif"))
+s2    <- rast(file.path(D, "rs_s2_20240721.tif"))
 lai   <- rast(file.path(D, "rs_LAI.tif")); nni <- rast(file.path(D, "rs_NNI.tif"))
 fv <- vect(st_transform(field, crs(s2)))
+inner <- st_buffer(field, -10)                           # edge_buffer = 10 of fig7_data.R
+IN <- geom_sf(data = inner, fill = NA, colour = "grey15", linewidth = 0.25, linetype = "22", inherit.aes = FALSE)
 
 fr <- list(geom_sf(data = field, fill = NA, colour = "grey15", linewidth = 0.3, inherit.aes = FALSE),
            coord_sf(datum = NA, expand = FALSE), theme_map(),
@@ -26,7 +28,7 @@ v <- values(mask(fc, buffer(fv, -20)), na.rm = TRUE)
 q <- quantile(v, c(0.01, 0.99))
 for (i in 1:3) fc[[i]] <- clamp((fc[[i]] - q[1]) / (q[2] - q[1]) * 255, 0, 255)
 p1 <- ggplot() + geom_spatraster_rgb(data = fc, r = 1, g = 2, b = 3, max_col_value = 255, interpolate = FALSE) + fr +
-  step(1, "Sentinel-2 scene", "13 Aug 2024, natural colour")
+  step(1, "Sentinel-2 scene", "21 Jul 2024, natural colour")
 # 2 LAI
 p2 <- ggplot() + geom_spatraster(data = lai) + fr +
   scale_fill_viridis_c(option = "viridis", limits = c(0, 6), na.value = "transparent", name = "LAI") +
@@ -35,17 +37,17 @@ p2 <- ggplot() + geom_spatraster(data = lai) + fr +
 # 3 NNI
 p3 <- ggplot() + geom_spatraster(data = nni) + fr + fill_NNI(breaks = c(0.6, 1, 1.4)) +
   guides(fill = guide_colourbar(title.position = "left", title.vjust = 1)) +
-  step(3, "Nitrogen Nutrition Index", "actual / critical N")
+  IN + step(3, "Nitrogen Nutrition Index", "actual / critical N")
 # 4 NNI zones
 zn <- as.data.frame(nni, xy = TRUE, na.rm = TRUE); names(zn)[3] <- "NNI"
 zn$zone <- cut(zn$NNI, c(-Inf, 0.9, 1.1, Inf), labels = c("deficient", "optimal", "luxury"))
 ZC <- c(deficient = "#b2182b", optimal = "#e8e8e8", luxury = "#2166ac")
 p4 <- ggplot(zn) + geom_raster(aes(x, y, fill = zone)) + fr + scale_fill_manual(values = ZC, name = NULL) +
-  step(4, "NNI zones", "< 0.9, 0.9-1.1, > 1.1")
+  IN + step(4, "NNI zones", "< 0.9, 0.9-1.1, > 1.1")
 # 5 machine grid over the zones
 p5 <- ggplot(zn) + geom_raster(aes(x, y, fill = zone), alpha = 0.55) +
   geom_sf(data = rx, fill = NA, colour = "black", linewidth = 0.2, inherit.aes = FALSE) + fr +
-  scale_fill_manual(values = ZC, name = NULL) + step(5, "Machine grid", "24 m x 30 m cells along the A-B line")
+  scale_fill_manual(values = ZC, name = NULL) + IN + step(5, "Machine grid", "24 m x 30 m cells along the A-B line")
 # 6 first doses from the zone of each cell; 7 final doses after the mass balance
 rx$zone <- cut(rx$mean_nni, c(-Inf, 0.9, 1.1, Inf), labels = c("deficient", "optimal", "luxury"))
 rx$dose0 <- ifelse(is.na(rx$zone), Nstar, c(deficient = hi, optimal = Nstar, luxury = lo)[as.character(rx$zone)])

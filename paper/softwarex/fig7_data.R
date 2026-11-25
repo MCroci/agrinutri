@@ -1,5 +1,5 @@
 # Data for Figs. 5-6: a satellite-delineated maize field of the Piacenza plain (Fields of The World
-# boundary, data/rs_field.geojson) and the Sentinel-2 L2A scene of 13 August 2024, clipped to it.
+# boundary, data/rs_field.geojson) and the Sentinel-2 L2A scene of 21 July 2024 (maize at about V10, in the top-dressing window), clipped to it.
 # Run from paper/softwarex/ after fig3_farm.R:  Rscript fig7_data.R
 # The scene is read from the public Microsoft Planetary Computer STAC catalogue (anonymous SAS token),
 # windowed to the field, 20 m bands resampled to the 10 m grid (nearest), offset of processing
@@ -8,7 +8,7 @@ suppressMessages(pkgload::load_all("../..", quiet = TRUE))
 field <- sf::st_read("data/rs_field.geojson", quiet = TRUE)
 PC <- "https://planetarycomputer.microsoft.com/api"
 bb <- sf::st_bbox(sf::st_transform(field, 4326))
-hit <- jsonlite::fromJSON(sprintf("%s/stac/v1/search?collections=sentinel-2-l2a&bbox=%s&datetime=2024-08-13T00:00:00Z/2024-08-13T23:59:59Z",
+hit <- jsonlite::fromJSON(sprintf("%s/stac/v1/search?collections=sentinel-2-l2a&bbox=%s&datetime=2024-07-21T00:00:00Z/2024-07-21T23:59:59Z",
                                   PC, paste(round(bb, 5), collapse = ",")), simplifyVector = FALSE)$features
 stopifnot(length(hit) >= 1); it <- hit[[1]]
 tok <- jsonlite::fromJSON(paste0(PC, "/sas/v1/token/sentinel-2-l2a"))$token
@@ -27,7 +27,7 @@ x <- terra::clamp(x[[1:10]] - off, lower = 0, values = TRUE)
 x <- terra::mask(x, scl >= 4 & scl <= 5, maskvalues = FALSE)   # SCL 4-5: vegetation, bare soil
 cat(it$id, "| cloud", round(it$properties$`eo:cloud_cover`, 1), "% | offset", off, "
 ")
-s2 <- "data/rs_s2_20240813.tif"
+s2 <- "data/rs_s2_20240721.tif"
 terra::writeRaster(x, s2, overwrite = TRUE, NAflag = 0, datatype = "INT2U")
 
 bio <- estimate_biophysical(s2, output_dir = tempdir(), variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
@@ -36,7 +36,8 @@ nni <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cpro
 Nstar <- read.csv("data/farm_2024.csv")$N_target[1]           # balance dose of plot P01 (Fig. 2)
 rx <- build_strip_prescription(field, machine_width = 24, cell_length = 30,
                                variability = "nni", nni_raster = nni$NNI,
-                               n_target = Nstar, min_dose = 0.8 * Nstar, max_dose = 1.2 * Nstar)
+                               n_target = Nstar, min_dose = 0.8 * Nstar, max_dose = 1.2 * Nstar,
+                               edge_buffer = 10)   # one S2 pixel: boundary pixels mix crop and margin
 terra::writeRaster(nni$NNI, "data/rs_NNI_full.tif", overwrite = TRUE)
 lai <- terra::mask(terra::crop(bio$LAI, fv), fv)
 nn  <- terra::mask(terra::crop(nni$NNI, fv), fv)
