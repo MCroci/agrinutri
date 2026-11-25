@@ -48,7 +48,7 @@ pF <- ggplot(e$tl, aes(lab, term, fill = kg)) + geom_tile(colour = "white") +
 put(pF, "fig3_F", 190, 75)
 
 # ---- Fig. 4 E, F ---------------------------------------------------------------------------
-e <- run("fig6_pk.R")
+e <- run("fig5_pk.R")
 cont <- function(v, name, opt) ggplot(e$px) + geom_raster(aes(x, y, fill = .data[[v]])) +
   geom_sf(data = e$fo, fill = NA, colour = "black", linewidth = 0.35, inherit.aes = FALSE) +
   geom_sf(data = e$p1, fill = NA, colour = "black", linewidth = 0.9, inherit.aes = FALSE) +
@@ -79,7 +79,7 @@ ph <- ggplot(zn, aes(NNI)) + geom_histogram(aes(fill = zone), binwidth = 0.02, b
 put(add_tags(e$pb + ph + plot_layout(widths = c(1, 1.2))), "fig5_F", 160, 75)
 
 # ---- Fig. 6 E, F ---------------------------------------------------------------------------
-e <- run("fig8_strategies.R"); nm <- names(e$M)
+e <- run("fig7_strategies.R"); nm <- names(e$M)
 dm <- function(k) { g <- e$cells[, "geometry"]; g$d <- e$M[[k]] - e$Nstar
   ggplot(g) + geom_sf(aes(fill = d), colour = "white", linewidth = 0.05) +
     geom_sf(data = e$field, fill = NA, colour = "grey20", linewidth = 0.2) +

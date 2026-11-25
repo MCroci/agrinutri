@@ -1,5 +1,5 @@
-# Fig. 9: re-parameterising the balance with agrinutri_tables(): the rotation of plot P01 with the bundled
-# and with an edited uptake table. Run from the package root:  Rscript paper/softwarex/fig9_tables.R
+# Fig. 8: re-parameterising the balance with agrinutri_tables(): the rotation of plot P01 with the bundled
+# and with an edited uptake table. Run from the package root:  Rscript paper/softwarex/fig8_tables.R
 suppressMessages({ library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -29,5 +29,5 @@ pd <- ggplot(dx, aes(lab)) +
   scale_colour_manual(values = c("bundled table" = OKABE[[5]], "edited table (+10% N uptake)" = OKABE[[6]]), name = NULL) +
   labs(x = NULL, y = expression("Balance dose (kg N ha"^-1*")")) + theme_sat() +
   theme(legend.position = "top", axis.text.x = element_text(size = BASE - 1.5, lineheight = 0.9))
-save_fig(add_tags(pc + pd + plot_layout(widths = c(1.15, 1.45))), "fig9_tables", "double", 62)
+save_fig(add_tags(pc + pd + plot_layout(widths = c(1.15, 1.45))), "fig8_tables", "double", 62)
 print(dx[, 1:4])

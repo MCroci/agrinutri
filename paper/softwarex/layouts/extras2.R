@@ -1,4 +1,4 @@
-# Graphical abstract (the former candidates X6 and X9 are now fig5_organic.R and fig9_tables.R). Run from the package root after fig3_farm.R and fig7_data.R:
+# Graphical abstract (the former candidates X6 and X9 are now fig5_organic.R and fig8_tables.R). Run from the package root after fig3_farm.R and fig6_data.R:
 #   Rscript paper/softwarex/layouts/extras2.R
 suppressMessages({ library(sf); library(terra); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)

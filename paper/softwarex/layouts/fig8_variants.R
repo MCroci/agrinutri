@@ -1,7 +1,7 @@
 # Layout alternatives of Fig. 8 (precision-agriculture methods). Run from the package root:
 #   Rscript paper/softwarex/layouts/fig8_variants.R ; then python layouts/contact_sheets.py from paper/softwarex/
 options(swx.nosave = TRUE)
-e <- new.env(); source("paper/softwarex/fig8_strategies.R", local = e)
+e <- new.env(); source("paper/softwarex/fig7_strategies.R", local = e)
 library(patchwork); library(ggplot2)
 OUT <- "paper/softwarex/layouts"
 put <- function(p, name, w, h) ggsave(file.path(OUT, paste0(name, ".png")), p, device = ragg::agg_png,

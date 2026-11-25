@@ -1,6 +1,6 @@
 # Data for Figs. 5-6: a satellite-delineated maize field of the Piacenza plain (Fields of The World
 # boundary, data/rs_field.geojson) and the Sentinel-2 L2A scene of 21 July 2024 (maize at about V10, in the top-dressing window), clipped to it.
-# Run from paper/softwarex/ after fig3_farm.R:  Rscript fig7_data.R
+# Run from paper/softwarex/ after fig3_farm.R:  Rscript fig6_data.R
 # The scene is read from the public Microsoft Planetary Computer STAC catalogue (anonymous SAS token),
 # windowed to the field, 20 m bands resampled to the 10 m grid (nearest), offset of processing
 # baseline >= 04.00 removed (reflectance x 10000, harmonised).

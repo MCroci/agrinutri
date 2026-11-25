@@ -1,7 +1,7 @@
-# Fig. 8: precision-agriculture methods on plot P01 (Figs. 2-5): for each method the rule (cell dose against the
+# Fig. 7: precision-agriculture methods on plot P01 (Figs. 2-5): for each method the rule (cell dose against the
 #     driving layer) and the prescription map; all redistribute the balance dose N* on the same 24 m x 30 m cells.
 #     (a) input layers NDVI and NNI and the dose scale; (b-g) uniform, calibration ramps, NDVI classes, NNI zones, sufficiency index.
-# Run from the package root after fig3_farm.R and fig7_data.R:  Rscript paper/softwarex/fig8_strategies.R
+# Run from the package root after fig3_farm.R and fig6_data.R:  Rscript paper/softwarex/fig7_strategies.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -16,7 +16,7 @@ Nstar <- fm$N_target[fm$plot == "P01"]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
 s2  <- rast(file.path(D, "rs_s2_20240721.tif"))
 ndvi <- (s2[["B08"]] - s2[["B04"]]) / (s2[["B08"]] + s2[["B04"]]); names(ndvi) <- "NDVI"
 nni <- rast(file.path(D, "rs_NNI_full.tif"))
-# inward buffer of one S2 pixel (as edge_buffer = 10 in fig7_data.R): boundary pixels mix crop and margin
+# inward buffer of one S2 pixel (as edge_buffer = 10 in fig6_data.R): boundary pixels mix crop and margin
 inner <- vect(sf::st_buffer(st_transform(field, crs(ndvi)), -10))
 ndvi <- mask(ndvi, inner); nni <- mask(nni, project(inner, crs(nni)))
 ANC <- list(inv = c(0.35, 0.80), dir = c(0.35, 0.80))    # package defaults, replaced below
@@ -131,4 +131,4 @@ mapt <- function(k) map_plot(k) + labs(title = sprintf("(%s) %s", letters[match(
         plot.margin = margin(2, 2, 2, 2))
 grid <- wrap_plots(lapply(names(M), mapt), ncol = 3)
 fig <- wrap_plots(list(grid, plot_spacer() | key | plot_spacer()), ncol = 1, heights = c(2, 0.05))
-save_fig(fig, "fig8_strategies", "double", 140)
+save_fig(fig, "fig7_strategies", "double", 140)

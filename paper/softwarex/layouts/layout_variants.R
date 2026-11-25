@@ -33,7 +33,7 @@ put(e$pa + coord_flip(ylim = c(-130, 310)) + theme(axis.text.y = element_text(si
     "fig3_D", 140, 150)
 
 # ---- Fig. 4: phosphorus and potassium -------------------------------------------------------------
-e <- run("fig6_pk.R")
+e <- run("fig5_pk.R")
 mt <- theme(plot.tag.location = "margin")
 put(add_tags(e$pb / (e$pc | e$pd) + plot_layout(heights = c(0.8, 1))) & mt, "fig4_A", 190, 150)
 put(add_tags((e$pb | e$pa + theme(legend.position = "none")) / (e$pc | e$pd) +
@@ -49,7 +49,7 @@ put(add_tags(e$pa / e$pb), "fig5_C", 90, 150)
 put(add_tags(e$pb + e$pc), "fig5_D", 140, 75)
 
 # ---- Fig. 6: precision-agriculture methods -------------------------------------------------------
-e <- run("fig8_strategies.R")
+e <- run("fig7_strategies.R")
 tg <- function(n) plot_annotation(tag_levels = list(c(sprintf("(%s)", letters[1:6]), rep("", n))))
 tt <- theme(plot.tag = element_text(family = FONT, face = "bold", size = BASE + 1))
 put(e$fig, "fig6_A", 190, 90)

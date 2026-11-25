@@ -1,8 +1,8 @@
-# Fig. 6: phosphorus and potassium. (a) P2O5 and K2O doses of plot P01 through the rotation 2019-2026
+# Fig. 5: phosphorus and potassium. (a) P2O5 and K2O doses of plot P01 through the rotation 2019-2026
 # (Fig. 3); (b, c) availability classes of
 # Olsen P and exchangeable K on the regional 100 m soil maps around the farm, which set the
 # strategy (enrichment, maintenance, reduction) of every balance.
-# Run from the package root after fig4_p01_years.R:  Rscript paper/softwarex/fig6_pk.R
+# Run from the package root after fig4_p01_years.R:  Rscript paper/softwarex/fig5_pk.R
 suppressMessages({ library(sf); library(terra); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -61,4 +61,4 @@ print(st_drop_geometry(out)[, c("plot", "crop", "P2O5_target", "K2O_target")])
 
 pb <- pb + labs(y = expression("Dose (kg ha"^-1*")"))
 pa <- pa + theme(legend.position = "none")
-save_fig(add_tags(pb / (pc | pd) + plot_layout(heights = c(0.85, 1))) & theme(plot.tag.location = "margin"), "fig6_pk", "double", 135)
+save_fig(add_tags(pb / (pc | pd) + plot_layout(heights = c(0.85, 1))) & theme(plot.tag.location = "margin"), "fig5_pk", "double", 135)

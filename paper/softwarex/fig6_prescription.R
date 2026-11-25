@@ -1,6 +1,6 @@
-# Fig. 7: how the prescription map of plot P01 is built, step by step, on the real data
+# Fig. 6: how the prescription map of plot P01 is built, step by step, on the real data
 # (Sentinel-2 L2A of 21 July 2024, balance dose N* = 175 kg N/ha, bounds 140-210).
-# Run from the package root after fig7_data.R:  Rscript paper/softwarex/fig7_prescription.R
+# Run from the package root after fig6_data.R:  Rscript paper/softwarex/fig6_prescription.R
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
@@ -11,7 +11,7 @@ rx    <- st_read(file.path(D, "rs_rx.geojson"), quiet = TRUE)
 s2    <- rast(file.path(D, "rs_s2_20240721.tif"))
 lai   <- rast(file.path(D, "rs_LAI.tif")); nni <- rast(file.path(D, "rs_NNI.tif"))
 fv <- vect(st_transform(field, crs(s2)))
-inner <- st_buffer(field, -10)                           # edge_buffer = 10 of fig7_data.R
+inner <- st_buffer(field, -10)                           # edge_buffer = 10 of fig6_data.R
 IN <- geom_sf(data = inner, fill = NA, colour = "grey15", linewidth = 0.25, linetype = "22", inherit.aes = FALSE)
 
 fr <- list(geom_sf(data = field, fill = NA, colour = "grey15", linewidth = 0.3, inherit.aes = FALSE),
@@ -75,5 +75,5 @@ p8 <- ggplot() + annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill =
         plot.subtitle = element_text(size = BASE - 1, colour = "grey30", margin = margin(b = 2))) +
   step(8, "Machine file", "export_prescription()")
 fig <- wrap_plots(p1, p2, p3, p4, p5, p6, p7, p8, nrow = 2)
-save_fig(fig, "fig7_prescription", "double", 120)
+save_fig(fig, "fig6_prescription", "double", 120)
 cat("zone mean", round(m0, 1), "-> final mean", round(m1, 1), "| XML:", basename(xmlf), "\n")
