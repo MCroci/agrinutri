@@ -5,8 +5,8 @@
 suppressMessages({ library(ggplot2); library(patchwork); library(scales) })
 
 FONT <- "Arial"
-BASE <- 7                                              # pt at final size
-WIDTH <- c(single = 90, onehalf = 140, double = 190)    # mm
+BASE <- 8                                              # pt at the drawn size (= size in the DOCX)
+WIDTH <- c(single = 80, onehalf = 120, double = 160)    # mm: A4 text width of the DOCX; the journal enlarges to 90 and 190
 OKABE <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7", "#F0E442")
 
 theme_sat <- function(base = BASE) {

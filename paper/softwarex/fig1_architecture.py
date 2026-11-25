@@ -12,10 +12,10 @@ import pubfig
 VARIANT = os.environ.get("FIG1_VARIANT", "A")   # A = article figure; B, C = layout alternatives
 
 p = pubfig.set_style("elsevier")
-fig, ax = pubfig.new_figure(width="double", aspect=0.56, journal="elsevier")
+fig, ax = pubfig.new_figure(width=160.0, aspect=0.56, journal="elsevier")   # A4 text width of the DOCX
 ax.set_xlim(0, 19); ax.set_ylim(0, 10.6); ax.axis("off")
-FS = p.base_fontsize_pt
-FT = p.min_fontsize_pt
+FS = 8.0   # pt at the drawn size, as BASE in theme_swx.R
+FT = 7.0
 
 # module colours: edge (Okabe-Ito) and light fill
 BAL = ("#0072B2", "#E3EEF7")
@@ -67,7 +67,7 @@ ax.text(4.6, 6.98, "A crop demand, B soil supply, C leaching, D immobilisation,\
 box(0.6, 4.55, 4.05, 1.65, "Balance terms",
     "calc_crop_N_demand()\nsoil_fertility()\nleaching_loss()  ...", col=BAL)
 box(4.85, 4.55, 3.75, 1.65, "Doses",
-    "N_balance()\ncalculate_N_fertilization()\nP_balance()  K_balance()", col=BAL)
+    "N_balance()\nP_balance()\nK_balance()", col=BAL)
 box(0.6, 3.1, 4.05, 1.3, "Limits and plan",
     "check_MAS()\nplan_distribution()", col=BAL)
 box(4.85, 3.1, 3.75, 1.3, "Scale: plot, year, pixel",
@@ -76,10 +76,10 @@ box(4.85, 3.1, 3.75, 1.3, "Scale: plot, year, pixel",
 # --- remote sensing ---------------------------------------------------------
 box(9.55, 5.15, 9.15, 3.0, "Remote-sensing diagnosis", col=RS, fill="white", lw=1.2)
 box(9.85, 5.4, 4.15, 2.15, "Canopy traits",
-    "compute_vi()\n(NDVI, NDRE, GNDVI, ...)\nestimate_biophysical()\n(GPR: LAI, Cm, CNC, FVC)",
+    "compute_vi()\nestimate_biophysical()\n(GPR: LAI, Cm, CNC)",
     col=RS)
 box(14.25, 5.4, 4.15, 2.15, "Nitrogen status",
-    "compute_NNI_from_S2()\ndiagnose_N_status()\n(deficient / optimal /\nluxury consumption)",
+    "compute_NNI_from_S2()\ndiagnose_N_status()\n(deficient/optimal/\nluxury)",
     col=RS)
 arrow(14.0, 6.47, 14.25, 6.47, col=RS[0])
 
@@ -87,13 +87,13 @@ arrow(14.0, 6.47, 14.25, 6.47, col=RS[0])
 box(9.55, 2.9, 9.15, 1.55, "Variable rate: field mean kept at N*",
     "variable_rate_N()    build_strip_prescription()", col=VR, lw=1.2)
 box(0.3, 0.6, 8.6, 1.55, "Coefficient tables (editable R data)",
-    "uptake_table  mas.table  coef_time  cb.table  e.table  ...", ls="--")
-ax.text(4.6, 1.0, "default set: Emilia-Romagna guidelines; replace a table to change it",
+    "uptake_table  mas.table  e.table  ...", ls="--")
+ax.text(4.6, 1.0, "Emilia-Romagna default; agrinutri_tables() replaces them",
         ha="center", va="top", fontsize=FT, style="italic")
 box(9.55, 0.25, 4.45, 1.9, "Export",
-    "export_prescription()\nISOXML, Shapefile, GeoJSON, KML,\nGeoPackage, John Deere, Trimble")
+    "export_prescription()\nISOXML, Shapefile, KML,\nJohn Deere, Trimble ...")
 box(14.25, 0.25, 4.45, 1.9, "Interfaces and tests",
-    "R scripts and pipelines\nrun_app() (Shiny)\ntestthat unit tests")
+    "run_app() (Shiny)\nR scripts, pipelines\ntestthat tests")
 
 # --- flows --------------------------------------------------------------------
 for x in xs[:2]:

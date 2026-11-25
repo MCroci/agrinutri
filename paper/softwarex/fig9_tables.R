@@ -15,12 +15,12 @@ d0 <- dose()
 my <- uptake_table; my$N <- my$N * 1.1                                 # illustrative edit: unit N uptake +10 percent
 old <- agrinutri_tables(uptake_table = my); d1 <- dose(); agrinutri_tables()
 dx <- data.frame(year = rot$year, crop = rot$crop_class, default = d0, edited = d1)
-dx$lab <- factor(paste0(dx$year, "\n", sub(" ", "\n", dx$crop)), levels = paste0(dx$year, "\n", sub(" ", "\n", dx$crop)))
+dx$lab <- factor(paste0(dx$year, "\n", gsub(" ", "\n", dx$crop)), levels = paste0(dx$year, "\n", gsub(" ", "\n", dx$crop)))
 code <- c("my <- uptake_table", "my$N <- my$N * 1.1", "agrinutri_tables(uptake_table = my)",
           "N_balance(...)       # every call uses it", "agrinutri_tables()   # bundled tables again")
 pc <- ggplot() + annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill = "grey97", colour = "grey60", linewidth = 0.3) +
   annotate("text", x = 0.04, y = seq(0.86, by = -0.18, length.out = length(code)), label = code, hjust = 0,
-           family = "mono", size = (BASE - 1) / .pt) +
+           family = "mono", size = (BASE - 1.5) / .pt) +
   coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) + theme_void()
 pd <- ggplot(dx, aes(lab)) +
   geom_segment(aes(y = default, yend = edited, xend = lab), colour = "grey55", linewidth = 0.7) +
@@ -29,5 +29,5 @@ pd <- ggplot(dx, aes(lab)) +
   scale_colour_manual(values = c("bundled table" = OKABE[[5]], "edited table (+10% N uptake)" = OKABE[[6]]), name = NULL) +
   labs(x = NULL, y = expression("Balance dose (kg N ha"^-1*")")) + theme_sat() +
   theme(legend.position = "top", axis.text.x = element_text(size = BASE - 1.5, lineheight = 0.9))
-save_fig(add_tags(pc + pd + plot_layout(widths = c(0.8, 1.6))), "fig9_tables", "double", 62)
+save_fig(add_tags(pc + pd + plot_layout(widths = c(1.15, 1.45))), "fig9_tables", "double", 62)
 print(dx[, 1:4])

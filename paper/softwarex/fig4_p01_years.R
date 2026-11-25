@@ -68,4 +68,4 @@ pa <- ggplot(tl, aes(lab, kg, fill = term)) + geom_col(width = 0.65, colour = "g
   theme_sat() + theme(legend.position = "right", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
                       legend.margin = margin(0, 0, 0, 0), legend.key.size = unit(2.5, "mm"),
                       axis.text.x = element_text(size = BASE - 1.5, lineheight = 0.9))
-save_fig(pa + theme(legend.position = "top") + guides(fill = guide_legend(nrow = 1)), "fig4_p01_years", "double", 90)
+save_fig(pa + theme(legend.position = "top") + guides(fill = guide_legend(nrow = 2)), "fig4_p01_years", "double", 90)

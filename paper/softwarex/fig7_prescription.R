@@ -43,11 +43,12 @@ zn <- as.data.frame(nni, xy = TRUE, na.rm = TRUE); names(zn)[3] <- "NNI"
 zn$zone <- cut(zn$NNI, c(-Inf, 0.9, 1.1, Inf), labels = c("deficient", "optimal", "luxury"))
 ZC <- c(deficient = "#b2182b", optimal = "#e8e8e8", luxury = "#2166ac")
 p4 <- ggplot(zn) + geom_raster(aes(x, y, fill = zone)) + fr + scale_fill_manual(values = ZC, name = NULL) +
-  IN + step(4, "NNI zones", "< 0.9, 0.9-1.1, > 1.1")
+  IN + step(4, "NNI zones", "< 0.9, 0.9-1.1, > 1.1") +
+  theme(legend.key.width = unit(2.5, "mm"), legend.text = element_text(size = BASE - 1))
 # 5 machine grid over the zones
 p5 <- ggplot(zn) + geom_raster(aes(x, y, fill = zone), alpha = 0.55) +
   geom_sf(data = rx, fill = NA, colour = "black", linewidth = 0.2, inherit.aes = FALSE) + fr +
-  scale_fill_manual(values = ZC, name = NULL) + IN + step(5, "Machine grid", "24 m x 30 m cells along the A-B line")
+  scale_fill_manual(values = ZC, name = NULL) + IN + step(5, "Machine grid", "24 m x 30 m cells") + theme(legend.position = "none")
 # 6 first doses from the zone of each cell; 7 final doses after the mass balance
 rx$zone <- cut(rx$mean_nni, c(-Inf, 0.9, 1.1, Inf), labels = c("deficient", "optimal", "luxury"))
 rx$dose0 <- ifelse(is.na(rx$zone), Nstar, c(deficient = hi, optimal = Nstar, luxury = lo)[as.character(rx$zone)])
@@ -55,14 +56,15 @@ m0 <- weighted.mean(rx$dose0, rx$area_ha); m1 <- weighted.mean(rx$dose, rx$area_
 DOSE <- fill_N(name = expression("kg N ha"^-1), limits = c(lo, hi), breaks = c(lo, Nstar, hi))
 cell <- function(v) list(geom_sf(data = rx, aes(fill = .data[[v]]), colour = "white", linewidth = 0.1, inherit.aes = FALSE),
                          DOSE, guides(fill = guide_colourbar(title.position = "left", title.vjust = 1)))
-p6 <- ggplot() + cell("dose0") + fr + step(6, "Zone doses", sprintf("210 / 175 / 140; mean %.1f", m0))
-p7 <- ggplot() + cell("dose") + fr + step(7, "Mass balance", sprintf("free cells rescaled; mean %.1f = N*", m1))
+p6 <- ggplot() + cell("dose0") + fr + step(6, "Zone doses", sprintf("210 / 175 / 140; mean %.0f", m0)) +
+  theme(legend.position = "none")
+p7 <- ggplot() + cell("dose") + fr + step(7, "Mass balance", sprintf("rescaled; mean %.1f = N*", m1))
 # 8 the ISOXML task file actually written by export_prescription()
 td <- file.path(tempdir(), "TASKDATA"); unlink(td, recursive = TRUE)
 export_prescription(rx[, "dose"], td, format = "isoxml")
 xmlf <- list.files(td, pattern = "\\.XML$", full.names = TRUE, recursive = TRUE, ignore.case = TRUE)[1]
 xl <- readLines(xmlf, warn = FALSE); xl <- trimws(unlist(strsplit(paste(xl, collapse = "\n"), "(?<=>)\\s*(?=<)", perl = TRUE)))
-xl <- substr(xl[nzchar(xl)], 1, 36)[1:min(9, length(xl))]
+xl <- substr(xl[nzchar(xl)], 1, 27)[1:min(9, length(xl))]
 p8 <- ggplot() + annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill = "grey97", colour = "grey60", linewidth = 0.3) +
   annotate("text", x = 0.03, y = seq(0.93, by = -0.1, length.out = length(xl)), label = xl, hjust = 0, vjust = 1,
            family = "mono", size = (BASE - 2) / .pt) +
@@ -71,7 +73,7 @@ p8 <- ggplot() + annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill =
   coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) + theme_void() +
   theme(plot.title = element_text(size = BASE, face = "bold", margin = margin(b = 1)),
         plot.subtitle = element_text(size = BASE - 1, colour = "grey30", margin = margin(b = 2))) +
-  step(8, "Machine file", "export_prescription(format = \"isoxml\")")
+  step(8, "Machine file", "export_prescription()")
 fig <- wrap_plots(p1, p2, p3, p4, p5, p6, p7, p8, nrow = 2)
 save_fig(fig, "fig7_prescription", "double", 120)
 cat("zone mean", round(m0, 1), "-> final mean", round(m1, 1), "| XML:", basename(xmlf), "\n")

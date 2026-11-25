@@ -91,7 +91,7 @@ pb <- ggplot(tl, aes(kg, plot, fill = term)) + geom_col(width = 0.65, colour = "
   scale_colour_manual(values = c("Balance dose" = "black", "Standard dose" = OKABE[[6]]), name = NULL) +
   scale_y_discrete(labels = setNames(paste0(lab$plot, "  ", lab$c2024, "
 after ", tolower(lab$c2023)), lab$plot)) +
-  labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand and losses (+)"), y = NULL) +
+  labs(x = expression("Balance term (kg N ha"^-1*"): supplies (-) | demand, losses (+)"), y = NULL) +
   theme_sat() + theme(legend.position = "top", legend.box = "vertical", legend.spacing.y = unit(0, "mm"),
                       legend.key.size = unit(2.5, "mm"), legend.margin = margin(0, 0, 0, 0))
 save_fig(add_tags(pa + pb + plot_layout(widths = c(1, 1.3))), "fig3_farm", "double", 72)

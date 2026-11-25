@@ -53,7 +53,7 @@ cmap <- function(v, name) ggplot(px) + geom_raster(aes(x, y, fill = .data[[v]]))
   scale_fill_manual(values = CLS, name = name) +              # classes present only, fixed colours
   map_furniture(st_bbox(rer), len = 1000) + coord_sf(datum = NA, expand = FALSE) + theme_map() +
   theme(legend.key.width = unit(3, "mm"), legend.key.height = unit(3, "mm")) +
-  guides(fill = guide_legend(title.position = "top", nrow = 1))
+  guides(fill = guide_legend(title.position = "top", nrow = 2))
 pc <- cmap("P", "Olsen P class")
 pd <- cmap("K", "Exchangeable K class")
 cat("classes around the farm\n"); print(table(P = px$P)); print(table(K = px$K))
@@ -61,4 +61,4 @@ print(st_drop_geometry(out)[, c("plot", "crop", "P2O5_target", "K2O_target")])
 
 pb <- pb + labs(y = expression("Dose (kg ha"^-1*")"))
 pa <- pa + theme(legend.position = "none")
-save_fig(add_tags(pb + pc + pd + plot_layout(widths = c(1.8, 1, 1))) & theme(plot.tag.location = "margin"), "fig6_pk", "double", 75)
+save_fig(add_tags(pb / (pc | pd) + plot_layout(heights = c(0.85, 1))) & theme(plot.tag.location = "margin"), "fig6_pk", "double", 135)
