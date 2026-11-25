@@ -6,6 +6,9 @@
   `uptake_table`) for the session, so the balance can be re-parameterised for
   another region without editing the package. `agrinutri_tables()` with no
   arguments restores the bundled tables.
+* `build_strip_prescription()` gains `edge_buffer` (metres, default 0): the
+  rasters are sampled only inside the field shrunk by that distance, so mixed
+  pixels on the boundary no longer drive the doses of the edge cells.
 * `export_prescription(format = "isoxml")`: prescriptions with mixed or
   multipart geometries (e.g. strip cells clipped to the field) are now made
   valid and split into single polygons before writing; the export failed on

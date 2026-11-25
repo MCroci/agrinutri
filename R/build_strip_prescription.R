@@ -85,6 +85,11 @@
 #'   level dose is rescaled so the area-weighted mean matches
 #'   \code{n_target}. Guarantees mass-balance compliance with the
 #'   balance-based field ceiling.
+#' @param edge_buffer Inward buffer in metres (default 0). When positive, the
+#'   rasters are sampled only inside the field shrunk by this distance, so mixed
+#'   pixels on the boundary (crop and margin) do not drive the doses; cells left
+#'   without a valid value receive \code{n_target} before the mean is preserved.
+#'   One Sentinel-2 pixel (10 m) is a reasonable choice.
 #' @param crs_metric EPSG code of the metric CRS in which strips are drawn.
 #'   `NULL` (default) uses the WGS 84 / UTM zone of the field centroid, so
 #'   `machine_width`, `cell_length` and `area_ha` are true ground distances
@@ -140,6 +145,7 @@ build_strip_prescription <- function(
   thr_hi        = 1.10,
   n_classes     = 5,
   preserve_mean = TRUE,
+  edge_buffer   = 0,
   crs_metric    = NULL
 ) {
   if (!requireNamespace("sf", quietly = TRUE))
@@ -147,7 +153,7 @@ build_strip_prescription <- function(
 
   variability <- match.arg(variability)
   stopifnot(machine_width > 0, n_target >= 0,
-             min_dose <= max_dose)
+             min_dose <= max_dose, is.numeric(edge_buffer), edge_buffer >= 0)
   if (variability %in% c("calibration", "classes")) {
     stopifnot(vi_low < vi_high)
   }
@@ -238,6 +244,18 @@ build_strip_prescription <- function(
   mean_vi  <- rep(NA_real_, nrow(strips))
   mean_nni <- rep(NA_real_, nrow(strips))
 
+  if (edge_buffer > 0) {
+    inner <- sf::st_buffer(fld, -edge_buffer)
+    if (all(sf::st_is_empty(inner)))
+      stop("`edge_buffer` (", edge_buffer, " m) leaves no area inside the field.", call. = FALSE)
+    inner_mask <- function(r) {
+      if (is.null(r)) return(r)
+      if (inherits(r, c("RasterLayer", "RasterStack", "RasterBrick"))) r <- terra::rast(r)
+      terra::mask(r, terra::project(terra::vect(inner), terra::crs(r)))
+    }
+    vi_raster  <- inner_mask(vi_raster)
+    nni_raster <- inner_mask(nni_raster)
+  }
   if (variability %in% c("calibration", "classes") && !is.null(vi_raster)) {
     mean_vi <- .strip_zonal_mean(strips, vi_raster)
     strips$mean_vi <- mean_vi

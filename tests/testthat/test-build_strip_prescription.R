@@ -97,3 +97,22 @@ test_that("strips have the true machine width and area (local UTM, not Web Merca
   expect_equal(sum(rx$area_ha),
                sum(as.numeric(sf::st_area(rx))) / 1e4, tolerance = 5e-3)
 })
+
+test_that("edge_buffer keeps boundary pixels from driving the doses", {
+  skip_if_not_installed("sf")
+  skip_if_not_installed("terra")
+  field <- sf::st_sf(geometry = sf::st_sfc(sf::st_polygon(list(rbind(
+    c(0, 0), c(240, 0), c(240, 240), c(0, 240), c(0, 0)))), crs = 32632))
+  r <- terra::rast(xmin = -20, xmax = 260, ymin = -20, ymax = 260, resolution = 10, crs = "EPSG:32632")
+  xy <- terra::crds(r)
+  edge <- xy[, 1] < 10 | xy[, 1] > 230 | xy[, 2] < 10 | xy[, 2] > 230
+  terra::values(r) <- ifelse(edge, 0.5, 1.0)                 # deficient ring, optimal interior
+  args <- list(field, machine_width = 24, cell_length = 30, angle_deg = 0, variability = "nni",
+               nni_raster = r, n_target = 150, min_dose = 120, max_dose = 180)
+  rx0 <- do.call(build_strip_prescription, args)
+  rx1 <- do.call(build_strip_prescription, c(args, edge_buffer = 10))
+  expect_true(any(rx0$dose > 160))                           # the ring pulls edge cells up
+  expect_true(all(abs(rx1$dose - 150) < 1))                  # with the buffer every cell is optimal
+  expect_equal(weighted.mean(rx1$dose, rx1$area_ha), 150, tolerance = 0.01)
+  expect_error(do.call(build_strip_prescription, c(args, edge_buffer = 200)), "no area")
+})
