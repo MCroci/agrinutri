@@ -1,6 +1,6 @@
 # agrinutri News
 
-## Development version
+## Version 1.2.1 (2026-11-26)
 
 * Shiny app, N balance tab: the waterfall now shows the soil supply terms B1 and
   B2 (they were drawn as zero; the net dose was already correct).
