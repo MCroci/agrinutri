@@ -26,9 +26,9 @@ R package; Nutrient balance; Fertilisation planning; Nitrogen; Precision agricul
 
 | Nr | Code metadata description | Metadata |
 |----|-----------------------|--------------------------------------|
-| C1 | Current code version | v1.2.1 |
+| C1 | Current code version | v1.2.2 |
 | C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/agrinutri |
-| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24561872 |
+| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24562266 |
 | C4 | Legal code license | MIT License |
 | C5 | Code versioning system used | git |
 | C6 | Software code languages, tools and services used | R |
@@ -60,7 +60,7 @@ The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop d
 
 The main functionalities are grouped in Table 1.
 
-Table: Table 1. Main functionalities of agrinutri 1.2.1.
+Table: Table 1. Main functionalities of agrinutri 1.2.2.
 
 | Area | Functions |
 |------------|------------------------------------|
@@ -195,7 +195,7 @@ During the preparation of this work the authors used Claude (Anthropic) to assis
 
 # Data availability
 
-The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The four field boundaries of Sections 3.2 to 3.7, with their crop classes and balance inputs, a Sentinel-2 scene over plot P01 (13 August 2024) and a clip of the regional soil maps are bundled with the package (`?piacenza`); the scene of 21 July 2024 used here is downloaded by `fig6_data.R` from the Microsoft Planetary Computer; the other fields of Section 4 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and provincial yield statistics are public.
+The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The four field boundaries of Sections 3.2 to 3.7, with their crop classes and balance inputs, the Sentinel-2 scene of 21 July 2024 over plot P01 and a clip of the regional soil maps are bundled with the package (`?piacenza`); the other fields of Section 4 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and provincial yield statistics are public.
 
 # Acknowledgements
 
