@@ -1,6 +1,6 @@
 # agrinutri News
 
-## Development version
+## Version 1.2.2 (2026-11-26)
 
 * The bundled Sentinel-2 scene of plot P01 is now that of 21 July 2024
   (`S2_piacenza_P01_20240721.tif`), when the maize was in the top-dressing
