@@ -26,9 +26,9 @@ R package; Nutrient balance; Fertilisation planning; Nitrogen; Precision agricul
 
 | Nr | Code metadata description | Metadata |
 |----|-----------------------|--------------------------------------|
-| C1 | Current code version | v1.2.0 |
+| C1 | Current code version | v1.2.1 |
 | C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/agrinutri |
-| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24560725 |
+| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24561872 |
 | C4 | Legal code license | MIT License |
 | C5 | Code versioning system used | git |
 | C6 | Software code languages, tools and services used | R |
@@ -60,7 +60,7 @@ The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop d
 
 The main functionalities are grouped in Table 1.
 
-Table: Table 1. Main functionalities of agrinutri 1.2.0.
+Table: Table 1. Main functionalities of agrinutri 1.2.1.
 
 | Area | Functions |
 |------------|------------------------------------|
@@ -112,7 +112,7 @@ The returned object lists A = 186.6, B = 70.2, C = 0, D = 38.1, E = F = 0 (stalk
 
 ## 3.2. A farm
 
-`farm_balance()` applies the balance to every plot of a vector layer whose columns carry the inputs, and appends the dose, the check against the crop maximum dose and the total nitrogen per plot. The illustrative farm is made of four neighbouring fields (46.7 ha) of the Po plain near Piacenza (Italy), delineated from Sentinel-2 with Fields of The World [@kerner2024ftw], one for each crop of 2024. The crops of 2024 and of 2023 (the previous crop) were estimated from AlphaEarth satellite embeddings [@brown2025alphaearth]; soil inputs are field means of the regional 0–30 cm maps of clay, sand, organic carbon, total nitrogen, Olsen P and exchangeable K [@rer_soil]; rainfall from October to January and in February comes from the ERA5 reanalysis [@hersbach2020]; and expected yields are the provincial yields of 2024 [@istat_coltivazioni], or reference yields where these are missing. The farm needs 6.8 t of nitrogen before any organic fertiliser and before the crop maximum doses are applied (Fig. 3). The terms show where each dose comes from: after processing tomato, soft and durum wheat receive a residue credit of 30 kg N ha^−1^ (term E) and need 134 and 105 kg N ha^−1^, and leaching adds about 60 kg N ha^−1^ to every plot. The processing tomato reaches 193 kg N ha^−1^, above its crop maximum dose of 180 kg N ha^−1^, and is flagged. The standard-dose scheme (`dose_standard_N()`) gives one value per crop instead: 240 kg N ha^−1^ for maize against a balance of 175, 130 for processing tomato against 193.
+`farm_balance()` applies the balance to every plot of a vector layer whose columns carry the inputs, and appends the dose, the check against the crop maximum dose and the total nitrogen per plot. The illustrative farm is made of four neighbouring fields (46.7 ha) of the Po plain near Piacenza (Italy), delineated from Sentinel-2 with Fields of The World [@kerner2024ftw], one for each crop of 2024. The crops of 2024 and of 2023 (the previous crop) were estimated from AlphaEarth satellite embeddings [@brown2025alphaearth]; soil inputs are field means of the regional 0–30 cm maps of clay, sand, organic carbon, total nitrogen, Olsen P and exchangeable K [@rer_soil; @ungaro2025]; rainfall from October to January and in February comes from the ERA5 reanalysis [@hersbach2020]; and expected yields are the provincial yields of 2024 [@istat_coltivazioni], or reference yields where these are missing. The farm needs 6.8 t of nitrogen before any organic fertiliser and before the crop maximum doses are applied (Fig. 3). The terms show where each dose comes from: after processing tomato, soft and durum wheat receive a residue credit of 30 kg N ha^−1^ (term E) and need 134 and 105 kg N ha^−1^, and leaching adds about 60 kg N ha^−1^ to every plot. The processing tomato reaches 193 kg N ha^−1^, above its crop maximum dose of 180 kg N ha^−1^, and is flagged. The standard-dose scheme (`dose_standard_N()`) gives one value per crop instead: 240 kg N ha^−1^ for maize against a balance of 175, 130 for processing tomato against 193.
 
 ![Fig. 3. Nitrogen balance of a farm of four satellite-delineated fields in the Po plain, crop year 2024. (a) Mineral N dose per plot; the outlined plot exceeds its crop maximum dose. (b) Balance terms per plot, demand and losses to the right (A crop demand, C leaching, D immobilisation) and supplies to the left (B soil supply, E previous crop, F past organic inputs, G deposition and fixation), with the balance dose and the standard dose. Plot P01 is the field of Figs. 4–7.](figures/fig3_farm.pdf){width=16cm}
 
