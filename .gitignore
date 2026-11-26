@@ -44,3 +44,5 @@ paper/softwarex/data/farm_2024_ids.csv
 paper/softwarex/submission/
 paper/softwarex/layouts/*.png
 .playwright-mcp/
+paper/softwarex/data_cerzoo/
+paper/softwarex/layouts/cerzoo/

@@ -70,7 +70,7 @@ map_furniture <- function(bb, len = 200) {
                 family = FONT, fontface = "bold", vjust = 1))
 }
 
-save_fig <- function(p, file, width = "double", height = 80, dir = "paper/softwarex/figures") {
+save_fig <- function(p, file, width = "double", height = 80, dir = Sys.getenv("SWX_FIGDIR", "paper/softwarex/figures")) {
   if (isTRUE(getOption("swx.nosave"))) return(invisible(file))   # layouts/layout_variants.R reuses the panels
   w <- if (is.character(width)) WIDTH[[width]] else width
   ggsave(file.path(dir, paste0(file, ".png")), p, device = ragg::agg_png, width = w, height = height,

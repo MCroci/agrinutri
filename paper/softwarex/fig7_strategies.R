@@ -5,15 +5,16 @@
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
-D <- "paper/softwarex/data"
+D <- Sys.getenv("SWX_DATA", "paper/softwarex/data")   # another case study: set SWX_DATA, SWX_SCENE, SWX_FIGDIR
+SCENE <- Sys.getenv("SWX_SCENE", "20240721"); SCENE_LAB <- format(as.Date(SCENE, "%Y%m%d"), "%d %b %Y")
 
 fm <- read.csv(file.path(D, "farm_2024.csv"), stringsAsFactors = FALSE)
 
 # ---- within field P01 ---------------------------------------------------------------------
 field <- st_read(file.path(D, "rs_field.geojson"), quiet = TRUE)
-inp   <- readRDS(file.path(D, "p01_inputs.rds"))
+
 Nstar <- fm$N_target[fm$plot == "P01"]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
-s2  <- rast(file.path(D, "rs_s2_20240721.tif"))
+s2  <- rast(file.path(D, paste0("rs_s2_", SCENE, ".tif")))
 ndvi <- (s2[["B08"]] - s2[["B04"]]) / (s2[["B08"]] + s2[["B04"]]); names(ndvi) <- "NDVI"
 nni <- rast(file.path(D, "rs_NNI_full.tif"))
 # inward buffer of one S2 pixel (as edge_buffer = 10 in fig6_data.R): boundary pixels mix crop and margin

@@ -4,11 +4,12 @@
 suppressMessages({ library(terra); library(sf); library(ggplot2); library(patchwork); library(tidyterra) })
 pkgload::load_all(".", quiet = TRUE)
 source("paper/softwarex/theme_swx.R")
-D <- "paper/softwarex/data"
+D <- Sys.getenv("SWX_DATA", "paper/softwarex/data")   # another case study: set SWX_DATA, SWX_SCENE, SWX_FIGDIR
+SCENE <- Sys.getenv("SWX_SCENE", "20240721"); SCENE_LAB <- format(as.Date(SCENE, "%Y%m%d"), "%d %b %Y")
 Nstar <- read.csv(file.path(D, "farm_2024.csv"))$N_target[1]; lo <- 0.8 * Nstar; hi <- 1.2 * Nstar
 field <- st_read(file.path(D, "rs_field_utm.geojson"), quiet = TRUE)
 rx    <- st_read(file.path(D, "rs_rx.geojson"), quiet = TRUE)
-s2    <- rast(file.path(D, "rs_s2_20240721.tif"))
+s2    <- rast(file.path(D, paste0("rs_s2_", SCENE, ".tif")))
 lai   <- rast(file.path(D, "rs_LAI.tif")); nni <- rast(file.path(D, "rs_NNI.tif"))
 fv <- vect(st_transform(field, crs(s2)))
 inner <- st_buffer(field, -10)                           # edge_buffer = 10 of fig6_data.R
@@ -28,7 +29,7 @@ v <- values(mask(fc, buffer(fv, -20)), na.rm = TRUE)
 q <- quantile(v, c(0.01, 0.99))
 for (i in 1:3) fc[[i]] <- clamp((fc[[i]] - q[1]) / (q[2] - q[1]) * 255, 0, 255)
 p1 <- ggplot() + geom_spatraster_rgb(data = fc, r = 1, g = 2, b = 3, max_col_value = 255, interpolate = FALSE) + fr +
-  step(1, "Sentinel-2 scene", "21 Jul 2024, natural colour")
+  step(1, "Sentinel-2 scene", paste0(SCENE_LAB, ", natural colour"))
 # 2 LAI
 p2 <- ggplot() + geom_spatraster(data = lai) + fr +
   scale_fill_viridis_c(option = "viridis", limits = c(0, 6), na.value = "transparent", name = "LAI") +
@@ -56,7 +57,7 @@ m0 <- weighted.mean(rx$dose0, rx$area_ha); m1 <- weighted.mean(rx$dose, rx$area_
 DOSE <- fill_N(name = expression("kg N ha"^-1), limits = c(lo, hi), breaks = c(lo, Nstar, hi))
 cell <- function(v) list(geom_sf(data = rx, aes(fill = .data[[v]]), colour = "white", linewidth = 0.1, inherit.aes = FALSE),
                          DOSE, guides(fill = guide_colourbar(title.position = "left", title.vjust = 1)))
-p6 <- ggplot() + cell("dose0") + fr + step(6, "Zone doses", sprintf("210 / 175 / 140; mean %.0f", m0)) +
+p6 <- ggplot() + cell("dose0") + fr + step(6, "Zone doses", sprintf("%.0f / %.0f / %.0f; mean %.0f", hi, Nstar, lo, m0)) +
   theme(legend.position = "none")
 p7 <- ggplot() + cell("dose") + fr + step(7, "Mass balance", sprintf("rescaled; mean %.1f = N*", m1))
 # 8 the ISOXML task file actually written by export_prescription()
