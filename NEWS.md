@@ -1,6 +1,6 @@
 # agrinutri News
 
-## Development version
+## Version 1.2.3 (2026-11-26)
 
 * The crop-keyed tables (`crops.table`, `uptake_table`, `mas.table` and the four
   `standard_*` tables) no longer carry the trailing rows of the spreadsheet

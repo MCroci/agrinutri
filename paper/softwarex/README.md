@@ -1,6 +1,6 @@
 # SoftwareX manuscript
 
-Source of the SoftwareX Original Software Publication on agrinutri 1.2.2.
+Source of the SoftwareX Original Software Publication on agrinutri 1.2.3.
 
 | File | Content |
 |---|---|
