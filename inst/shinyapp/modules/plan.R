@@ -82,7 +82,7 @@ planUI <- function(id) {
       .agrinutri_card(
         h3("Fertilisation plan"),
         uiOutput(ns("alerts_box")),
-        h4("Split vs. target and regulatory limits"),
+        h4("Split vs. target and limits"),
         plotOutput(ns("split_plot"), height = "170px"),
         tags$hr(),
         h4("Application rows"),

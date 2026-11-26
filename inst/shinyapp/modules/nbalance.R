@@ -193,7 +193,7 @@ nBalanceServer <- function(id, research_mode, app_state) {
       b <- bal(); req(b)
       nms <- c("A","B1","B2","C1","C2","D","E","F","Forg","G")
       vals <- vapply(nms, function(nm) {
-        v <- tryCatch(b[[nm]], error = function(e) NA_real_)
+        v <- tryCatch(b[[if (nm %in% c("B1", "B2")) tolower(nm) else nm]], error = function(e) NA_real_)  # N_balance() names them b1, b2
         # Accept numeric scalar, numeric vector, or nested list entries;
         # fall back to 0 if the term is missing/not a number (so the
         # waterfall / table still render without propagating NAs).

@@ -77,7 +77,7 @@ Table: Table 1. Main functionalities of agrinutri 1.2.0.
 
 `run_app()` opens a Shiny interface that runs the same functions without code, from the balance of one field to the farm map and the prescription (Fig. 2).
 
-![Fig. 2. The Shiny interface (`run_app()`), nitrogen balance tab: crop, soil and weather inputs (left) and the balance as a waterfall from crop demand A to the net mineral N dose, with the crop maximum dose (dashed).](figures/fig2_app.png){width=16cm}
+![Fig. 2. The Shiny interface (`run_app()`), nitrogen balance tab with the inputs of plot P01 in 2024 (left) and the balance as a waterfall from crop demand A to the net mineral N dose of 175 kg N ha^−1^ (Section 3.2), with the crop maximum dose (dashed).](figures/fig2_app.png){width=16cm}
 
 The P~2~O~5~ and K~2~O balances follow the same structure. Their doses depend on the availability class of Olsen P and exchangeable K for the texture group: enrichment, maintenance or reduction, with a carbonate-dependent P immobilisation factor and a clay-dependent K leaching term.
 
