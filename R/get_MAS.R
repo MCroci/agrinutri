@@ -7,7 +7,7 @@
 #' the reference yield.
 #'
 #' The DPI 2026 values (default) are read from the bundled [mas.table]
-#' dataset, which mirrors the MAS sheet of Fert_Office v1.26 (239 crops).
+#' dataset, which mirrors the MAS sheet of Fert_Office v1.26 (234 crops).
 #'
 #' @param crop Character. Crop name, as in `uptake_table$crop`; matching is
 #'   case- and accent-insensitive. With `edition = "2025"` use the crop labels

@@ -77,7 +77,21 @@ fold_nonascii <- function(df) {
   df
 }
 
+# The crop-keyed sheets of the spreadsheet end with rows that are not crops: column
+# headers and counters, and the "currently selected" crop and previous crop, which
+# repeat an existing row. Keep the rows with a crop code (A2, Ab2, E17, BL15, ...)
+# and drop exact repeats of crop code + phase + crop.
+drop_sheet_artefacts <- function(df) {
+  if (!"crop_id" %in% names(df)) return(df)
+  df <- df[grepl("^[A-Z][A-Za-z]{0,2}[0-9]+$", df$crop_id), , drop = FALSE]
+  key <- do.call(paste, c(df[intersect(c("crop_id", "phase", "crop"), names(df))], sep = "|"))
+  df <- df[!duplicated(key), , drop = FALSE]
+  rownames(df) <- NULL
+  df
+}
+
 save_as_rda <- function(df, name) {
+  df  <- drop_sheet_artefacts(df)
   df  <- promote_english_primary(df, name)
   df  <- fold_nonascii(df)
   out <- file.path(data_dir, paste0(name, ".rda"))

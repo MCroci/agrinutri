@@ -1,5 +1,13 @@
 # agrinutri News
 
+## Development version
+
+* The crop-keyed tables (`crops.table`, `uptake_table`, `mas.table` and the four
+  `standard_*` tables) no longer carry the trailing rows of the spreadsheet
+  that were not crops (column headers, counters and the repeated "currently
+  selected" crop): each now has 234 rows and `crop_id` identifies a crop.
+  Results do not change.
+
 ## Version 1.2.2 (2026-11-26)
 
 * The bundled Sentinel-2 scene of plot P01 is now that of 21 July 2024

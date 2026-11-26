@@ -35,7 +35,7 @@ the reference yield.
 }
 \details{
 The DPI 2026 values (default) are read from the bundled \link{mas.table}
-dataset, which mirrors the MAS sheet of Fert_Office v1.26 (239 crops).
+dataset, which mirrors the MAS sheet of Fert_Office v1.26 (234 crops).
 }
 \examples{
 get_MAS("Durum wheat (grain)")

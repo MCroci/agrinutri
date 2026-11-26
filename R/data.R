@@ -31,7 +31,7 @@
 #' @section Core N datasets:
 #' \describe{
 #'   \item{uptake_table}{Crop unit absorption/asportation coefficients for
-#'         N, P2O5 and K2O (from Fert_Office sheet A). 247 crops in v0.2.0.}
+#'         N, P2O5 and K2O (from Fert_Office sheet A). 234 crops.}
 #'   \item{e.table}{Previous crop: N kg/ha from previous crop residues, with
 #'         legume flag and Fert_Office label.}
 #'   \item{f.table}{Coefficients of recovery for organic fertilisation applied
@@ -88,7 +88,7 @@
 #' \describe{
 #'   \item{standard_pk_doses.table}{Base N, P2O5 and K2O standard doses
 #'         per crop, with 4 soil availability classes (very low, low, normal,
-#'         high) for P and K (239 rows, 14 cols).}
+#'         high) for P and K (234 rows, 14 cols).}
 #'   \item{standard_decrements.table}{Crop-level catalogue of reduction
 #'         factors (yield, previous soil amendment, high SOM,
 #'         after alfalfa or legume, etc.) for the standard-dose method.}
