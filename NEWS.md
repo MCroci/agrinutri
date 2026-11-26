@@ -1,5 +1,12 @@
 # agrinutri News
 
+## Development version
+
+* The bundled Sentinel-2 scene of plot P01 is now that of 21 July 2024
+  (`S2_piacenza_P01_20240721.tif`), when the maize was in the top-dressing
+  window; it replaces the scene of 13 August 2024. The vignettes use it, and
+  the strip prescription of the farm vignette uses `edge_buffer = 10`.
+
 ## Version 1.2.1 (2026-11-26)
 
 * Shiny app, N balance tab: the waterfall now shows the soil supply terms B1 and

@@ -39,15 +39,16 @@ N% into a dimensionless deficiency / sufficiency index.
 
 ## 1. A Sentinel-2 scene
 
-The package ships the Sentinel-2 Level-2A scene of 13 August 2024 over plot P01
-of the Piacenza example farm (grain maize, 10 bands, reflectance scaled by 10000;
+The package ships the Sentinel-2 Level-2A scene of 21 July 2024 over plot P01
+of the Piacenza example farm (grain maize at about the tenth leaf, in the top-dressing
+window; 10 bands, reflectance scaled by 10000;
 see `?piacenza`):
 
 ```{r s2-stack}
 library(agrinutri)
 library(terra)
 
-s2f   <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif", package = "agrinutri")
+s2f   <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240721.tif", package = "agrinutri")
 field <- terra::vect(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"))
 field <- terra::project(field[field$plot == "P01"], terra::crs(terra::rast(s2f)))
 s2    <- terra::mask(terra::rast(s2f), field)                       # keep the field only
@@ -142,7 +143,9 @@ terra::plot(d$class,
 ```
 
 Most deficient pixels lie on the field edge, where a 10 m pixel mixes the crop
-with the margin.
+with the margin; `build_strip_prescription(edge_buffer = 10)` keeps them out of a
+prescription. The NNI retrieved from one scene is best read as a map of relative
+status within the field: scenes two days apart can differ in level.
 
 ```{r nni-summary, eval = requireNamespace("jsonlite", quietly = TRUE)}
 d$summary

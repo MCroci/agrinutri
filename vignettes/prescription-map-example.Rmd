@@ -52,20 +52,20 @@ plot(sf::st_geometry(field), col = "#D5E4F0", border = "#1F4E79",
 
 ## 2. NDVI from Sentinel-2
 
-The bundled scene is the Sentinel-2 Level-2A acquisition of 13 August 2024
-over P01, with reflectance scaled by 10000:
+The bundled scene is the Sentinel-2 Level-2A acquisition of 21 July 2024
+over P01, with the maize at about the tenth leaf and reflectance scaled by 10000:
 
 ```{r ndvi}
 library(terra)
 
-s2 <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif",
+s2 <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240721.tif",
                               package = "agrinutri"))
 fv <- terra::project(terra::vect(field), terra::crs(s2))
 r  <- terra::mask(compute_vi(s2, "NDVI", scale_factor = 10000), fv)
 names(r) <- "NDVI"
 r
 
-terra::plot(r, main = "Input NDVI (Sentinel-2, 13 August 2024)",
+terra::plot(r, main = "Input NDVI (Sentinel-2, 21 July 2024)",
             col = hcl.colors(30, "YlGn", rev = TRUE))
 terra::lines(fv)
 ```

@@ -2,7 +2,7 @@
 
 test_that("Piacenza example files are bundled", {
   for (f in c("piacenza_farm.geojson", "piacenza_p01_rotation.csv",
-              "sentinel-2/S2_piacenza_P01_20240813.tif", "rer_soil_piacenza.tif"))
+              "sentinel-2/S2_piacenza_P01_20240721.tif", "rer_soil_piacenza.tif"))
     expect_true(nzchar(system.file("extdata", f, package = "agrinutri")), info = f)
 })
 

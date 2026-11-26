@@ -4,7 +4,7 @@
 #   piacenza_farm.geojson          four satellite-delineated fields (P01-P04), crop 2019-2026,
 #                                  field-mean soil (Olsen P, exchangeable K as elements, for p_balance/k_balance) and the farm_balance() inputs of 2024
 #   piacenza_p01_rotation.csv      yearly balance inputs of plot P01, 2019-2026
-#   sentinel-2/S2_piacenza_P01_20240813.tif   Sentinel-2 L2A over P01 (reflectance x 10000)
+#   sentinel-2/S2_piacenza_P01_20240721.tif   Sentinel-2 L2A over P01 (reflectance x 10000)
 #   rer_soil_piacenza.tif          regional soil maps 0-30 cm, 100 m, around the farm
 # Original field identifiers are dropped.
 suppressMessages({ library(sf); library(terra) })
@@ -35,7 +35,7 @@ rot <- data.frame(year = yr$year, crop_class = yr$class, crop = yr$crop, ccp = y
                   winter_rain = yr$rain, start_spring_rain = yr$spring_rain)
 write.csv(rot, file.path(X, "piacenza_p01_rotation.csv"), row.names = FALSE)
 
-file.copy(file.path(D, "rs_s2_20240813.tif"), file.path(X, "sentinel-2/S2_piacenza_P01_20240813.tif"), overwrite = TRUE)
+file.copy(file.path(D, "rs_s2_20240721.tif"), file.path(X, "sentinel-2/S2_piacenza_P01_20240721.tif"), overwrite = TRUE)
 
 rs <- c(rast(file.path(SOIL, "ARGILLA_0_30.tif")), rast(file.path(SOIL, "SABBIA_0_30.tif")),
         rast(file.path(SOIL, "CORG_0_30.tif")), rast(file.path(SOIL, "npk_0_30/Azoto_N_totale/N_0_30.tif")),
@@ -49,4 +49,4 @@ writeRaster(round(rs, 2), file.path(X, "rer_soil_piacenza.tif"), overwrite = TRU
 
 stopifnot(nrow(farm) == 4, nrow(rot) == 8, nlyr(rast(file.path(X, "rer_soil_piacenza.tif"))) == 6)
 print(file.size(file.path(X, c("piacenza_farm.geojson", "piacenza_p01_rotation.csv",
-                               "sentinel-2/S2_piacenza_P01_20240813.tif", "rer_soil_piacenza.tif"))))
+                               "sentinel-2/S2_piacenza_P01_20240721.tif", "rer_soil_piacenza.tif"))))
