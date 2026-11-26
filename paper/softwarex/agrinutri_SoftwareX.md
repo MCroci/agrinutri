@@ -173,7 +173,7 @@ agrinutri turns a nutrient balance into a reusable component.
 
 **Daily practice.** For advisors, a plan becomes a script: a file of soil analyses and a field layer give the N, P and K balances, the crop maximum dose checks and the distribution plan for every plot in one run, and the version history records how each recommendation was obtained. For teaching, the package and its Shiny interface are designed for exercises that go from the field balance to the export of a prescription map; students can see and change every term.
 
-**Use.** agrinutri is public on GitHub with a documentation website, vignettes on bundled real data and continuous integration on three operating systems; `R CMD check` runs on each of them at every change. The package was first released publicly in October 2026, so no usage figures are available yet.
+**Use.** agrinutri is public on GitHub with a documentation website, vignettes on bundled real data and continuous integration on three operating systems; `R CMD check` runs on each of them at every change. The first tagged release dates from November 2026, so no usage figures are available yet.
 
 **Limitations.** agrinutri is an R package rather than a web service, and its default coefficients are those of one region. Adapting other schemes means editing the tables and, where the rules differ, the term functions.
 
