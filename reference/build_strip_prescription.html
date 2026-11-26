@@ -17,7 +17,7 @@ GeoJSON / ISOXML / John Deere / Trimble export."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">agrinutri</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,6 +82,7 @@ GeoJSON / ISOXML / John Deere / Trimble export.</p>
 <span>  thr_hi <span class="op">=</span> <span class="fl">1.1</span>,</span>
 <span>  n_classes <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  preserve_mean <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  edge_buffer <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  crs_metric <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -175,6 +176,14 @@ are inversely related along the segment (<code>vi_low</code> \(\rightarrow\)
 level dose is rescaled so the area-weighted mean matches
 <code>n_target</code>. Guarantees mass-balance compliance with the
 balance-based field ceiling.</p></dd>
+
+
+<dt id="arg-edge-buffer">edge_buffer<a class="anchor" aria-label="anchor" href="#arg-edge-buffer"></a></dt>
+<dd><p>Inward buffer in metres (default 0). When positive, the
+rasters are sampled only inside the field shrunk by this distance, so mixed
+pixels on the boundary (crop and margin) do not drive the doses; cells left
+without a valid value receive <code>n_target</code> before the mean is preserved.
+One Sentinel-2 pixel (10 m) is a reasonable choice.</p></dd>
 
 
 <dt id="arg-crs-metric">crs_metric<a class="anchor" aria-label="anchor" href="#arg-crs-metric"></a></dt>

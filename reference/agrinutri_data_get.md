@@ -16,3 +16,9 @@ agrinutri_data_get(name)
 
 Kept in `00-agrinutri_data.R` so collation loads this before other
 sources.
+
+A table supplied in the option `agrinutri.tables` (a named list)
+replaces the bundled one, so the balance can be re-parameterised without
+editing the package:
+`options(agrinutri.tables = list(uptake_table = my_uptake))`. See
+[agrinutri_tables](https://mcroci.github.io/agrinutri/reference/agrinutri_tables.md).

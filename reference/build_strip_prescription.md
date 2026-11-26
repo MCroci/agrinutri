@@ -30,6 +30,7 @@ build_strip_prescription(
   thr_hi = 1.1,
   n_classes = 5,
   preserve_mean = TRUE,
+  edge_buffer = 0,
   crs_metric = NULL
 )
 ```
@@ -116,6 +117,14 @@ build_strip_prescription(
   Logical. If `TRUE` (default) the strip- level dose is rescaled so the
   area-weighted mean matches `n_target`. Guarantees mass-balance
   compliance with the balance-based field ceiling.
+
+- edge_buffer:
+
+  Inward buffer in metres (default 0). When positive, the rasters are
+  sampled only inside the field shrunk by this distance, so mixed pixels
+  on the boundary (crop and margin) do not drive the doses; cells left
+  without a valid value receive `n_target` before the mean is preserved.
+  One Sentinel-2 pixel (10 m) is a reasonable choice.
 
 - crs_metric:
 

@@ -213,6 +213,9 @@ MIT. See `LICENSE`.
 - [`agrinutri_it2en()`](https://mcroci.github.io/agrinutri/reference/agrinutri_it2en.md)
   : Translate an Italian agrinutri canonical key into its English alias
 
+- [`agrinutri_tables()`](https://mcroci.github.io/agrinutri/reference/agrinutri_tables.md)
+  : Replace the coefficient tables of the balance
+
 - [`agrinutri_to_quefts_biom()`](https://mcroci.github.io/agrinutri/reference/agrinutri_to_quefts_biom.md)
   : Build QUEFTS biomass list from agrinutri state and Sentinel-2 NNI
 
