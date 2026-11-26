@@ -26,9 +26,9 @@ R package; Nutrient balance; Fertilisation planning; Nitrogen; Precision agricul
 
 | Nr | Code metadata description | Metadata |
 |----|-----------------------|--------------------------------------|
-| C1 | Current code version | v1.2.2 |
+| C1 | Current code version | v1.2.3 |
 | C2 | Permanent link to code/repository used for this code version | https://github.com/mcroci/agrinutri |
-| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24562266 |
+| C3 | Permanent link to reproducible capsule | https://doi.org/10.5281/zenodo.24563287 |
 | C4 | Legal code license | MIT License |
 | C5 | Code versioning system used | git |
 | C6 | Software code languages, tools and services used | R |
@@ -44,7 +44,7 @@ The method is also the reference structure of European fertilisation schemes. Th
 
 The tools that compute such balances are web services or spreadsheets, such as webBESyD [@donauer2025] and AzoFert [@machet2017], or national algorithms run as services of the FaST platform [@fastplatform; @villalobos2020]. Process-based crop models simulate nitrogen in detail but need calibration and are not the method that recommendations prescribe [@jones2003; @keating2003; @brisson2003]. Sensor-based variable-rate methods modulate a dose that comes from elsewhere but do not compute it [@holland2010; @vizzari2019; @santaga2021]. Three uses therefore remain poorly served: computing the balance in batch over fields, years or soil-map pixels; linking the balance dose to satellite diagnosis and to variable-rate machinery without changing the total that the plan justifies; and inspecting every term and coefficient. The 2021 review of OVERSEER in New Zealand shows the cost of a nutrient budget model that users cannot inspect [@pce2021], and compatibility with the schemes advisors already use is one factor in whether they adopt a decision tool [@rose2016].
 
-agrinutri addresses these uses as an open R package [@rcore2025]. Each balance term has its own function, each coefficient table is a replaceable dataset, and the same balance runs per field, per year or per pixel and feeds Nitrogen Nutrition Index (NNI) prescriptions exported in ISOXML. The default coefficients are those of the integrated production guidelines of Emilia-Romagna (Italy) [@dpi2026]; replacing the tables adapts the engine to another scheme without changing the code. Advisors can compute traceable plans for every field of a farm in one run, researchers can embed the recommended dose in multi-year or spatial analyses, and teachers can show how each term moves the dose.
+agrinutri addresses these uses as an open R package [@rcore2025]. Each balance term has its own function, each coefficient table is a replaceable dataset, and the same balance runs per field, per year or per pixel and feeds Nitrogen Nutrition Index (NNI) prescriptions exported in ISOXML. The default coefficients are those of the integrated production guidelines of Emilia-Romagna (Italy) [@dpi2026]; replacing the tables adapts the package to another scheme without changing the code. Advisors can compute traceable plans for every field of a farm in one run, researchers can embed the recommended dose in multi-year or spatial analyses, and teachers can show how each term moves the dose.
 
 # 2. Software description
 
@@ -60,7 +60,7 @@ The nitrogen balance is N = A − B + C + D − E − F − G, where A is crop d
 
 The main functionalities are grouped in Table 1.
 
-Table: Table 1. Main functionalities of agrinutri 1.2.2.
+Table: Table 1. Main functionalities of agrinutri 1.2.3.
 
 | Area | Functions |
 |------------|------------------------------------|
@@ -167,7 +167,7 @@ agrinutri turns a nutrient balance into a reusable component.
 
 **Existing questions, pursued better.** The balance can be computed for every plot of a farm, for several years or per pixel of soil maps, including the open SoilGrids layers [@poggio2021], in one script that can be re-run and shared. A sensor-driven map never changes the nitrogen total that the plan justifies.
 
-**Transferability.** Since the coefficient tables are data, the engine can be re-parameterised for other schemes that use the same balance structure, such as other Italian regional guidelines [@lazio2025]; schemes based on corrected standards or soil indices [@jordanmeille2023] may be adapted by editing the term functions. `agrinutri_tables()` replaces any bundled table for the session: raising the unit N uptake of `uptake_table` by 10 percent raises the doses of P01 by 15 to 22 kg N ha^−1^, while the legume of 2026 stays at zero (Fig. 8). Only the default parameter set is implemented and tested so far; a second parameter set is planned.
+**Transferability.** Since the coefficient tables are data, the package can be re-parameterised for other schemes that use the same balance structure, such as other Italian regional guidelines [@lazio2025]; schemes based on corrected standards or soil indices [@jordanmeille2023] may be adapted by editing the term functions. `agrinutri_tables()` replaces any bundled table for the session: raising the unit N uptake of `uptake_table` by 10 percent raises the doses of P01 by 15 to 22 kg N ha^−1^, while the legume of 2026 stays at zero (Fig. 8). Only the default parameter set is implemented and tested so far; a second parameter set is planned.
 
 ![Fig. 8. Re-parameterising the balance. (a) An edited copy of `uptake_table` replaces the bundled table for every later call, until `agrinutri_tables()` is called without arguments. (b) Balance doses of plot P01, 2019–2026, with the bundled table and with the unit N uptake raised by 10 percent.](figures/fig8_tables.pdf){width=16cm}
 
@@ -192,6 +192,10 @@ The authors declare that they have no known competing financial interests or per
 # Declaration of generative AI and AI-assisted technologies in the writing process
 
 During the preparation of this work the authors used Claude (Anthropic) to assist with code development, figure scripts and language editing of the manuscript. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
+
+# Funding
+
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
 
 # Data availability
 
