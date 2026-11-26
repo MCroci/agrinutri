@@ -25,14 +25,14 @@ Source:
 
 Croci M, Impollonia G, Ferrarini A, Fiorini A, Ragazzi M, Franceschi N,
 Tabaglio V, Amaducci S (2026). agrinutri: Nutrient Balances and
-Variable-Rate Fertilisation Planning. R package version 1.2.0.
+Variable-Rate Fertilisation Planning. R package version 1.2.1.
 https://github.com/mcroci/agrinutri
 
     @Manual{,
       title = {agrinutri: Nutrient Balances and Variable-Rate Fertilisation Planning},
       author = {Michele Croci and Giorgio Impollonia and Andrea Ferrarini and Andrea Fiorini and Manuele Ragazzi and Nicolaj Franceschi and Vincenzo Tabaglio and Stefano Amaducci},
       year = {2026},
-      note = {R package version 1.2.0},
+      note = {R package version 1.2.1},
       url = {https://github.com/mcroci/agrinutri},
       doi = {10.5281/zenodo.24202413},
     }
