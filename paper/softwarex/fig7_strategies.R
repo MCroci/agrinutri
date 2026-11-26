@@ -73,7 +73,7 @@ SHORT <- c("Uniform" = "Uniform rate", "Calibration (inverse)" = "Calibration ra
            "NNI zones" = "NNI management zones", "Holland-Schepers" = "Sufficiency index")
 DRV <- c("Uniform" = "one dose, no sensing", "Calibration (inverse)" = "more N where NDVI is low",
          "Calibration (direct)" = "more N where NDVI is high", "NDVI quantile classes" = "five NDVI classes",
-         "NNI zones" = "deficient / optimal / luxury", "Holland-Schepers" = "Holland-Schepers curve on NDVI")
+         "NNI zones" = "deficient / optimal / luxury", "Holland-Schepers" = "Holland-Schepers curve")
 XV <- c("Uniform" = "NDVI", "Calibration (inverse)" = "NDVI", "Calibration (direct)" = "NDVI",
         "NDVI quantile classes" = "NDVI", "NNI zones" = "NNI", "Holland-Schepers" = "NDVI")
 cellmean <- function(r) terra::extract(r, vect(st_transform(cells, crs(r))), fun = mean, na.rm = TRUE, ID = FALSE)[, 1]
@@ -130,6 +130,7 @@ mapt <- function(k) map_plot(k) + labs(title = sprintf("(%s) %s", letters[match(
   theme(plot.title = element_text(family = FONT, face = "bold", size = BASE, hjust = 0, margin = margin(b = 0.5)),
         plot.subtitle = element_text(family = FONT, size = BASE - 1, colour = "grey30", hjust = 0, margin = margin(b = 1)),
         plot.margin = margin(2, 2, 2, 2))
-grid <- wrap_plots(lapply(names(M), mapt), ncol = 3)
+bb <- st_bbox(st_transform(field, 32632)); asp <- min(max(as.numeric((bb["ymax"] - bb["ymin"]) / (bb["xmax"] - bb["xmin"])), 0.8), 1.6)
+grid <- wrap_plots(lapply(names(M), function(k) wrap_elements(full = mapt(k))), ncol = 3)   # equal cells: titles never overlap
 fig <- wrap_plots(list(grid, plot_spacer() | key | plot_spacer()), ncol = 1, heights = c(2, 0.05))
-save_fig(fig, "fig7_strategies", "double", 140)
+save_fig(fig, "fig7_strategies", "double", 2 * (50 * asp + 12) + 14)

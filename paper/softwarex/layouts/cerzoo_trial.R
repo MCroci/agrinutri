@@ -37,6 +37,7 @@ for (i in seq_len(nrow(FIELDS))) { fi <- FIELDS[i, ]
         start_spring_rain = fi$start_spring_rain, prev_crop = fi$prev_crop, source = "None", forg_quantity = 0,
         location = fi$location, terms = "N_to_apply")[[1]]
   N <- cover(N, d) }
+N <- trim(N)                                             # the soil maps cover more than the farm
 px <- terra::extract(N, vect(AOI), ID = TRUE); rng <- tapply(px[, 2], px$ID, function(v) diff(range(v, na.rm = TRUE)))
 cat("within-field range of the pixel dose (kg N/ha):", round(rng), "\n")
 
@@ -66,7 +67,7 @@ pb <- ggplot(lg, aes(kg, lab, fill = term)) + geom_col(width = 0.7, colour = "gr
 pc <- ggplot() + geom_spatraster(data = N) + geom_sf(data = AOI, fill = NA, colour = "grey20", linewidth = 0.2) +
   fill_N(name = expression("Pixel dose, 10 m (kg N ha"^-1*")"), limits = lim) + cbar() + coord_sf(datum = NA) + theme_map() +
   theme(legend.position = "bottom")
-save_fig(add_tags((pa | pc) / pb + plot_layout(heights = c(1.1, 1))), "T1_farm_pixel", "double", 170, dir = OUT)
+save_fig(add_tags((pa | pc) / pb + plot_layout(heights = c(1, 1))) & theme(plot.tag.location = "margin"), "T1_farm_pixel", "double", 185, dir = OUT)
 
 # ---- data of the focus field for fig6_prescription.R and fig7_strategies.R --------------------
 S2B <- c("B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12")
