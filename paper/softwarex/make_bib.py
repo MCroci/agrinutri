@@ -18,10 +18,10 @@ EU2115 = r"""@misc{eu2021_2115,
 
 NFERT = r"""@misc{agrinutri2026,
   author = {Croci, Michele and Impollonia, Giorgio and Ferrarini, Andrea and Fiorini, Andrea and Ragazzi, Manuele and Franceschi, Nicolaj and Tabaglio, Vincenzo and Amaducci, Stefano},
-  title = {{agrinutri}: Nutrient Balances and Variable-Rate Fertilisation Planning. {R} package version 1.1.0},
+  title = {{agrinutri}: Nutrient Balances and Variable-Rate Fertilisation Planning. {R} package version 1.2.0},
   year = {2026},
   howpublished = {\url{https://github.com/mcroci/agrinutri}},
-  doi = {10.5281/zenodo.24467354}
+  doi = {10.5281/zenodo.24560725}
 }"""
 
 txt = "\n".join(open(f, encoding="utf-8").read()
