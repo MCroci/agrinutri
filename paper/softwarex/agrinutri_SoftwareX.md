@@ -81,7 +81,7 @@ Table: Table 1. Main functionalities of agrinutri 1.1.0.
 
 The P~2~O~5~ and K~2~O balances follow the same structure. Their doses depend on the availability class of Olsen P and exchangeable K for the texture group: enrichment, maintenance or reduction, with a carbonate-dependent P immobilisation factor and a clay-dependent K leaching term.
 
-The remote-sensing module goes from a Sentinel-2 Level-2A scene to a nitrogen diagnosis. `estimate_biophysical()` is an R port of the Sentinel-2 Level-2A Gaussian-process regression models of the pyeogpr library [@estevez2022] [authors: confirm the reference for the L2A and canopy-N models], a retrieval approach reviewed by Verrelst et al. [-@verrelst2015]. It estimates leaf area index, leaf dry matter, chlorophyll and canopy nitrogen content, and processes rasters in blocks so that whole tiles fit in memory. `compute_NNI_from_S2()` combines these traits into the NNI, the ratio of actual to critical N concentration along the critical dilution curve of the species [@lemaire1997; @plenet1999]. The same call classes the map into deficient (< 0.9), optimal and luxury (> 1.1) zones [@houles2007]; `diagnose_N_status()` does the same from measured N content and biomass.
+The remote-sensing module goes from a Sentinel-2 Level-2A scene to a nitrogen diagnosis. `estimate_biophysical()` is an R port of the Sentinel-2 Level-2A Gaussian-process regression models of the pyeogpr library [@kovacs2025; @estevez2022], a retrieval approach reviewed by Verrelst et al. [-@verrelst2015]. It estimates leaf area index, leaf dry matter, chlorophyll and canopy nitrogen content, and processes rasters in blocks so that whole tiles fit in memory. `compute_NNI_from_S2()` combines these traits into the NNI, the ratio of actual to critical N concentration along the critical dilution curve of the species [@lemaire1997; @plenet1999]. The same call classes the map into deficient (< 0.9), optimal and luxury (> 1.1) zones [@houles2007]; `diagnose_N_status()` does the same from measured N content and biomass.
 
 The variable-rate functions turn a vegetation index, such as the normalised difference vegetation index (NDVI), or an NNI map into rates with a calibration ramp, the sufficiency index of Holland and Schepers [-@holland2010], quantile classes or NNI zones. Whatever the method, the rates are rescaled so that their area-weighted mean equals the balance dose N\* within user bounds: the map changes where nitrogen goes, not how much. `build_strip_prescription()` tiles a field along the A–B line of the machine, in the local UTM zone so that working width and cell length are true ground distances.
 
@@ -126,7 +126,6 @@ The balance runs over years as easily as over plots. Plot P01 follows a wheat–
 
 `plan_distribution()` splits a dose between organic and mineral fertilisers. For P01 in 2024 (N\* = 175 kg N ha^−1^), 30 t ha^−1^ of dairy slurry bring 153 kg N ha^−1^, below the organic N limit of 170. The distribution efficiency sets how much of it counts: 26, 41 or 55 percent (40, 62 or 85 kg N ha^−1^), so urea makes up 135, 113 or 90 kg N ha^−1^.
 
-
 ## 3.5. Phosphorus and potassium
 
 The P~2~O~5~ and K~2~O balances run on the same inputs and depend on soil availability (Fig. 5). Around the farm the regional maps classify Olsen P as high or very high on 71 percent of the pixels and exchangeable K as low or very low on 81 percent. Plot P01 follows the same pattern. Its field-mean Olsen P of 17 mg kg^−1^ (as P) is in the high class, for which the strategy is maintenance, a dose equal to crop removal, from 39 to 91 kg P~2~O~5~ ha^−1^ across the rotation. Its 88 mg kg^−1^ of exchangeable K (as K) on a loamy soil is in the low class, for which the strategy is enrichment, from 118 to 164 kg K~2~O ha^−1^ and up to 300 kg ha^−1^ for processing tomato.
@@ -164,7 +163,7 @@ The main ways of distributing a dose inside a field can be compared on the same 
 
 agrinutri turns a nutrient balance into a reusable component.
 
-**New research questions.** Because the balance is a function rather than a set of spreadsheet cells, it can be called more than 100,000 times inside other analyses. One example is how the nitrogen requirement of a whole plain changes from year to year with the rainfall of the leaching terms. With the inputs of Section 3.2 we ran 126,667 field-year balances for the 17,332 fields of the Po plain in the province of Piacenza from 2019 to 2026, in about five minutes on eight cores. The requirement of the mapped fields, before any credit for current-year organic fertilisers, ranged from 8.2 to 11.4 kt N per year over 56,000 to 72,000 ha with a known crop. It followed the October–January rainfall (correlation 0.93 with the mean dose over the eight years), and in the wet winter of 2021 the balance exceeded the crop maximum dose on 44 percent of the area. ERA5 rainfall exceeded a station record of the plain (463 against 301 mm, October 2024 to January 2025), so these totals are likely an upper bound. Other questions are how much of the dose uncertainty comes from the soil maps, and how prescription methods compare when the field total is held constant.
+**New research questions.** Because the balance is a function rather than a set of spreadsheet cells, it can be called more than 100,000 times inside other analyses. One example is how the nitrogen requirement of a whole plain changes from year to year with the rainfall of the leaching terms. With the inputs of Section 3.2 we ran 126,667 field-year balances for the 17,332 fields of the Po plain in the province of Piacenza from 2019 to 2026, in about five minutes on eight cores. The requirement of the mapped fields, before any credit for current-year organic fertilisers, ranged from 8.2 to 11.4 kt N per year over 56,000 to 72,000 ha with a known crop. It followed the October–January rainfall (correlation 0.93 with the mean dose; n = 8 years), and in the wet winter of 2021 the balance exceeded the crop maximum dose on 44 percent of the area. ERA5 rainfall exceeded a station record of the plain (463 against 301 mm, October 2024 to January 2025), so these totals are likely an upper bound. Other questions are how much of the dose uncertainty comes from the soil maps, and how prescription methods compare when the field total is held constant.
 
 **Existing questions, pursued better.** The balance can be computed for every plot of a farm, for several years or per pixel of soil maps, including the open SoilGrids layers [@poggio2021], in one script that can be re-run and shared. A sensor-driven map never changes the nitrogen total that the plan justifies.
 
@@ -172,9 +171,9 @@ agrinutri turns a nutrient balance into a reusable component.
 
 ![Fig. 8. Re-parameterising the balance. (a) An edited copy of `uptake_table` replaces the bundled table for every later call, until `agrinutri_tables()` is called without arguments. (b) Balance doses of plot P01, 2019–2026, with the bundled table and with the unit N uptake raised by 10 percent.](figures/fig8_tables.pdf){width=16cm}
 
-**Daily practice.** For advisors, a plan becomes a script: a file of soil analyses and a field layer give the N, P and K balances, the crop maximum dose checks and the distribution plan for every plot in one run, and the version history records how each recommendation was obtained. For teaching, the package and its Shiny interface support the exercises of a precision-agriculture course [author to confirm course name, year and number of students], which go from the field balance to the export of a prescription map; students can see and change every term.
+**Daily practice.** For advisors, a plan becomes a script: a file of soil analyses and a field layer give the N, P and K balances, the crop maximum dose checks and the distribution plan for every plot in one run, and the version history records how each recommendation was obtained. For teaching, the package and its Shiny interface are designed for exercises that go from the field balance to the export of a prescription map; students can see and change every term.
 
-**Use.** agrinutri is public on GitHub with a documentation website, vignettes on bundled real data and continuous integration on three operating systems, and passes the CRAN checks [author to add download or user figures, other publications or projects that use the package, and any commercial use, if available].
+**Use.** agrinutri is public on GitHub with a documentation website, vignettes on bundled real data and continuous integration on three operating systems; `R CMD check` runs on each of them at every change. The package was first released publicly in October 2026, so no usage figures are available yet.
 
 **Limitations.** agrinutri is an R package rather than a web service, and its default coefficients are those of one region. Adapting other schemes means editing the tables and, where the rules differ, the term functions.
 
@@ -184,19 +183,19 @@ agrinutri is an open-source R package for the predictive nutrient balance of nit
 
 # Declaration of competing interest
 
-[Author to complete.]
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
 
 # CRediT authorship contribution statement
 
-[Author to complete.]
+**Michele Croci:** Conceptualization, Methodology, Software, Validation, Formal analysis, Data curation, Visualization, Writing – original draft, Writing – review & editing. **Giorgio Impollonia:** Methodology, Software, Writing – review & editing. **Andrea Ferrarini:** Conceptualization, Methodology, Writing – review & editing. **Andrea Fiorini:** Validation, Writing – review & editing. **Manuele Ragazzi:** Validation, Resources, Writing – review & editing. **Nicolaj Franceschi:** Data curation, Writing – review & editing. **Vincenzo Tabaglio:** Supervision, Writing – review & editing. **Stefano Amaducci:** Conceptualization, Supervision, Resources, Project administration, Writing – review & editing.
 
 # Declaration of generative AI and AI-assisted technologies in the writing process
 
-[Author to complete, as required by the journal: state whether and how AI-assisted tools were used in preparing the software or the manuscript.]
+During the preparation of this work the authors used Claude (Anthropic) to assist with code development, figure scripts and language editing of the manuscript. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
 
 # Data availability
 
-The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The four field boundaries of Sections 3.2 to 3.6, with their crop classes and balance inputs, the Sentinel-2 scene over plot P01 and a clip of the regional soil maps are bundled with the package (`?piacenza`); the other fields of Section 4 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and provincial yield statistics are public.
+The code, the bundled example data and the scripts that produce the figures of this article (`paper/softwarex/`, including the provincial application of Section 4 in `paper/softwarex/piacenza/`) are available at https://github.com/mcroci/agrinutri under the MIT License [@agrinutri2026]. The four field boundaries of Sections 3.2 to 3.7, with their crop classes and balance inputs, a Sentinel-2 scene over plot P01 (13 August 2024) and a clip of the regional soil maps are bundled with the package (`?piacenza`); the scene of 21 July 2024 used here is downloaded by `fig6_data.R` from the Microsoft Planetary Computer; the other fields of Section 4 are distributed as aggregated results only; the regional soil maps [@rer_soil], Sentinel-2, ERA5 and provincial yield statistics are public.
 
 # Acknowledgements
 
