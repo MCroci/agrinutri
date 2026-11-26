@@ -19,7 +19,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">agrinutri</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,14 +96,15 @@ sufficiency index.</p>
 <div class="section level2">
 <h2 id="a-sentinel-2-scene">1. A Sentinel-2 scene<a class="anchor" aria-label="anchor" href="#a-sentinel-2-scene"></a>
 </h2>
-<p>The package ships the Sentinel-2 Level-2A scene of 13 August 2024
-over plot P01 of the Piacenza example farm (grain maize, 10 bands,
-reflectance scaled by 10000; see <code><a href="../reference/piacenza.html">?piacenza</a></code>):</p>
+<p>The package ships the Sentinel-2 Level-2A scene of 21 July 2024 over
+plot P01 of the Piacenza example farm (grain maize at about the tenth
+leaf, in the top-dressing window; 10 bands, reflectance scaled by 10000;
+see <code><a href="../reference/piacenza.html">?piacenza</a></code>):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mcroci/agrinutri" class="external-link">agrinutri</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">s2f</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240813.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
+<span><span class="va">s2f</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240721.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
 <span><span class="va">field</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/piacenza_farm.geojson"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">field</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">field</span><span class="op">[</span><span class="va">field</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span><span class="op">]</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">s2f</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">s2</span>    <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">s2f</span><span class="op">)</span>, <span class="va">field</span><span class="op">)</span>                       <span class="co"># keep the field only</span></span>
@@ -128,10 +129,10 @@ reflectance.</p>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">ndvi</span>, mat <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs </span></span>
-<span><span class="co">#&gt;  0.3231  0.7523  0.8415  0.7812  0.8540  0.8971     712</span></span>
+<span><span class="co">#&gt;  0.2524  0.7069  0.7721  0.7185  0.7909  0.8337     712</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">ndre</span>, mat <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs </span></span>
-<span><span class="co">#&gt;  0.2372  0.5660  0.6959  0.6340  0.7130  0.7441     712</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.1392  0.4850  0.5897  0.5406  0.6137  0.6616     712</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ndvi</span>,  main <span class="op">=</span> <span class="st">"NDVI"</span>,  col <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">terrain.colors</a></span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -223,29 +224,33 @@ gives the same diagnosis from any pair of W and N% layers.</p>
 <span>     col  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#d73027"</span>, <span class="st">"#fee08b"</span>, <span class="st">"#1a9850"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="remote-sensing-diagnosis_files/figure-html/raster-nni-1.png" class="r-plt" alt="" width="672"></p>
 <p>Most deficient pixels lie on the field edge, where a 10 m pixel mixes
-the crop with the margin.</p>
+the crop with the margin;
+<code>build_strip_prescription(edge_buffer = 10)</code> keeps them out
+of a prescription. The NNI retrieved from one scene is best read as a
+map of relative status within the field: scenes two days apart can
+differ in level.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span><span class="op">$</span><span class="va">summary</span></span>
 <span><span class="co">#&gt; $counts</span></span>
 <span><span class="co">#&gt; $counts$deficient</span></span>
-<span><span class="co">#&gt; [1] 75</span></span>
+<span><span class="co">#&gt; [1] 85</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $counts$optimal</span></span>
-<span><span class="co">#&gt; [1] 546</span></span>
+<span><span class="co">#&gt; [1] 238</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $counts$excessive</span></span>
-<span><span class="co">#&gt; [1] 138</span></span>
+<span><span class="co">#&gt; [1] 408</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fractions</span></span>
 <span><span class="co">#&gt; $fractions$deficient</span></span>
-<span><span class="co">#&gt; [1] 0.09881423</span></span>
+<span><span class="co">#&gt; [1] 0.1162791</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fractions$optimal</span></span>
-<span><span class="co">#&gt; [1] 0.7193676</span></span>
+<span><span class="co">#&gt; [1] 0.3255814</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fractions$excessive</span></span>
-<span><span class="co">#&gt; [1] 0.1818182</span></span>
+<span><span class="co">#&gt; [1] 0.5581395</span></span>
 <span><span class="va">d</span><span class="op">$</span><span class="va">thresholds</span></span>
 <span><span class="co">#&gt; deficient excessive </span></span>
 <span><span class="co">#&gt;       0.9       1.1</span></span>
@@ -295,14 +300,14 @@ already over-supplied.</p>
 <span><span class="co">#&gt; Full prescription  mean : 175 kg/ha</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"NNI-guided        mean  :"</span>,</span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">rate_guided</span>, <span class="st">"mean"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"kg/ha\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; NNI-guided        mean  : 149.7 kg/ha</span></span>
+<span><span class="co">#&gt; NNI-guided        mean  : 99.6 kg/ha</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"N saved by NNI mask     :"</span>,</span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">rate_raster</span> <span class="op">-</span> <span class="va">rate_guided</span>, <span class="st">"mean"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    <span class="st">"kg/ha avg, or"</span>,</span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/global.html" class="external-link">global</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">rate_raster</span> <span class="op">-</span> <span class="va">rate_guided</span>, <span class="st">"sum"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">*</span></span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">res</a></span><span class="op">(</span><span class="va">rate_guided</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">10000</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    <span class="st">"kg total over the field\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; N saved by NNI mask     : 25.3 kg/ha avg, or 234.5 kg total over the field</span></span></code></pre></div>
+<span><span class="co">#&gt; N saved by NNI mask     : 75.4 kg/ha avg, or 698.6 kg total over the field</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="empirical-nni-from-a-single-vi-raster-no-gpr-models">7. Empirical NNI from a single VI raster (no GPR models)<a class="anchor" aria-label="anchor" href="#empirical-nni-from-a-single-vi-raster-no-gpr-models"></a>
@@ -413,7 +418,7 @@ Soil 216.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] terra_1.9-60    agrinutri_1.2.1</span></span>
+<span><span class="co">#&gt; [1] terra_1.9-60    agrinutri_1.2.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] cli_3.6.6         knitr_1.52        rlang_1.3.0       xfun_0.62        </span></span>

@@ -19,7 +19,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">agrinutri</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -189,13 +189,13 @@ the same maps:</p>
 <div class="section level2">
 <h2 id="variable-rate-inside-plot-p01">4. Variable rate inside plot P01<a class="anchor" aria-label="anchor" href="#variable-rate-inside-plot-p01"></a>
 </h2>
-<p><code>S2_piacenza_P01_20240813.tif</code> is the Sentinel-2 Level-2A
-scene of 13 August 2024 over P01 (reflectance scaled by 10000). The NDVI
+<p><code>S2_piacenza_P01_20240721.tif</code> is the Sentinel-2 Level-2A
+scene of 21 July 2024 over P01 (reflectance scaled by 10000). The NDVI
 drives the Holland-Schepers sufficiency index; the doses may range
 between 80 and 120 percent of the field balance and their mean is
 rescaled to it.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s2</span>   <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240813.tif"</span>,</span>
+<code class="sourceCode R"><span><span class="va">s2</span>   <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240721.tif"</span>,</span>
 <span>                                package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1_v</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">farm_v</span><span class="op">[</span><span class="va">farm</span><span class="op">$</span><span class="va">plot</span> <span class="op">==</span> <span class="st">"P01"</span><span class="op">]</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ndvi</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_vi.html">compute_vi</a></span><span class="op">(</span><span class="va">s2</span>, <span class="st">"NDVI"</span>, scale_factor <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span>, <span class="va">p1_v</span><span class="op">)</span></span>
@@ -204,7 +204,7 @@ rescaled to it.</p>
 <span>                      minN <span class="op">=</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">fld</span>, maxN <span class="op">=</span> <span class="fl">1.2</span> <span class="op">*</span> <span class="va">fld</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ndvi</span>, main <span class="op">=</span> <span class="st">"NDVI, 13 August 2024"</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"YlGn"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ndvi</span>, main <span class="op">=</span> <span class="st">"NDVI, 21 July 2024"</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">30</span>, <span class="st">"YlGn"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>            axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">p1_v</span><span class="op">)</span></span>
 <span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">rate_raster</span>, main <span class="op">=</span> <span class="st">"Prescription (kg N/ha)"</span>,</span>
@@ -217,7 +217,7 @@ rescaled to it.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Prescription mean:"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">mean_kg_ha</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"kg N/ha\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Prescription mean: 175 kg N/ha</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Range:           "</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">min_kg_ha</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"-"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">vr</span><span class="op">$</span><span class="va">max_kg_ha</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"kg N/ha\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Range:            171.7 - 210 kg N/ha</span></span></code></pre></div>
+<span><span class="co">#&gt; Range:            171.5 - 210 kg N/ha</span></span></code></pre></div>
 <p>Where the bounds clip many pixels, the mean can stay below the
 target: the bounds take precedence over the mass balance.</p>
 </div>

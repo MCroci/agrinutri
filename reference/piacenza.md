@@ -25,10 +25,11 @@ files are stored under `inst/extdata` and accessed with
   yield, October-January and February rainfall), to run the balance year
   by year.
 
-- `extdata/sentinel-2/S2_piacenza_P01_20240813.tif`: Sentinel-2 Level-2A
-  surface reflectance over plot `P01` on 13 August 2024 (10 bands, B02,
-  B03, B04, B05, B06, B07, B08, B8A, B11, B12, 10 m; reflectance scaled
-  by 10000, harmonised for processing baseline 04.00; pixels outside SCL
+- `extdata/sentinel-2/S2_piacenza_P01_20240721.tif`: Sentinel-2 Level-2A
+  surface reflectance over plot `P01` on 21 July 2024, with the maize at
+  about the tenth leaf, in the top-dressing window (10 bands, B02, B03,
+  B04, B05, B06, B07, B08, B8A, B11, B12, 10 m; reflectance scaled by
+  10000, harmonised for processing baseline 04.00; pixels outside SCL
   classes 4-5 set to 0).
 
 - `extdata/rer_soil_piacenza.tif`: the regional soil maps 0-30 cm on

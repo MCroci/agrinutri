@@ -144,13 +144,14 @@ balance follows the enrichment strategy every year.
 
 [`estimate_biophysical()`](https://mcroci.github.io/agrinutri/reference/estimate_biophysical.md)
 retrieves leaf area index, leaf dry matter and canopy N content from the
-Level-2A scene of 13 August 2024 with Gaussian-process regression;
+Level-2A scene of 21 July 2024 (maize at about the tenth leaf, in the
+top-dressing window) with Gaussian-process regression;
 [`compute_NNI_from_S2()`](https://mcroci.github.io/agrinutri/reference/compute_NNI_from_S2.md)
 turns them into the Nitrogen Nutrition Index.
 
 ``` r
 
-s2f <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif", package = "agrinutri")
+s2f <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240721.tif", package = "agrinutri")
 bio <- estimate_biophysical(s2f, output_dir = tempdir(),
                             variables = c("LAI", "Cm", "CNC_Cprot", "FVC"))
 nni <- compute_NNI_from_S2(bio$LAI, bio$Cm, bio$CNC_Cprot, cnc_layer = "CNC_Cprot",
@@ -163,17 +164,20 @@ tiles the plot along the A-B line of a 24 m spreader, with 30 m cells.
 NNI zones set the cells to the upper bound (deficient), the target
 (optimal) or the lower bound (excessive); the free cells are then
 shifted so that the area-weighted mean equals the field balance.
+`edge_buffer = 10` samples the NNI only inside the field shrunk by one
+Sentinel-2 pixel, so that boundary pixels, which mix crop and margin, do
+not drive the doses of the edge cells.
 
 ``` r
 
 rx <- build_strip_prescription(p1, machine_width = 24, cell_length = 30,
                                variability = "nni", nni_raster = nni$NNI,
                                n_target = N_star, min_dose = 0.8 * N_star,
-                               max_dose = 1.2 * N_star)
+                               max_dose = 1.2 * N_star, edge_buffer = 10)
 table(rx$dose)
 #> 
-#> 141.1 176.4   210 
-#>    16   118    18
+#> 152.1 190.2   210 
+#>    53    86    13
 c(target = N_star, mean = round(weighted.mean(rx$dose, rx$area_ha), 1))
 #> target   mean 
 #>    175    175

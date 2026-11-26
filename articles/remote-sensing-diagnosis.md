@@ -29,9 +29,10 @@ index.
 
 ## 1. A Sentinel-2 scene
 
-The package ships the Sentinel-2 Level-2A scene of 13 August 2024 over
-plot P01 of the Piacenza example farm (grain maize, 10 bands,
-reflectance scaled by 10000; see
+The package ships the Sentinel-2 Level-2A scene of 21 July 2024 over
+plot P01 of the Piacenza example farm (grain maize at about the tenth
+leaf, in the top-dressing window; 10 bands, reflectance scaled by 10000;
+see
 [`?piacenza`](https://mcroci.github.io/agrinutri/reference/piacenza.md)):
 
 ``` r
@@ -39,7 +40,7 @@ reflectance scaled by 10000; see
 library(agrinutri)
 library(terra)
 
-s2f   <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif", package = "agrinutri")
+s2f   <- system.file("extdata/sentinel-2/S2_piacenza_P01_20240721.tif", package = "agrinutri")
 field <- terra::vect(system.file("extdata/piacenza_farm.geojson", package = "agrinutri"))
 field <- terra::project(field[field$plot == "P01"], terra::crs(terra::rast(s2f)))
 s2    <- terra::mask(terra::rast(s2f), field)                       # keep the field only
@@ -66,10 +67,10 @@ cire  <- compute_vi(s2, "CIred", scale_factor = 10000)
 
 summary(terra::values(ndvi, mat = FALSE))
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
-#>  0.3231  0.7523  0.8415  0.7812  0.8540  0.8971     712
+#>  0.2524  0.7069  0.7721  0.7185  0.7909  0.8337     712
 summary(terra::values(ndre, mat = FALSE))
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
-#>  0.2372  0.5660  0.6959  0.6340  0.7130  0.7441     712
+#>  0.1392  0.4850  0.5897  0.5406  0.6137  0.6616     712
 ```
 
 ``` r
@@ -178,31 +179,34 @@ terra::plot(d$class,
 ![](remote-sensing-diagnosis_files/figure-html/raster-nni-1.png)
 
 Most deficient pixels lie on the field edge, where a 10 m pixel mixes
-the crop with the margin.
+the crop with the margin; `build_strip_prescription(edge_buffer = 10)`
+keeps them out of a prescription. The NNI retrieved from one scene is
+best read as a map of relative status within the field: scenes two days
+apart can differ in level.
 
 ``` r
 
 d$summary
 #> $counts
 #> $counts$deficient
-#> [1] 75
+#> [1] 85
 #> 
 #> $counts$optimal
-#> [1] 546
+#> [1] 238
 #> 
 #> $counts$excessive
-#> [1] 138
+#> [1] 408
 #> 
 #> 
 #> $fractions
 #> $fractions$deficient
-#> [1] 0.09881423
+#> [1] 0.1162791
 #> 
 #> $fractions$optimal
-#> [1] 0.7193676
+#> [1] 0.3255814
 #> 
 #> $fractions$excessive
-#> [1] 0.1818182
+#> [1] 0.5581395
 d$thresholds
 #> deficient excessive 
 #>       0.9       1.1
@@ -259,14 +263,14 @@ cat("Full prescription  mean :",
 #> Full prescription  mean : 175 kg/ha
 cat("NNI-guided        mean  :",
     round(terra::global(rate_guided, "mean", na.rm = TRUE)[1, 1], 1), "kg/ha\n")
-#> NNI-guided        mean  : 149.7 kg/ha
+#> NNI-guided        mean  : 99.6 kg/ha
 cat("N saved by NNI mask     :",
     round(terra::global(vr$rate_raster - rate_guided, "mean", na.rm = TRUE)[1, 1], 1),
     "kg/ha avg, or",
     round(terra::global(vr$rate_raster - rate_guided, "sum", na.rm = TRUE)[1, 1] *
           prod(terra::res(rate_guided)) / 10000, 1),
     "kg total over the field\n")
-#> N saved by NNI mask     : 25.3 kg/ha avg, or 234.5 kg total over the field
+#> N saved by NNI mask     : 75.4 kg/ha avg, or 698.6 kg total over the field
 ```
 
 ## 7. Empirical NNI from a single VI raster (no GPR models)
@@ -384,7 +388,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] terra_1.9-60    agrinutri_1.2.1
+#> [1] terra_1.9-60    agrinutri_1.2.2
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] cli_3.6.6         knitr_1.52        rlang_1.3.0       xfun_0.62        

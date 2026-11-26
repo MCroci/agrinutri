@@ -40,14 +40,15 @@ plot(sf::st_geometry(field), col = "#D5E4F0", border = "#1F4E79",
 
 ## 2. NDVI from Sentinel-2
 
-The bundled scene is the Sentinel-2 Level-2A acquisition of 13 August
-2024 over P01, with reflectance scaled by 10000:
+The bundled scene is the Sentinel-2 Level-2A acquisition of 21 July 2024
+over P01, with the maize at about the tenth leaf and reflectance scaled
+by 10000:
 
 ``` r
 
 library(terra)
 
-s2 <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif",
+s2 <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240721.tif",
                               package = "agrinutri"))
 fv <- terra::project(terra::vect(field), terra::crs(s2))
 r  <- terra::mask(compute_vi(s2, "NDVI", scale_factor = 10000), fv)
@@ -59,12 +60,12 @@ r
 #> extent      : 552350, 552740, 4977010, 4977430  (xmin, xmax, ymin, ymax)
 #> coord. ref. : WGS 84 / UTM zone 32N (EPSG:32632)
 #> source(s)   : memory
-#> varname     : S2_piacenza_P01_20240813
+#> varname     : S2_piacenza_P01_20240721
 #> name        :     NDVI
-#> min value   :  0.32309
-#> max value   : 0.897106
+#> min value   : 0.252434
+#> max value   : 0.833684
 
-terra::plot(r, main = "Input NDVI (Sentinel-2, 13 August 2024)",
+terra::plot(r, main = "Input NDVI (Sentinel-2, 21 July 2024)",
             col = hcl.colors(30, "YlGn", rev = TRUE))
 terra::lines(fv)
 ```
@@ -149,7 +150,7 @@ cat("Mean applied N:  ", round(terra::global(rx_raster, "mean", na.rm = TRUE)[1,
 #> Mean applied N:   175 kg N/ha
 cat("Range:           ", round(terra::global(rx_raster, "min", na.rm = TRUE)[1, 1], 1),
     "-", round(terra::global(rx_raster, "max", na.rm = TRUE)[1, 1], 1), "kg N/ha\n")
-#> Range:            159.9 - 210 kg N/ha
+#> Range:            160 - 210 kg N/ha
 ```
 
 `%||%` is just defensive code (some versions of

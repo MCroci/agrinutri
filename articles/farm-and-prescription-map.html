@@ -19,7 +19,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">agrinutri</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -196,12 +196,12 @@ K<sub>2</sub>O balance follows the enrichment strategy every year.</p>
 <h2 id="from-sentinel-2-to-a-strip-prescription">4. From Sentinel-2 to a strip prescription<a class="anchor" aria-label="anchor" href="#from-sentinel-2-to-a-strip-prescription"></a>
 </h2>
 <p><code><a href="../reference/estimate_biophysical.html">estimate_biophysical()</a></code> retrieves leaf area index, leaf
-dry matter and canopy N content from the Level-2A scene of 13 August
-2024 with Gaussian-process regression;
-<code><a href="../reference/compute_NNI_from_S2.html">compute_NNI_from_S2()</a></code> turns them into the Nitrogen
-Nutrition Index.</p>
+dry matter and canopy N content from the Level-2A scene of 21 July 2024
+(maize at about the tenth leaf, in the top-dressing window) with
+Gaussian-process regression; <code><a href="../reference/compute_NNI_from_S2.html">compute_NNI_from_S2()</a></code> turns
+them into the Nitrogen Nutrition Index.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s2f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240813.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">s2f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/sentinel-2/S2_piacenza_P01_20240721.tif"</span>, package <span class="op">=</span> <span class="st">"agrinutri"</span><span class="op">)</span></span>
 <span><span class="va">bio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_biophysical.html">estimate_biophysical</a></span><span class="op">(</span><span class="va">s2f</span>, output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>                            variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LAI"</span>, <span class="st">"Cm"</span>, <span class="st">"CNC_Cprot"</span>, <span class="st">"FVC"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">nni</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compute_NNI_from_S2.html">compute_NNI_from_S2</a></span><span class="op">(</span><span class="va">bio</span><span class="op">$</span><span class="va">LAI</span>, <span class="va">bio</span><span class="op">$</span><span class="va">Cm</span>, <span class="va">bio</span><span class="op">$</span><span class="va">CNC_Cprot</span>, cnc_layer <span class="op">=</span> <span class="st">"CNC_Cprot"</span>,</span>
@@ -211,16 +211,19 @@ Nutrition Index.</p>
 line of a 24 m spreader, with 30 m cells. NNI zones set the cells to the
 upper bound (deficient), the target (optimal) or the lower bound
 (excessive); the free cells are then shifted so that the area-weighted
-mean equals the field balance.</p>
+mean equals the field balance. <code>edge_buffer = 10</code> samples the
+NNI only inside the field shrunk by one Sentinel-2 pixel, so that
+boundary pixels, which mix crop and margin, do not drive the doses of
+the edge cells.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_strip_prescription.html">build_strip_prescription</a></span><span class="op">(</span><span class="va">p1</span>, machine_width <span class="op">=</span> <span class="fl">24</span>, cell_length <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>                               variability <span class="op">=</span> <span class="st">"nni"</span>, nni_raster <span class="op">=</span> <span class="va">nni</span><span class="op">$</span><span class="va">NNI</span>,</span>
 <span>                               n_target <span class="op">=</span> <span class="va">N_star</span>, min_dose <span class="op">=</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">N_star</span>,</span>
-<span>                               max_dose <span class="op">=</span> <span class="fl">1.2</span> <span class="op">*</span> <span class="va">N_star</span><span class="op">)</span></span>
+<span>                               max_dose <span class="op">=</span> <span class="fl">1.2</span> <span class="op">*</span> <span class="va">N_star</span>, edge_buffer <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">rx</span><span class="op">$</span><span class="va">dose</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 141.1 176.4   210 </span></span>
-<span><span class="co">#&gt;    16   118    18</span></span>
+<span><span class="co">#&gt; 152.1 190.2   210 </span></span>
+<span><span class="co">#&gt;    53    86    13</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">N_star</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/weighted.mean.html" class="external-link">weighted.mean</a></span><span class="op">(</span><span class="va">rx</span><span class="op">$</span><span class="va">dose</span>, <span class="va">rx</span><span class="op">$</span><span class="va">area_ha</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; target   mean </span></span>
 <span><span class="co">#&gt;    175    175</span></span></code></pre></div>

@@ -133,14 +133,14 @@ c(pixels = round(pix, 1), field = fld)
 
 ## 4. Variable rate inside plot P01
 
-`S2_piacenza_P01_20240813.tif` is the Sentinel-2 Level-2A scene of 13
-August 2024 over P01 (reflectance scaled by 10000). The NDVI drives the
+`S2_piacenza_P01_20240721.tif` is the Sentinel-2 Level-2A scene of 21
+July 2024 over P01 (reflectance scaled by 10000). The NDVI drives the
 Holland-Schepers sufficiency index; the doses may range between 80 and
 120 percent of the field balance and their mean is rescaled to it.
 
 ``` r
 
-s2   <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240813.tif",
+s2   <- terra::rast(system.file("extdata/sentinel-2/S2_piacenza_P01_20240721.tif",
                                 package = "agrinutri"))
 p1_v <- terra::project(farm_v[farm$plot == "P01"], terra::crs(s2))
 ndvi <- terra::mask(compute_vi(s2, "NDVI", scale_factor = 10000), p1_v)
@@ -152,7 +152,7 @@ vr <- variable_rate_N(ndvi_raster = ndvi, n_dose = fld, method = "holland",
 ``` r
 
 par(mfrow = c(1, 2), mar = c(1, 1, 2, 4))
-terra::plot(ndvi, main = "NDVI, 13 August 2024", col = hcl.colors(30, "YlGn", rev = TRUE),
+terra::plot(ndvi, main = "NDVI, 21 July 2024", col = hcl.colors(30, "YlGn", rev = TRUE),
             axes = FALSE)
 terra::lines(p1_v)
 terra::plot(vr$rate_raster, main = "Prescription (kg N/ha)",
@@ -169,7 +169,7 @@ cat("Field balance:   ", fld, "kg N/ha\n")
 cat("Prescription mean:", round(vr$mean_kg_ha, 1), "kg N/ha\n")
 #> Prescription mean: 175 kg N/ha
 cat("Range:           ", round(vr$min_kg_ha, 1), "-", round(vr$max_kg_ha, 1), "kg N/ha\n")
-#> Range:            171.7 - 210 kg N/ha
+#> Range:            171.5 - 210 kg N/ha
 ```
 
 Where the bounds clip many pixels, the mean can stay below the target:
