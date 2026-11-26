@@ -1,9 +1,9 @@
 cff-version: 1.2.0
 message: "If you use agrinutri, please cite it as below."
 title: "agrinutri: Nutrient Balances and Variable-Rate Fertilisation Planning"
-version: 1.1.0
+version: 1.2.0
 doi: 10.5281/zenodo.24202413
-date-released: 2026-11-23
+date-released: 2026-11-26
 license: MIT
 repository-code: "https://github.com/mcroci/agrinutri"
 url: "https://mcroci.github.io/agrinutri/"

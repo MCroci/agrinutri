@@ -31,3 +31,5 @@
 ^\.zenodo\.json$
 ^TODO\.md$
 ^assets$
+^\.claude$
+^\.playwright-mcp$

@@ -1,6 +1,6 @@
 # agrinutri News
 
-## Development version
+## Version 1.2.0 (2026-11-26)
 
 * New `agrinutri_tables()`: replaces any bundled coefficient table (e.g.
   `uptake_table`) for the session, so the balance can be re-parameterised for
