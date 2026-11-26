@@ -615,7 +615,6 @@ scheda_N(
   crop = crop,
   increments = c(straw_burial = 30, compacted_no_till = 10)
 )
-#> Crop 'Durum wheat (whole plant)' has 2 matching rows; using the first.
 #> $crop
 #> [1] "Durum wheat (whole plant)"
 #> 
@@ -655,7 +654,6 @@ scheda_N(
   decrements = c(after_alfalfa_meadow = 60, yield_low = 20),
   increments = c(low_SOM = 20)
 )
-#> Crop 'Durum wheat (whole plant)' has 2 matching rows; using the first.
 #> $crop
 #> [1] "Durum wheat (whole plant)"
 #> 
@@ -699,7 +697,6 @@ scheda_N(
   crop = crop,
   increments = c(straw_burial = 100, compacted_no_till = 100, low_SOM = 50)
 )
-#> Crop 'Durum wheat (whole plant)' has 2 matching rows; using the first.
 #> $crop
 #> [1] "Durum wheat (whole plant)"
 #> 
@@ -1460,7 +1457,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] terra_1.9-60    agrinutri_1.2.2
+#> [1] terra_1.9-60    agrinutri_1.2.3
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] cli_3.6.6          knitr_1.52         rlang_1.3.0        xfun_0.62         

@@ -44,7 +44,7 @@ For `check_MAS`: a list with `ok` (logical), `mas_N`, `N_planned`,
 
 The DPI 2026 values (default) are read from the bundled
 [mas.table](https://mcroci.github.io/agrinutri/reference/agrinutri-data.md)
-dataset, which mirrors the MAS sheet of Fert_Office v1.26 (239 crops).
+dataset, which mirrors the MAS sheet of Fert_Office v1.26 (234 crops).
 
 ## References
 

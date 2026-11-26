@@ -104,7 +104,6 @@ scheda_N(crop = "Durum wheat (whole plant)",
          decrements = c(after_alfalfa_meadow = 60),
          increments = c(straw_burial = 30,
                         compacted_no_till = 10))
-#> Crop 'Durum wheat (whole plant)' has 2 matching rows; using the first.
 #> $crop
 #> [1] "Durum wheat (whole plant)"
 #> 

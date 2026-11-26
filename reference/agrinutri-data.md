@@ -22,7 +22,7 @@ lists commercial product names.
 - uptake_table:
 
   Crop unit absorption/asportation coefficients for N, P2O5 and K2O
-  (from Fert_Office sheet A). 247 crops in v0.2.0.
+  (from Fert_Office sheet A). 234 crops.
 
 - e.table:
 
@@ -159,7 +159,7 @@ lists commercial product names.
 - standard_pk_doses.table:
 
   Base N, P2O5 and K2O standard doses per crop, with 4 soil availability
-  classes (very low, low, normal, high) for P and K (239 rows, 14 cols).
+  classes (very low, low, normal, high) for P and K (234 rows, 14 cols).
 
 - standard_decrements.table:
 
